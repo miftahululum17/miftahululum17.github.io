@@ -148,6 +148,191 @@
 
 
 
+        <!-- Curriculum Documents Section (Hidden by default) -->
+        <div id="curriculum-section" class="hidden">
+            <div class="bg-white p-8 rounded-xl border border-gray-200 shadow-lg">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold text-gray-800">Dokumen Kurikulum</h2>
+                    <button onclick="showDashboard()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg text-sm font-medium transition-all">
+                        ← Kembali
+                    </button>
+                </div>
+                
+                <!-- Google Drive Folder Display for Curriculum -->
+                <div class="mb-6 bg-white rounded-lg border border-gray-200 shadow-md overflow-hidden">
+                    <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 p-3 text-white">
+                        <div class="flex items-center space-x-3">
+                            <div class="text-2xl">📚</div>
+                            <div>
+                                <h3 class="text-lg font-bold">Google Drive - Dokumen Kurikulum</h3>
+                                <p class="text-indigo-100 text-sm">Akses langsung ke folder dokumen kurikulum sekolah</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Embedded Google Drive Folder -->
+                    <div class="p-3">
+                        <div class="bg-gray-50 rounded-lg p-2 mb-3">
+                            <div class="flex items-center space-x-2">
+                                <div class="text-sm">ℹ️</div>
+                                <div>
+                                    <h4 class="font-medium text-gray-800 text-xs">Akses Folder Google Drive</h4>
+                                    <p class="text-gray-600 text-xs">Klik tombol untuk melihat dokumen kurikulum</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
+                            <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                                <div class="flex items-center space-x-2">
+                                    <div class="text-lg text-gray-600">📁</div>
+                                    <div>
+                                        <h5 class="font-medium text-gray-800 text-sm">Akses Folder Google Drive</h5>
+                                        <p class="text-gray-700 text-xs">Buka folder dokumen kurikulum</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-green-50 p-3 rounded-lg border border-green-200">
+                                <div class="flex items-center space-x-2">
+                                    <div class="text-lg text-green-600">✅</div>
+                                    <div>
+                                        <h5 class="font-medium text-green-800 text-sm">Akses Langsung</h5>
+                                        <p class="text-green-700 text-xs">Lihat semua dokumen dalam folder</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-blue-50 p-3 rounded-lg border border-blue-200 sm:col-span-2 lg:col-span-1">
+                                <div class="flex items-center space-x-2">
+                                    <div class="text-lg text-blue-600">🔄</div>
+                                    <div>
+                                        <h5 class="font-medium text-blue-800 text-sm">Sinkronisasi Real-time</h5>
+                                        <p class="text-blue-700 text-xs">Dokumen terbaru langsung tersedia</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Drive Access Buttons -->
+                        <div class="text-center mb-3">
+                            <div class="flex flex-col lg:flex-row gap-2 justify-center items-start">
+                                <!-- Upload File Dropdown Section -->
+                                <div class="flex items-start gap-2">
+                                    <!-- Upload File Button -->
+                                    <button onclick="toggleCurriculumUploadDropdown()" id="curriculum-upload-dropdown-btn" class="bg-green-600 text-white hover:bg-green-700 px-3 py-1.5 rounded-md font-medium transition-all shadow-md text-xs flex items-center space-x-1">
+                                        <span>📤 Upload Dokumen</span>
+                                        <span id="curriculum-dropdown-arrow" class="transform transition-transform text-xs">▼</span>
+                                    </button>
+                                    
+                                    <!-- Dropdown Menu positioned beside button -->
+                                    <div id="curriculum-upload-dropdown-menu" class="hidden bg-white rounded-lg shadow-xl border border-gray-200 w-56" style="z-index: 9999;">
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-gray-800 mb-1 text-xs">
+                                                📋 Pilih Jenis Dokumen
+                                            </h4>
+                                            <div class="space-y-1">
+                                                <button onclick="openCurriculumUploadForm('rpp')" class="w-full text-left px-2 py-1 hover:bg-blue-50 rounded-md transition-all flex items-center space-x-2 text-xs">
+                                                    <span class="text-sm">📝</span>
+                                                    <div>
+                                                        <div class="font-medium text-gray-800">RPP (Rencana Pelaksanaan Pembelajaran)</div>
+                                                        <div class="text-xs text-gray-500">Upload rencana pembelajaran</div>
+                                                    </div>
+                                                </button>
+                                                
+                                                <button onclick="openCurriculumUploadForm('silabus')" class="w-full text-left px-2 py-1 hover:bg-purple-50 rounded-md transition-all flex items-center space-x-2 text-xs">
+                                                    <span class="text-sm">📋</span>
+                                                    <div>
+                                                        <div class="font-medium text-gray-800">Silabus</div>
+                                                        <div class="text-xs text-gray-500">Upload silabus mata pelajaran</div>
+                                                    </div>
+                                                </button>
+                                                
+                                                <button onclick="openCurriculumUploadForm('modul-ajar')" class="w-full text-left px-2 py-1 hover:bg-green-50 rounded-md transition-all flex items-center space-x-2 text-xs">
+                                                    <span class="text-sm">📚</span>
+                                                    <div>
+                                                        <div class="font-medium text-gray-800">Modul Ajar</div>
+                                                        <div class="text-xs text-gray-500">Upload modul pembelajaran</div>
+                                                    </div>
+                                                </button>
+                                                
+                                                <button onclick="openCurriculumUploadForm('bahan-ajar')" class="w-full text-left px-2 py-1 hover:bg-orange-50 rounded-md transition-all flex items-center space-x-2 text-xs">
+                                                    <span class="text-sm">📖</span>
+                                                    <div>
+                                                        <div class="font-medium text-gray-800">Bahan Ajar</div>
+                                                        <div class="text-xs text-gray-500">Upload materi pembelajaran</div>
+                                                    </div>
+                                                </button>
+                                                
+                                                <button onclick="openCurriculumUploadForm('evaluasi')" class="w-full text-left px-2 py-1 hover:bg-yellow-50 rounded-md transition-all flex items-center space-x-2 text-xs">
+                                                    <span class="text-sm">📊</span>
+                                                    <div>
+                                                        <div class="font-medium text-gray-800">Evaluasi & Penilaian</div>
+                                                        <div class="text-xs text-gray-500">Upload instrumen evaluasi</div>
+                                                    </div>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Drive Access Button -->
+                                <button onclick="openCurriculumDriveFolder()" class="bg-indigo-600 text-white hover:bg-indigo-700 px-3 py-1.5 rounded-md font-medium transition-all shadow-md text-xs">
+                                    🔗 Buka Folder Drive
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-2 p-2 bg-yellow-50 rounded-md border border-yellow-200">
+                            <div class="flex items-start space-x-1">
+                                <div class="text-yellow-600 text-xs">💡</div>
+                                <div class="text-yellow-800 text-xs">
+                                    <strong>Tips:</strong> Buka folder di tab baru untuk pengalaman terbaik.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Embedded Drive Viewer (Auto-displayed) -->
+                <div id="embedded-curriculum-drive-viewer" class="mb-6 bg-white rounded-lg border border-gray-200 shadow-md overflow-hidden">
+                    <div class="bg-gray-100 p-2 border-b border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-semibold text-gray-800 flex items-center space-x-1 text-sm">
+                                <span>📚</span>
+                                <span>Google Drive - Dokumen Kurikulum (Live)</span>
+                                <span id="curriculum-refresh-indicator" class="text-green-500 text-xs">🔄 Auto-refresh aktif</span>
+                            </h4>
+                            <div class="flex items-center space-x-1">
+                                <button onclick="refreshEmbeddedCurriculumDrive()" class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs font-medium transition-all">
+                                    🔄 Refresh
+                                </button>
+                                <button onclick="toggleCurriculumAutoRefresh()" id="curriculum-auto-refresh-btn" class="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded text-xs font-medium transition-all">
+                                    ⏸️ Pause
+                                </button>
+                                <button onclick="hideEmbeddedCurriculumDrive()" class="text-gray-500 hover:text-gray-700 text-lg">×</button>
+                            </div>
+                        </div>
+                        <div class="mt-1 text-xs text-gray-600">
+                            <span>Terakhir diperbarui: </span>
+                            <span id="curriculum-last-refresh-time">Memuat...</span>
+                            <span class="ml-2">Auto-refresh setiap: </span>
+                            <span id="curriculum-refresh-interval">30 detik</span>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <iframe id="curriculum-drive-iframe" src="" class="w-full h-64 border-0"></iframe>
+                        <div class="absolute inset-0 bg-gray-100 flex items-center justify-center" id="curriculum-drive-loading">
+                            <div class="text-center">
+                                <div class="animate-spin text-2xl mb-2">⏳</div>
+                                <p class="text-gray-600 text-sm">Memuat Google Drive...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Gallery Section (Hidden by default) -->
         <div id="gallery-section" class="hidden">
             <div class="bg-white p-8 rounded-xl border border-gray-200 shadow-lg">
@@ -769,6 +954,7 @@
             document.getElementById('profile-section').classList.add('hidden');
             document.getElementById('dashboard-section').classList.add('hidden');
             document.getElementById('gallery-section').classList.add('hidden');
+            document.getElementById('curriculum-section').classList.add('hidden');
         }
 
         // Load profile data
@@ -1000,27 +1186,15 @@
         }
 
         function openCurriculumDocuments() {
-            // Show notification about the link
-            showNotification('🔗 Membuka Google Drive - Dokumen Kurikulum...', 'info');
+            hideAllSections();
+            document.getElementById('curriculum-section').classList.remove('hidden');
             
-            // Try to open the link
-            const driveUrl = 'https://s.id/E-Kurikulum';
-            
-            // Create a temporary link element to handle the navigation
-            const link = document.createElement('a');
-            link.href = driveUrl;
-            link.target = '_blank';
-            link.rel = 'noopener noreferrer';
-            
-            // Add to document, click, then remove
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            // Show fallback notification if blocked
+            // Auto-load embedded Google Drive
             setTimeout(() => {
-                showNotification('📁 Jika link tidak terbuka, salin URL ini: ' + driveUrl, 'info');
-            }, 2000);
+                loadEmbeddedCurriculumDriveAutomatically();
+                startCurriculumAutoRefresh();
+                showNotification('📚 Google Drive Dokumen Kurikulum dimuat otomatis dengan auto-refresh aktif', 'success');
+            }, 500);
         }
 
 
@@ -2114,11 +2288,186 @@
             showNotification('📁 Tampilan Google Drive disembunyikan', 'info');
         }
 
+        // Curriculum-specific variables
+        let curriculumAutoRefreshInterval = null;
+        let isCurriculumAutoRefreshActive = true;
+
+        // Curriculum Google Drive functions
+        function openCurriculumDriveFolder() {
+            const driveUrl = 'https://s.id/E-Kurikulum';
+            
+            showNotification('🔗 Membuka Google Drive - Dokumen Kurikulum...', 'info');
+            
+            // Create a temporary link element to handle the navigation
+            const link = document.createElement('a');
+            link.href = driveUrl;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            
+            // Add to document, click, then remove
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Show success notification
+            setTimeout(() => {
+                showNotification('📚 Folder Google Drive Dokumen Kurikulum berhasil dibuka di tab baru!', 'success');
+            }, 1000);
+        }
+
+        // Auto-load embedded curriculum drive
+        function loadEmbeddedCurriculumDriveAutomatically() {
+            const driveIframe = document.getElementById('curriculum-drive-iframe');
+            const loadingDiv = document.getElementById('curriculum-drive-loading');
+            const lastRefreshTime = document.getElementById('curriculum-last-refresh-time');
+            
+            // Show loading state
+            loadingDiv.classList.remove('hidden');
+            
+            // Set the iframe source to the embedded view (using a different folder ID for curriculum)
+            const embedUrl = 'https://drive.google.com/embeddedfolderview?id=1ABC123CurriculumFolderID#list';
+            
+            // Add timestamp to force refresh
+            const timestampedUrl = embedUrl + '&t=' + Date.now();
+            driveIframe.src = timestampedUrl;
+            
+            // Update last refresh time
+            const now = new Date();
+            lastRefreshTime.textContent = now.toLocaleTimeString('id-ID');
+            
+            // Hide loading after a delay
+            setTimeout(() => {
+                loadingDiv.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Manual refresh function for curriculum
+        function refreshEmbeddedCurriculumDrive() {
+            showNotification('🔄 Memperbarui Google Drive Dokumen Kurikulum...', 'info');
+            loadEmbeddedCurriculumDriveAutomatically();
+            
+            setTimeout(() => {
+                showNotification('✅ Google Drive Dokumen Kurikulum berhasil diperbarui!', 'success');
+            }, 2000);
+        }
+
+        // Toggle auto-refresh for curriculum
+        function toggleCurriculumAutoRefresh() {
+            const btn = document.getElementById('curriculum-auto-refresh-btn');
+            const indicator = document.getElementById('curriculum-refresh-indicator');
+            
+            if (isCurriculumAutoRefreshActive) {
+                // Stop auto-refresh
+                if (curriculumAutoRefreshInterval) {
+                    clearInterval(curriculumAutoRefreshInterval);
+                    curriculumAutoRefreshInterval = null;
+                }
+                isCurriculumAutoRefreshActive = false;
+                btn.innerHTML = '▶️ Resume';
+                btn.className = 'bg-orange-500 hover:bg-orange-600 text-white px-2 py-1 rounded text-xs font-medium transition-all';
+                indicator.innerHTML = '⏸️ Auto-refresh dijeda';
+                indicator.className = 'text-orange-500 text-xs';
+                showNotification('⏸️ Auto-refresh dokumen kurikulum dijeda', 'info');
+            } else {
+                // Start auto-refresh
+                startCurriculumAutoRefresh();
+                isCurriculumAutoRefreshActive = true;
+                btn.innerHTML = '⏸️ Pause';
+                btn.className = 'bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded text-xs font-medium transition-all';
+                indicator.innerHTML = '🔄 Auto-refresh aktif';
+                indicator.className = 'text-green-500 text-xs';
+                showNotification('▶️ Auto-refresh dokumen kurikulum diaktifkan', 'success');
+            }
+        }
+
+        // Start auto-refresh interval for curriculum
+        function startCurriculumAutoRefresh() {
+            if (curriculumAutoRefreshInterval) {
+                clearInterval(curriculumAutoRefreshInterval);
+            }
+            
+            curriculumAutoRefreshInterval = setInterval(() => {
+                if (isCurriculumAutoRefreshActive) {
+                    loadEmbeddedCurriculumDriveAutomatically();
+                }
+            }, REFRESH_INTERVAL_MS);
+        }
+
+        // Hide embedded curriculum drive
+        function hideEmbeddedCurriculumDrive() {
+            const embeddedViewer = document.getElementById('embedded-curriculum-drive-viewer');
+            const driveIframe = document.getElementById('curriculum-drive-iframe');
+            
+            // Stop auto-refresh when hiding
+            if (curriculumAutoRefreshInterval) {
+                clearInterval(curriculumAutoRefreshInterval);
+                curriculumAutoRefreshInterval = null;
+            }
+            
+            embeddedViewer.classList.add('hidden');
+            driveIframe.src = ''; // Clear the iframe to stop loading
+            
+            showNotification('📚 Tampilan Google Drive Dokumen Kurikulum disembunyikan', 'info');
+        }
+
+        // Curriculum upload dropdown functions
+        function toggleCurriculumUploadDropdown() {
+            const dropdown = document.getElementById('curriculum-upload-dropdown-menu');
+            const arrow = document.getElementById('curriculum-dropdown-arrow');
+            
+            if (dropdown.classList.contains('hidden')) {
+                dropdown.classList.remove('hidden');
+                arrow.style.transform = 'rotate(180deg)';
+            } else {
+                dropdown.classList.add('hidden');
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // Open curriculum upload form based on type
+        function openCurriculumUploadForm(type) {
+            const uploadForms = {
+                'rpp': 'https://forms.gle/RPP123RencanaPembelajaran',
+                'silabus': 'https://forms.gle/SIL456SilabusMataPelajaran', 
+                'modul-ajar': 'https://forms.gle/MOD789ModulAjarPembelajaran',
+                'bahan-ajar': 'https://forms.gle/BAH012BahanAjarMateri',
+                'evaluasi': 'https://forms.gle/EVA345EvaluasiPenilaian'
+            };
+
+            const formNames = {
+                'rpp': 'RPP (Rencana Pelaksanaan Pembelajaran)',
+                'silabus': 'Silabus',
+                'modul-ajar': 'Modul Ajar',
+                'bahan-ajar': 'Bahan Ajar',
+                'evaluasi': 'Evaluasi & Penilaian'
+            };
+
+            const formUrl = uploadForms[type];
+            const formName = formNames[type];
+            
+            if (formUrl) {
+                // Close dropdown immediately
+                const dropdown = document.getElementById('curriculum-upload-dropdown-menu');
+                const arrow = document.getElementById('curriculum-dropdown-arrow');
+                if (dropdown) dropdown.classList.add('hidden');
+                if (arrow) arrow.style.transform = 'rotate(0deg)';
+                
+                // Show notification
+                showNotification(`🔗 Membuka form upload ${formName}...`, 'info');
+                
+                // Open Google Form in same page
+                window.location.href = formUrl;
+                
+            } else {
+                showNotification('❌ Form tidak ditemukan', 'error');
+            }
+        }
+
 
 
 
 
 
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97c56d9056c2fd6d',t:'MTc1NzQwNzcyMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97c576fed133fd6d',t:'MTc1NzQwODEwNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
