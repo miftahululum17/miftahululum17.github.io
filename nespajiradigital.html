@@ -165,26 +165,24 @@
 
 
                 <!-- Google Drive Folder Display -->
-                <div class="mb-8 bg-white rounded-xl border border-gray-200 shadow-lg overflow-hidden">
-                    <div class="bg-gradient-to-r from-blue-600 to-blue-700 p-6 text-white">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center space-x-4">
-                                <div class="text-4xl">📁</div>
-                                <div>
-                                    <h3 class="text-2xl font-bold">Google Drive - Galeri Sekolah</h3>
-                                    <p class="text-blue-100">Akses langsung ke folder foto kegiatan sekolah</p>
-                                </div>
+                <div class="mb-6 bg-white rounded-lg border border-gray-200 shadow-md overflow-hidden">
+                    <div class="bg-gradient-to-r from-blue-600 to-blue-700 p-3 text-white">
+                        <div class="flex items-center space-x-3">
+                            <div class="text-2xl">📁</div>
+                            <div>
+                                <h3 class="text-lg font-bold">Google Drive - Galeri Sekolah</h3>
+                                <p class="text-blue-100 text-sm">Akses langsung ke folder foto kegiatan sekolah</p>
                             </div>
                         </div>
                     </div>
                     
                     <!-- Embedded Google Drive Folder -->
-                    <div class="p-4">
-                        <div class="bg-gray-50 rounded-lg p-3 mb-3">
-                            <div class="flex items-center space-x-2 mb-2">
-                                <div class="text-lg">ℹ️</div>
+                    <div class="p-3">
+                        <div class="bg-gray-50 rounded-lg p-2 mb-3">
+                            <div class="flex items-center space-x-2">
+                                <div class="text-sm">ℹ️</div>
                                 <div>
-                                    <h4 class="font-medium text-gray-800 text-sm">Akses Folder Google Drive</h4>
+                                    <h4 class="font-medium text-gray-800 text-xs">Akses Folder Google Drive</h4>
                                     <p class="text-gray-600 text-xs">Klik tombol untuk melihat foto kegiatan sekolah</p>
                                 </div>
                             </div>
@@ -223,12 +221,12 @@
                         </div>
                         
                         <!-- Drive Access Buttons -->
-                        <div class="text-center mb-4">
-                            <div class="flex flex-col lg:flex-row gap-3 justify-center items-start">
+                        <div class="text-center mb-3">
+                            <div class="flex flex-col lg:flex-row gap-2 justify-center items-start">
                                 <!-- Upload File Dropdown Section -->
-                                <div class="flex items-start gap-3">
+                                <div class="flex items-start gap-2">
                                     <!-- Upload File Button -->
-                                    <button onclick="toggleUploadDropdown()" id="upload-dropdown-btn" class="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-lg font-medium transition-all shadow-md text-sm flex items-center space-x-2">
+                                    <button onclick="toggleUploadDropdown()" id="upload-dropdown-btn" class="bg-green-600 text-white hover:bg-green-700 px-3 py-1.5 rounded-md font-medium transition-all shadow-md text-xs flex items-center space-x-1">
                                         <span>📤 Upload File</span>
                                         <span id="dropdown-arrow" class="transform transition-transform text-xs">▼</span>
                                     </button>
@@ -285,17 +283,17 @@
                                 </div>
                                 
                                 <!-- Drive Access Button -->
-                                <button onclick="openGoogleDriveFolder()" class="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-lg font-medium transition-all shadow-md text-sm">
+                                <button onclick="openGoogleDriveFolder()" class="bg-blue-600 text-white hover:bg-blue-700 px-3 py-1.5 rounded-md font-medium transition-all shadow-md text-xs">
                                     🔗 Buka Folder Drive
                                 </button>
                             </div>
                         </div>
                         
-                        <div class="mt-3 p-2 bg-yellow-50 rounded-lg border border-yellow-200">
-                            <div class="flex items-start space-x-2">
-                                <div class="text-yellow-600 text-sm">💡</div>
+                        <div class="mt-2 p-2 bg-yellow-50 rounded-md border border-yellow-200">
+                            <div class="flex items-start space-x-1">
+                                <div class="text-yellow-600 text-xs">💡</div>
                                 <div class="text-yellow-800 text-xs">
-                                    <strong>Tips:</strong> Untuk pengalaman terbaik, buka folder di tab baru. Anda dapat mendownload, berbagi, atau melihat detail setiap foto langsung dari Google Drive.
+                                    <strong>Tips:</strong> Buka folder di tab baru untuk pengalaman terbaik.
                                 </div>
                             </div>
                         </div>
@@ -303,37 +301,37 @@
                 </div>
 
                 <!-- Embedded Drive Viewer (Auto-displayed) -->
-                <div id="embedded-drive-viewer" class="mb-8 bg-white rounded-xl border border-gray-200 shadow-lg overflow-hidden">
-                    <div class="bg-gray-100 p-4 border-b border-gray-200">
+                <div id="embedded-drive-viewer" class="mb-6 bg-white rounded-lg border border-gray-200 shadow-md overflow-hidden">
+                    <div class="bg-gray-100 p-2 border-b border-gray-200">
                         <div class="flex items-center justify-between">
-                            <h4 class="font-semibold text-gray-800 flex items-center space-x-2">
+                            <h4 class="font-semibold text-gray-800 flex items-center space-x-1 text-sm">
                                 <span>📁</span>
                                 <span>Google Drive - Galeri Sekolah (Live)</span>
-                                <span id="refresh-indicator" class="text-green-500 text-sm">🔄 Auto-refresh aktif</span>
+                                <span id="refresh-indicator" class="text-green-500 text-xs">🔄 Auto-refresh aktif</span>
                             </h4>
-                            <div class="flex items-center space-x-2">
-                                <button onclick="refreshEmbeddedDrive()" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm font-medium transition-all">
+                            <div class="flex items-center space-x-1">
+                                <button onclick="refreshEmbeddedDrive()" class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs font-medium transition-all">
                                     🔄 Refresh
                                 </button>
-                                <button onclick="toggleAutoRefresh()" id="auto-refresh-btn" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm font-medium transition-all">
+                                <button onclick="toggleAutoRefresh()" id="auto-refresh-btn" class="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded text-xs font-medium transition-all">
                                     ⏸️ Pause
                                 </button>
-                                <button onclick="hideEmbeddedDrive()" class="text-gray-500 hover:text-gray-700 text-xl">×</button>
+                                <button onclick="hideEmbeddedDrive()" class="text-gray-500 hover:text-gray-700 text-lg">×</button>
                             </div>
                         </div>
-                        <div class="mt-2 text-xs text-gray-600">
+                        <div class="mt-1 text-xs text-gray-600">
                             <span>Terakhir diperbarui: </span>
                             <span id="last-refresh-time">Memuat...</span>
-                            <span class="ml-4">Auto-refresh setiap: </span>
+                            <span class="ml-2">Auto-refresh setiap: </span>
                             <span id="refresh-interval">30 detik</span>
                         </div>
                     </div>
                     <div class="relative">
-                        <iframe id="drive-iframe" src="" class="w-full h-96 border-0"></iframe>
+                        <iframe id="drive-iframe" src="" class="w-full h-64 border-0"></iframe>
                         <div class="absolute inset-0 bg-gray-100 flex items-center justify-center" id="drive-loading">
                             <div class="text-center">
-                                <div class="animate-spin text-4xl mb-4">⏳</div>
-                                <p class="text-gray-600">Memuat Google Drive...</p>
+                                <div class="animate-spin text-2xl mb-2">⏳</div>
+                                <p class="text-gray-600 text-sm">Memuat Google Drive...</p>
                             </div>
                         </div>
                     </div>
@@ -2122,5 +2120,5 @@
 
 
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97c5664754e6fd6d',t:'MTc1NzQwNzQyMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97c56d9056c2fd6d',t:'MTc1NzQwNzcyMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
