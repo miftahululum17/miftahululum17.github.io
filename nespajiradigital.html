@@ -175,52 +175,116 @@
                                     <p class="text-blue-100">Akses langsung ke folder foto kegiatan sekolah</p>
                                 </div>
                             </div>
-                            <button onclick="openGoogleDriveFolder()" class="bg-white text-blue-600 hover:bg-blue-50 px-6 py-3 rounded-lg font-semibold transition-all transform hover:scale-105 shadow-lg">
-                                🔗 Buka Folder Drive
-                            </button>
                         </div>
                     </div>
                     
                     <!-- Embedded Google Drive Folder -->
-                    <div class="p-6">
-                        <div class="bg-gray-50 rounded-lg p-4 mb-4">
-                            <div class="flex items-center space-x-3 mb-3">
-                                <div class="text-2xl">ℹ️</div>
+                    <div class="p-4">
+                        <div class="bg-gray-50 rounded-lg p-3 mb-3">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <div class="text-lg">ℹ️</div>
                                 <div>
-                                    <h4 class="font-semibold text-gray-800">Akses Folder Google Drive</h4>
-                                    <p class="text-gray-600 text-sm">Klik tombol di bawah untuk melihat semua foto kegiatan sekolah yang tersimpan di Google Drive</p>
+                                    <h4 class="font-medium text-gray-800 text-sm">Akses Folder Google Drive</h4>
+                                    <p class="text-gray-600 text-xs">Klik tombol untuk melihat foto kegiatan sekolah</p>
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="grid md:grid-cols-2 gap-4 mb-6">
-                            <div class="bg-green-50 p-4 rounded-lg border border-green-200">
-                                <div class="flex items-center space-x-3">
-                                    <div class="text-2xl text-green-600">✅</div>
+                        <div class="grid md:grid-cols-2 gap-3 mb-4">
+                            <div class="bg-green-50 p-3 rounded-lg border border-green-200">
+                                <div class="flex items-center space-x-2">
+                                    <div class="text-lg text-green-600">✅</div>
                                     <div>
-                                        <h5 class="font-semibold text-green-800">Akses Langsung</h5>
-                                        <p class="text-green-700 text-sm">Lihat semua foto dalam folder yang dibagikan</p>
+                                        <h5 class="font-medium text-green-800 text-sm">Akses Langsung</h5>
+                                        <p class="text-green-700 text-xs">Lihat semua foto dalam folder</p>
                                     </div>
                                 </div>
                             </div>
                             
-                            <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                                <div class="flex items-center space-x-3">
-                                    <div class="text-2xl text-blue-600">🔄</div>
+                            <div class="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                                <div class="flex items-center space-x-2">
+                                    <div class="text-lg text-blue-600">🔄</div>
                                     <div>
-                                        <h5 class="font-semibold text-blue-800">Sinkronisasi Real-time</h5>
-                                        <p class="text-blue-700 text-sm">Foto terbaru langsung tersedia</p>
+                                        <h5 class="font-medium text-blue-800 text-sm">Sinkronisasi Real-time</h5>
+                                        <p class="text-blue-700 text-xs">Foto terbaru langsung tersedia</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
-
+                        <!-- Drive Access Buttons -->
+                        <div class="text-center mb-4">
+                            <div class="flex flex-col lg:flex-row gap-3 justify-center items-start">
+                                <!-- Upload File Dropdown Section -->
+                                <div class="flex items-start gap-3">
+                                    <!-- Upload File Button -->
+                                    <button onclick="toggleUploadDropdown()" id="upload-dropdown-btn" class="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-lg font-medium transition-all shadow-md text-sm flex items-center space-x-2">
+                                        <span>📤 Upload File</span>
+                                        <span id="dropdown-arrow" class="transform transition-transform text-xs">▼</span>
+                                    </button>
+                                    
+                                    <!-- Dropdown Menu positioned beside button -->
+                                    <div id="upload-dropdown-menu" class="hidden bg-white rounded-lg shadow-xl border border-gray-200 w-56" style="z-index: 9999;">
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-gray-800 mb-1 text-xs">
+                                                📋 Pilih Jenis Upload
+                                            </h4>
+                                            <div class="space-y-1">
+                                                <button onclick="openUploadForm('foto-kegiatan')" class="w-full text-left px-2 py-1 hover:bg-blue-50 rounded-md transition-all flex items-center space-x-2 text-xs">
+                                                    <span class="text-sm">📸</span>
+                                                    <div>
+                                                        <div class="font-medium text-gray-800">Foto Kegiatan</div>
+                                                        <div class="text-xs text-gray-500">Upload foto sekolah</div>
+                                                    </div>
+                                                </button>
+                                                
+                                                <button onclick="openUploadForm('video-kegiatan')" class="w-full text-left px-2 py-1 hover:bg-purple-50 rounded-md transition-all flex items-center space-x-2 text-xs">
+                                                    <span class="text-sm">🎥</span>
+                                                    <div>
+                                                        <div class="font-medium text-gray-800">Video Kegiatan</div>
+                                                        <div class="text-xs text-gray-500">Upload video dokumentasi</div>
+                                                    </div>
+                                                </button>
+                                                
+                                                <button onclick="openUploadForm('dokumen-kurikulum')" class="w-full text-left px-2 py-1 hover:bg-green-50 rounded-md transition-all flex items-center space-x-2 text-xs">
+                                                    <span class="text-sm">📄</span>
+                                                    <div>
+                                                        <div class="font-medium text-gray-800">Dokumen Kurikulum</div>
+                                                        <div class="text-xs text-gray-500">Upload materi pembelajaran</div>
+                                                    </div>
+                                                </button>
+                                                
+                                                <button onclick="openUploadForm('laporan-kegiatan')" class="w-full text-left px-2 py-1 hover:bg-orange-50 rounded-md transition-all flex items-center space-x-2 text-xs">
+                                                    <span class="text-sm">📊</span>
+                                                    <div>
+                                                        <div class="font-medium text-gray-800">Laporan Kegiatan</div>
+                                                        <div class="text-xs text-gray-500">Upload laporan dan evaluasi</div>
+                                                    </div>
+                                                </button>
+                                                
+                                                <button onclick="openUploadForm('sertifikat-prestasi')" class="w-full text-left px-2 py-1 hover:bg-yellow-50 rounded-md transition-all flex items-center space-x-2 text-xs">
+                                                    <span class="text-sm">🏆</span>
+                                                    <div>
+                                                        <div class="font-medium text-gray-800">Sertifikat & Prestasi</div>
+                                                        <div class="text-xs text-gray-500">Upload sertifikat dan penghargaan</div>
+                                                    </div>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Drive Access Button -->
+                                <button onclick="openGoogleDriveFolder()" class="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-lg font-medium transition-all shadow-md text-sm">
+                                    🔗 Buka Folder Drive
+                                </button>
+                            </div>
+                        </div>
                         
-                        <div class="mt-4 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                        <div class="mt-3 p-2 bg-yellow-50 rounded-lg border border-yellow-200">
                             <div class="flex items-start space-x-2">
-                                <div class="text-yellow-600 text-lg">💡</div>
-                                <div class="text-yellow-800 text-sm">
+                                <div class="text-yellow-600 text-sm">💡</div>
+                                <div class="text-yellow-800 text-xs">
                                     <strong>Tips:</strong> Untuk pengalaman terbaik, buka folder di tab baru. Anda dapat mendownload, berbagi, atau melihat detail setiap foto langsung dari Google Drive.
                                 </div>
                             </div>
@@ -1946,6 +2010,86 @@
             }, REFRESH_INTERVAL_MS);
         }
 
+        // Upload dropdown functions
+        function toggleUploadDropdown() {
+            const dropdown = document.getElementById('upload-dropdown-menu');
+            const arrow = document.getElementById('dropdown-arrow');
+            
+            if (dropdown.classList.contains('hidden')) {
+                dropdown.classList.remove('hidden');
+                arrow.style.transform = 'rotate(180deg)';
+            } else {
+                dropdown.classList.add('hidden');
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // Open upload form based on type
+        function openUploadForm(type) {
+            const uploadForms = {
+                'foto-kegiatan': 'https://forms.gle/ABC123FotoKegiatan',
+                'video-kegiatan': 'https://forms.gle/DEF456VideoKegiatan', 
+                'dokumen-kurikulum': 'https://forms.gle/GHI789DokumenKurikulum',
+                'laporan-kegiatan': 'https://forms.gle/JKL012LaporanKegiatan',
+                'sertifikat-prestasi': 'https://forms.gle/MNO345SertifikatPrestasi'
+            };
+
+            const formNames = {
+                'foto-kegiatan': 'Foto Kegiatan',
+                'video-kegiatan': 'Video Kegiatan',
+                'dokumen-kurikulum': 'Dokumen Kurikulum', 
+                'laporan-kegiatan': 'Laporan Kegiatan',
+                'sertifikat-prestasi': 'Sertifikat & Prestasi'
+            };
+
+            const formUrl = uploadForms[type];
+            const formName = formNames[type];
+            
+            if (formUrl) {
+                // Close dropdown immediately
+                const dropdown = document.getElementById('upload-dropdown-menu');
+                const arrow = document.getElementById('dropdown-arrow');
+                if (dropdown) dropdown.classList.add('hidden');
+                if (arrow) arrow.style.transform = 'rotate(0deg)';
+                
+                // Show notification
+                showNotification(`🔗 Membuka form upload ${formName}...`, 'info');
+                
+                // Open Google Form in same page
+                window.location.href = formUrl;
+                
+            } else {
+                showNotification('❌ Form tidak ditemukan', 'error');
+            }
+        }
+
+        // Close dropdown when clicking outside or on menu items
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('upload-dropdown-menu');
+            const button = document.getElementById('upload-dropdown-btn');
+            const arrow = document.getElementById('dropdown-arrow');
+            
+            // Close if clicking outside dropdown and button
+            if (dropdown && button && !button.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.add('hidden');
+                if (arrow) {
+                    arrow.style.transform = 'rotate(0deg)';
+                }
+            }
+        });
+
+        // Close dropdown when window is resized (but not on scroll)
+        window.addEventListener('resize', function() {
+            const dropdown = document.getElementById('upload-dropdown-menu');
+            const arrow = document.getElementById('dropdown-arrow');
+            if (dropdown && !dropdown.classList.contains('hidden')) {
+                dropdown.classList.add('hidden');
+                if (arrow) {
+                    arrow.style.transform = 'rotate(0deg)';
+                }
+            }
+        });
+
         function hideEmbeddedDrive() {
             const embeddedViewer = document.getElementById('embedded-drive-viewer');
             const driveIframe = document.getElementById('drive-iframe');
@@ -1968,5 +2112,5 @@
 
 
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97c4f5fae262410c',t:'MTc1NzQwMjgyMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97c55be631866b9e',t:'MTc1NzQwNjk5OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
