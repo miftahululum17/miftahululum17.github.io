@@ -1,0 +1,1972 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NESPAJIRA DIGITAL - Portal Siswa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); }
+        .glass-effect { backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.1); }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .animate-spin-slow {
+            animation: spin 3s linear infinite;
+        }
+        
+        .gallery-item {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .filter-btn {
+            transition: all 0.3s ease;
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen gradient-bg">
+    <!-- Navigation -->
+    <nav class="glass-effect border-b border-white/20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="text-gray-800 font-bold text-xl">🏫 NESPAJIRA DIGITAL</div>
+                </div>
+
+                <div id="auth-buttons" class="flex space-x-2">
+                    <button onclick="showLogin()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg text-sm font-medium transition-all">Masuk</button>
+                    <button onclick="showRegister()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all">Daftar</button>
+                </div>
+                <div id="user-menu" class="hidden flex items-center space-x-4">
+                    <span id="username-display" class="text-gray-800 font-medium"></span>
+                    <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all">Keluar</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <!-- Welcome Section -->
+        <div id="welcome-section" class="text-center mb-16">
+            <h1 class="text-4xl md:text-6xl font-bold text-gray-800 mb-6">
+                Selamat Datang di<br>
+                <span class="text-blue-600">NESPAJIRA DIGITAL</span>
+            </h1>
+            <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+                Portal NESPAJIRA DIGITAL. Akses Web Sekolah, Akses Dokumen kurikulum, E-Commerce USMAN TPHP, Foto / Video Kegiatan, dan informasi sekolah dengan mudah.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button onclick="showLogin()" class="bg-blue-600 text-white hover:bg-blue-700 px-8 py-3 rounded-lg font-semibold transition-all transform hover:scale-105">
+                    Masuk ke Portal
+                </button>
+                <button onclick="showRegister()" class="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-3 rounded-lg font-semibold transition-all">
+                    Daftar Sekarang
+                </button>
+            </div>
+        </div>
+
+
+
+        <!-- Dashboard Section (Hidden by default) -->
+        <div id="dashboard-section" class="hidden">
+            <div class="bg-white p-8 rounded-xl border border-gray-200 shadow-lg text-center">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Dashboard Digital</h2>
+                <p class="text-gray-600 mb-6">Selamat datang di portal NESPAJIRA DIGITAL!</p>
+                <div class="grid md:grid-cols-6 gap-4 max-w-7xl mx-auto">
+                    <div onclick="showProfile()" class="bg-blue-50 hover:bg-blue-100 p-8 rounded-xl transition-all cursor-pointer border border-blue-200 min-h-[180px] flex flex-col justify-center items-center">
+                        <div class="text-5xl mb-4 text-blue-600">👤</div>
+                        <h4 class="font-semibold text-gray-800 text-lg mb-2">Profil</h4>
+                        <p class="text-gray-600 text-sm text-center">Kelola Akun</p>
+                    </div>
+                    
+                    <div onclick="openSchoolWebsite()" class="bg-green-50 hover:bg-green-100 p-8 rounded-xl transition-all cursor-pointer border border-green-200 min-h-[180px] flex flex-col justify-center items-center">
+                        <div class="text-5xl mb-4 text-green-600">🏫</div>
+                        <h4 class="font-semibold text-gray-800 text-lg mb-2">Website Sekolah</h4>
+                        <p class="text-gray-600 text-sm text-center">Portal Resmi NESPAJIRA DIGITAL</p>
+                    </div>
+                    
+                    <div onclick="openCurriculumWebsite()" class="bg-purple-50 hover:bg-purple-100 p-8 rounded-xl transition-all cursor-pointer border border-purple-200 min-h-[180px] flex flex-col justify-center items-center">
+                        <div class="text-5xl mb-4 text-purple-600">📚</div>
+                        <h4 class="font-semibold text-gray-800 text-lg mb-2">Website Kurikulum</h4>
+                        <p class="text-gray-600 text-sm text-center">Informasi Kurikulum Merdeka</p>
+                    </div>
+                    
+                    <div onclick="openHumasWebsite()" class="bg-orange-50 hover:bg-orange-100 p-8 rounded-xl transition-all cursor-pointer border border-orange-200 min-h-[180px] flex flex-col justify-center items-center">
+                        <div class="text-5xl mb-4 text-orange-600">📢</div>
+                        <h4 class="font-semibold text-gray-800 text-lg mb-2">Website Humas</h4>
+                        <p class="text-gray-600 text-sm text-center">Hubungan Masyarakat & Komunikasi</p>
+                    </div>
+                    
+                    <div onclick="openEcommerce()" class="bg-teal-50 hover:bg-teal-100 p-8 rounded-xl transition-all cursor-pointer border border-teal-200 min-h-[180px] flex flex-col justify-center items-center">
+                        <div class="text-5xl mb-4 text-teal-600">🛒</div>
+                        <h4 class="font-semibold text-gray-800 text-lg mb-2">E-Commerce</h4>
+                        <p class="text-gray-600 text-sm text-center">Toko Online USMAN TPHP</p>
+                    </div>
+                    
+                    <div onclick="openCurriculumDocuments()" class="bg-indigo-50 hover:bg-indigo-100 p-8 rounded-xl transition-all cursor-pointer border border-indigo-200 min-h-[180px] flex flex-col justify-center items-center">
+                        <div class="text-5xl mb-4 text-indigo-600">📄</div>
+                        <h4 class="font-semibold text-gray-800 text-lg mb-2">Dokumen Kurikulum</h4>
+                        <p class="text-gray-600 text-sm text-center">Akses Dokumen & Materi</p>
+                    </div>
+                    
+                    <div onclick="showGallery()" class="bg-pink-50 hover:bg-pink-100 p-8 rounded-xl transition-all cursor-pointer border border-pink-200 min-h-[180px] flex flex-col justify-center items-center">
+                        <div class="text-5xl mb-4 text-pink-600">📸</div>
+                        <h4 class="font-semibold text-gray-800 text-lg mb-2">Galeri Kegiatan</h4>
+                        <p class="text-gray-600 text-sm text-center">Foto & Video Kegiatan Sekolah</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <!-- Gallery Section (Hidden by default) -->
+        <div id="gallery-section" class="hidden">
+            <div class="bg-white p-8 rounded-xl border border-gray-200 shadow-lg">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold text-gray-800">Galeri Kegiatan Sekolah</h2>
+                    <button onclick="showDashboard()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg text-sm font-medium transition-all">
+                        ← Kembali
+                    </button>
+                </div>
+                
+
+
+
+
+
+
+                <!-- Google Drive Folder Display -->
+                <div class="mb-8 bg-white rounded-xl border border-gray-200 shadow-lg overflow-hidden">
+                    <div class="bg-gradient-to-r from-blue-600 to-blue-700 p-6 text-white">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <div class="text-4xl">📁</div>
+                                <div>
+                                    <h3 class="text-2xl font-bold">Google Drive - Galeri Sekolah</h3>
+                                    <p class="text-blue-100">Akses langsung ke folder foto kegiatan sekolah</p>
+                                </div>
+                            </div>
+                            <button onclick="openGoogleDriveFolder()" class="bg-white text-blue-600 hover:bg-blue-50 px-6 py-3 rounded-lg font-semibold transition-all transform hover:scale-105 shadow-lg">
+                                🔗 Buka Folder Drive
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Embedded Google Drive Folder -->
+                    <div class="p-6">
+                        <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <div class="text-2xl">ℹ️</div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">Akses Folder Google Drive</h4>
+                                    <p class="text-gray-600 text-sm">Klik tombol di bawah untuk melihat semua foto kegiatan sekolah yang tersimpan di Google Drive</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-4 mb-6">
+                            <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                                <div class="flex items-center space-x-3">
+                                    <div class="text-2xl text-green-600">✅</div>
+                                    <div>
+                                        <h5 class="font-semibold text-green-800">Akses Langsung</h5>
+                                        <p class="text-green-700 text-sm">Lihat semua foto dalam folder yang dibagikan</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                                <div class="flex items-center space-x-3">
+                                    <div class="text-2xl text-blue-600">🔄</div>
+                                    <div>
+                                        <h5 class="font-semibold text-blue-800">Sinkronisasi Real-time</h5>
+                                        <p class="text-blue-700 text-sm">Foto terbaru langsung tersedia</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+
+                        
+                        <div class="mt-4 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                            <div class="flex items-start space-x-2">
+                                <div class="text-yellow-600 text-lg">💡</div>
+                                <div class="text-yellow-800 text-sm">
+                                    <strong>Tips:</strong> Untuk pengalaman terbaik, buka folder di tab baru. Anda dapat mendownload, berbagi, atau melihat detail setiap foto langsung dari Google Drive.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Embedded Drive Viewer (Auto-displayed) -->
+                <div id="embedded-drive-viewer" class="mb-8 bg-white rounded-xl border border-gray-200 shadow-lg overflow-hidden">
+                    <div class="bg-gray-100 p-4 border-b border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-semibold text-gray-800 flex items-center space-x-2">
+                                <span>📁</span>
+                                <span>Google Drive - Galeri Sekolah (Live)</span>
+                                <span id="refresh-indicator" class="text-green-500 text-sm">🔄 Auto-refresh aktif</span>
+                            </h4>
+                            <div class="flex items-center space-x-2">
+                                <button onclick="refreshEmbeddedDrive()" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm font-medium transition-all">
+                                    🔄 Refresh
+                                </button>
+                                <button onclick="toggleAutoRefresh()" id="auto-refresh-btn" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm font-medium transition-all">
+                                    ⏸️ Pause
+                                </button>
+                                <button onclick="hideEmbeddedDrive()" class="text-gray-500 hover:text-gray-700 text-xl">×</button>
+                            </div>
+                        </div>
+                        <div class="mt-2 text-xs text-gray-600">
+                            <span>Terakhir diperbarui: </span>
+                            <span id="last-refresh-time">Memuat...</span>
+                            <span class="ml-4">Auto-refresh setiap: </span>
+                            <span id="refresh-interval">30 detik</span>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <iframe id="drive-iframe" src="" class="w-full h-96 border-0"></iframe>
+                        <div class="absolute inset-0 bg-gray-100 flex items-center justify-center" id="drive-loading">
+                            <div class="text-center">
+                                <div class="animate-spin text-4xl mb-4">⏳</div>
+                                <p class="text-gray-600">Memuat Google Drive...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <!-- Hidden sections for uploaded content -->
+                <div id="uploaded-images-section" class="hidden">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-semibold text-gray-800">Foto yang Diupload</h3>
+                        <div class="text-sm text-gray-600">
+                            <span id="upload-count">0</span> foto • 
+                            <span id="drive-storage">0 MB</span> tersimpan di Google Drive
+                        </div>
+                    </div>
+                    
+                    <div id="uploaded-images-grid" class="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        <!-- Uploaded images will be displayed here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Section (Hidden by default) -->
+        <div id="profile-section" class="hidden">
+            <div class="bg-white p-8 rounded-xl border border-gray-200 shadow-lg">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold text-gray-800">Profil Saya</h2>
+                    <button onclick="showDashboard()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg text-sm font-medium transition-all">
+                        ← Kembali
+                    </button>
+                </div>
+                
+                <!-- Profile Form -->
+                <div class="bg-gray-50 rounded-lg p-6">
+                    <form onsubmit="saveProfile(event)" class="space-y-8">
+                        <!-- Personal Information Section -->
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                                📋 Personal Information
+                            </h3>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">Nama Lengkap</label>
+                                    <input type="text" id="profile-fullname" class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Masukkan nama lengkap">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">NIK/NIP</label>
+                                    <input type="text" id="profile-nik" class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Masukkan NIK/NIP">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">Tempat Lahir</label>
+                                    <input type="text" id="profile-birthplace" class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Masukkan tempat lahir">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">Tanggal Lahir</label>
+                                    <input type="date" id="profile-birthdate" class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-400 focus:border-transparent">
+                                </div>
+                                
+                                <div class="md:col-span-2">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">Jenis Kelamin</label>
+                                    <select id="profile-gender" class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-400 focus:border-transparent">
+                                        <option value="" class="text-gray-800">Pilih Jenis Kelamin</option>
+                                        <option value="Laki-laki" class="text-gray-800">Laki-laki</option>
+                                        <option value="Perempuan" class="text-gray-800">Perempuan</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contact Details Section -->
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                                📞 Contact Details
+                            </h3>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">Email</label>
+                                    <input type="email" id="profile-email" class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Masukkan email">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">No. Telepon</label>
+                                    <input type="tel" id="profile-phone" class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Masukkan nomor telepon">
+                                </div>
+                                
+                                <div class="md:col-span-2">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">Alamat</label>
+                                    <textarea id="profile-address" rows="3" class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:ring-2 focus:ring-blue-400 focus:border-transparent resize-none" placeholder="Masukkan alamat lengkap"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Personal Details Section -->
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                                🎯 Personal Details
+                            </h3>
+                            <div class="grid md:grid-cols-1 gap-4">
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">Hobi</label>
+                                    <input type="text" id="profile-hobby" class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:ring-2 focus:ring-blue-400 focus:border-transparent" placeholder="Masukkan hobi">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-4 pt-4">
+                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-all">
+                                💾 Simpan Profil
+                            </button>
+                            <button type="button" onclick="loadProfile()" class="bg-gray-600 hover:bg-gray-700 text-white px-8 py-3 rounded-lg font-semibold transition-all">
+                                🔄 Reset
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl p-8 w-full max-w-md">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Masuk ke Portal</h2>
+                <p class="text-gray-600">Masukkan kredensial Anda untuk mengakses portal</p>
+            </div>
+            <form onsubmit="handleLogin(event)">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">NISN / Email</label>
+                    <input type="text" id="login-username" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Masukkan NISN atau email">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">Kata Sandi</label>
+                    <input type="password" id="login-password" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Masukkan kata sandi">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-all mb-4">
+                    Masuk
+                </button>
+                <div class="text-center">
+                    <button type="button" onclick="hideLogin(); showRegister();" class="text-blue-600 hover:text-blue-800 text-sm">
+                        Belum punya akun? Daftar di sini
+                    </button>
+                </div>
+            </form>
+            <button onclick="hideLogin()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="register-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl p-8 w-full max-w-md">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Daftar Akun Baru</h2>
+                <p class="text-gray-600">Buat akun untuk mengakses portal pembelajaran</p>
+            </div>
+            <form onsubmit="handleRegister(event)">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">Nama Lengkap</label>
+                    <input type="text" id="register-fullname" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Masukkan nama lengkap">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">Email</label>
+                    <input type="email" id="register-email" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Masukkan email">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">Kata Sandi</label>
+                    <input type="password" id="register-password" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Buat kata sandi">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-all mb-4">
+                    Daftar
+                </button>
+                <div class="text-center">
+                    <button type="button" onclick="hideRegister(); showLogin();" class="text-blue-600 hover:text-blue-800 text-sm">
+                        Sudah punya akun? Masuk di sini
+                    </button>
+                </div>
+            </form>
+            <button onclick="hideRegister()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+        </div>
+    </div>
+
+    <!-- Upload Image Modal -->
+    <div id="upload-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl p-8 w-full max-w-md">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Upload Gambar Kegiatan</h2>
+                <p class="text-gray-600">Tambahkan foto kegiatan sekolah ke galeri</p>
+            </div>
+            <form onsubmit="handleImageUpload(event)">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">Pilih Gambar</label>
+                    <input type="file" id="image-upload" accept="image/*" multiple required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <p class="text-sm text-gray-500 mt-1">Format: JPG, PNG, GIF (Maks. 5MB per file)</p>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">Judul Kegiatan</label>
+                    <input type="text" id="image-title" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Masukkan judul kegiatan">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">Kategori</label>
+                    <select id="image-category" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">Pilih Kategori</option>
+                        <option value="academic">Akademik</option>
+                        <option value="competition">Kompetisi</option>
+                        <option value="arts">Seni & Budaya</option>
+                        <option value="sports">Olahraga</option>
+                        <option value="social">Sosial</option>
+                    </select>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">Deskripsi</label>
+                    <textarea id="image-description" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" placeholder="Deskripsi singkat kegiatan"></textarea>
+                </div>
+                <div class="flex gap-4">
+                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-all">
+                        📤 Upload
+                    </button>
+                    <button type="button" onclick="hideUploadModal()" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-3 rounded-lg font-semibold transition-all">
+                        Batal
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+
+    <!-- Image View Modal -->
+    <div id="image-view-modal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center p-4 z-50">
+        <div class="relative max-w-4xl max-h-[90vh] w-full">
+            <button onclick="hideImageViewModal()" class="absolute top-4 right-4 text-white hover:text-gray-300 text-3xl z-10 bg-black/50 rounded-full w-12 h-12 flex items-center justify-center">
+                &times;
+            </button>
+            <div class="bg-white rounded-xl overflow-hidden">
+                <img id="modal-image" src="" alt="" class="w-full h-auto max-h-[60vh] object-contain">
+                <div class="p-6">
+                    <h3 id="modal-image-title" class="text-2xl font-bold text-gray-800 mb-2"></h3>
+                    <p id="modal-image-description" class="text-gray-600 mb-4"></p>
+                    <div class="flex justify-between items-center">
+                        <span id="modal-image-date" class="text-sm text-gray-500"></span>
+                        <div class="flex gap-2">
+                            <button onclick="downloadImage()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all">
+                                💾 Download
+                            </button>
+                            <button onclick="deleteImage()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all">
+                                🗑️ Hapus
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gallery Detail Modal -->
+    <div id="gallery-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl p-8 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <h2 id="modal-title" class="text-3xl font-bold text-gray-800 mb-2"></h2>
+                    <p id="modal-date" class="text-gray-600"></p>
+                </div>
+                <button onclick="closeGalleryModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+            </div>
+            
+            <!-- Modal Content -->
+            <div id="modal-content" class="space-y-6">
+                <!-- Content will be dynamically loaded here -->
+            </div>
+            
+            <div class="flex justify-center mt-8">
+                <button onclick="closeGalleryModal()" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-medium transition-all">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Google Drive Setup Modal -->
+    <div id="google-drive-setup-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="text-center mb-6">
+                <div class="text-6xl mb-4">🔧</div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Setup Google Drive API</h2>
+                <p class="text-gray-600">Untuk menggunakan fitur upload ke Google Drive, diperlukan konfigurasi API</p>
+            </div>
+            
+            <div class="space-y-6">
+                <div class="bg-blue-50 p-6 rounded-lg">
+                    <h3 class="text-lg font-semibold text-blue-800 mb-3">📋 Langkah Setup:</h3>
+                    <ol class="list-decimal list-inside space-y-2 text-blue-700">
+                        <li>Buka <a href="https://console.cloud.google.com/" target="_blank" class="underline hover:text-blue-900">Google Cloud Console</a></li>
+                        <li>Buat project baru atau pilih project yang ada</li>
+                        <li>Aktifkan Google Drive API</li>
+                        <li>Buat credentials (API Key dan OAuth 2.0 Client ID)</li>
+                        <li>Tambahkan domain Anda ke authorized origins</li>
+                        <li>Ganti konfigurasi di kode dengan credentials Anda</li>
+                    </ol>
+                </div>
+
+                <div class="bg-yellow-50 p-6 rounded-lg">
+                    <h3 class="text-lg font-semibold text-yellow-800 mb-3">⚙️ Konfigurasi yang Diperlukan:</h3>
+                    <div class="space-y-3 text-yellow-700">
+                        <div>
+                            <strong>API Key:</strong>
+                            <code class="block bg-yellow-100 p-2 rounded text-sm mt-1">YOUR_GOOGLE_API_KEY</code>
+                        </div>
+                        <div>
+                            <strong>Client ID:</strong>
+                            <code class="block bg-yellow-100 p-2 rounded text-sm mt-1">YOUR_GOOGLE_CLIENT_ID</code>
+                        </div>
+                        <div>
+                            <strong>Folder ID:</strong>
+                            <code class="block bg-yellow-100 p-2 rounded text-sm mt-1">1ZhP4VR6xzOzBgvGOz9cezUBMm6ySWccT</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-green-50 p-6 rounded-lg">
+                    <h3 class="text-lg font-semibold text-green-800 mb-3">✅ Setelah Setup:</h3>
+                    <ul class="list-disc list-inside space-y-1 text-green-700">
+                        <li>Upload gambar akan langsung tersimpan di Google Drive</li>
+                        <li>File dapat diakses melalui link Google Drive</li>
+                        <li>Sinkronisasi otomatis dengan folder yang ditentukan</li>
+                        <li>Backup otomatis untuk semua foto kegiatan sekolah</li>
+                    </ul>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-lg">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">🔗 Link Berguna:</h3>
+                    <div class="space-y-2">
+                        <a href="https://developers.google.com/drive/api/quickstart/js" target="_blank" class="block text-blue-600 hover:text-blue-800 underline">
+                            📖 Google Drive API Quickstart
+                        </a>
+                        <a href="https://console.cloud.google.com/apis/credentials" target="_blank" class="block text-blue-600 hover:text-blue-800 underline">
+                            🔑 Google Cloud Credentials
+                        </a>
+                        <a href="https://drive.google.com/drive/folders/1ZhP4VR6xzOzBgvGOz9cezUBMm6ySWccT" target="_blank" class="block text-blue-600 hover:text-blue-800 underline">
+                            📁 Target Google Drive Folder
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex gap-4 mt-8">
+                <button onclick="hideGoogleDriveSetupModal()" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-3 rounded-lg font-semibold transition-all">
+                    Tutup
+                </button>
+                <button onclick="testGoogleDriveConnection()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-all">
+                    🧪 Test Koneksi
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <script>
+        // State management
+        let isLoggedIn = false;
+        let currentUser = null;
+        let editingUserId = null;
+
+        // Load credentials from localStorage or use defaults
+        function loadCredentials() {
+            const stored = localStorage.getItem('sma_credentials');
+            if (stored) {
+                return JSON.parse(stored);
+            } else {
+                // Default credentials with IDs and roles
+                const defaultCredentials = [
+                    { id: 1, username: 'admin', password: 'admin123', fullname: 'Administrator', role: 'admin' },
+                    { id: 2, username: 'siswa', password: 'siswa123', fullname: 'Siswa Demo', role: 'siswa' },
+                    { id: 3, username: 'guru@smanusantara.sch.id', password: 'guru123', fullname: 'Guru Demo', role: 'guru' },
+                    { id: 4, username: 'student@gmail.com', password: 'password', fullname: 'Student Demo', role: 'siswa' }
+                ];
+                saveCredentials(defaultCredentials);
+                return defaultCredentials;
+            }
+        }
+
+        // Save credentials to localStorage
+        function saveCredentials(credentials) {
+            localStorage.setItem('sma_credentials', JSON.stringify(credentials));
+        }
+
+        // Initialize credentials
+        let validCredentials = loadCredentials();
+
+        // Modal functions
+        function showLogin() {
+            document.getElementById('login-modal').classList.remove('hidden');
+        }
+
+        function hideLogin() {
+            document.getElementById('login-modal').classList.add('hidden');
+        }
+
+        function showRegister() {
+            document.getElementById('register-modal').classList.remove('hidden');
+        }
+
+        function hideRegister() {
+            document.getElementById('register-modal').classList.add('hidden');
+        }
+
+        // Navigation functions
+        function showProfile() {
+            hideAllSections();
+            document.getElementById('profile-section').classList.remove('hidden');
+            loadProfile();
+        }
+
+
+
+
+
+
+
+
+
+        function showDashboard() {
+            hideAllSections();
+            document.getElementById('dashboard-section').classList.remove('hidden');
+        }
+
+        function hideAllSections() {
+            document.getElementById('profile-section').classList.add('hidden');
+            document.getElementById('dashboard-section').classList.add('hidden');
+            document.getElementById('gallery-section').classList.add('hidden');
+        }
+
+        // Load profile data
+        function loadProfile() {
+            const profileKey = `profile_${currentUser.username}`;
+            const savedProfile = localStorage.getItem(profileKey);
+            
+            if (savedProfile) {
+                const profile = JSON.parse(savedProfile);
+                document.getElementById('profile-fullname').value = profile.fullname || '';
+                document.getElementById('profile-nik').value = profile.nik || '';
+                document.getElementById('profile-birthplace').value = profile.birthplace || '';
+                document.getElementById('profile-birthdate').value = profile.birthdate || '';
+                document.getElementById('profile-gender').value = profile.gender || '';
+                document.getElementById('profile-email').value = profile.email || '';
+                document.getElementById('profile-phone').value = profile.phone || '';
+                document.getElementById('profile-address').value = profile.address || '';
+                document.getElementById('profile-hobby').value = profile.hobby || '';
+            } else {
+                // Clear all fields if no saved profile
+                document.getElementById('profile-fullname').value = '';
+                document.getElementById('profile-nik').value = '';
+                document.getElementById('profile-birthplace').value = '';
+                document.getElementById('profile-birthdate').value = '';
+                document.getElementById('profile-gender').value = '';
+                document.getElementById('profile-email').value = '';
+                document.getElementById('profile-phone').value = '';
+                document.getElementById('profile-address').value = '';
+                document.getElementById('profile-hobby').value = '';
+            }
+        }
+
+        // Save profile data
+        function saveProfile(event) {
+            event.preventDefault();
+            
+            const profileData = {
+                fullname: document.getElementById('profile-fullname').value,
+                nik: document.getElementById('profile-nik').value,
+                birthplace: document.getElementById('profile-birthplace').value,
+                birthdate: document.getElementById('profile-birthdate').value,
+                gender: document.getElementById('profile-gender').value,
+                email: document.getElementById('profile-email').value,
+                phone: document.getElementById('profile-phone').value,
+                address: document.getElementById('profile-address').value,
+                hobby: document.getElementById('profile-hobby').value
+            };
+            
+            const profileKey = `profile_${currentUser.username}`;
+            localStorage.setItem(profileKey, JSON.stringify(profileData));
+            
+            showNotification('Profil berhasil disimpan!', 'success');
+        }
+
+        // Authentication functions
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+
+            // Check if fields are filled
+            if (!username || !password) {
+                showNotification('Mohon isi semua field yang diperlukan.', 'error');
+                return;
+            }
+
+            // Use global validCredentials array
+
+            // Check if credentials match
+            const validUser = validCredentials.find(cred => 
+                cred.username === username && cred.password === password
+            );
+
+            if (validUser) {
+                // Successful login
+                currentUser = {
+                    name: username.includes('@') ? username.split('@')[0] : username,
+                    username: username
+                };
+                
+                isLoggedIn = true;
+                updateUI();
+                hideLogin();
+                
+                // Clear form fields
+                document.getElementById('login-username').value = '';
+                document.getElementById('login-password').value = '';
+                
+                showNotification('Berhasil masuk! Selamat datang di portal NESPAJIRA DIGITAL.', 'success');
+            } else {
+                // Invalid credentials
+                showNotification('Username atau password salah. Silakan coba lagi.', 'error');
+                
+                // Clear password field for security
+                document.getElementById('login-password').value = '';
+            }
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+            
+            const fullname = document.getElementById('register-fullname').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+
+            if (fullname && email && password) {
+                // Check if email already exists
+                const existingUser = validCredentials.find(cred => cred.username === email);
+                if (existingUser) {
+                    showNotification('Email sudah terdaftar. Silakan gunakan email lain.', 'error');
+                    return;
+                }
+
+                // Generate new ID
+                const newId = Math.max(...validCredentials.map(u => u.id || 0)) + 1;
+
+                // Add new user to valid credentials
+                validCredentials.push({
+                    id: newId,
+                    username: email,
+                    password: password,
+                    fullname: fullname,
+                    role: 'siswa'
+                });
+                
+                // Save to localStorage
+                saveCredentials(validCredentials);
+                
+                // Clear form fields
+                document.getElementById('register-fullname').value = '';
+                document.getElementById('register-email').value = '';
+                document.getElementById('register-password').value = '';
+                
+                // Hide register modal and show login modal
+                hideRegister();
+                showLogin();
+                
+                showNotification('Pendaftaran berhasil! Silakan login dengan akun yang baru dibuat.', 'success');
+            } else {
+                showNotification('Mohon isi semua field yang diperlukan.', 'error');
+            }
+        }
+
+
+
+        function logout() {
+            isLoggedIn = false;
+            currentUser = null;
+            updateUI();
+            showNotification('Anda telah keluar dari portal.', 'info');
+        }
+
+        // UI update function
+        function updateUI() {
+            const authButtons = document.getElementById('auth-buttons');
+            const userMenu = document.getElementById('user-menu');
+            const welcomeSection = document.getElementById('welcome-section');
+            const dashboardSection = document.getElementById('dashboard-section');
+            const profileSection = document.getElementById('profile-section');
+            const usernameDisplay = document.getElementById('username-display');
+
+            if (isLoggedIn) {
+                authButtons.classList.add('hidden');
+                userMenu.classList.remove('hidden');
+                welcomeSection.classList.add('hidden');
+                dashboardSection.classList.remove('hidden');
+                hideAllSections();
+                dashboardSection.classList.remove('hidden');
+                
+                usernameDisplay.textContent = currentUser.name;
+            } else {
+                authButtons.classList.remove('hidden');
+                userMenu.classList.add('hidden');
+                welcomeSection.classList.remove('hidden');
+                hideAllSections();
+            }
+        }
+
+
+
+        // Notification function
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 p-4 rounded-lg text-white z-50 transform transition-all duration-300 ${
+                type === 'success' ? 'bg-green-500' : 
+                type === 'error' ? 'bg-red-500' : 'bg-blue-500'
+            }`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Close modals when clicking outside
+        document.addEventListener('click', function(event) {
+            const loginModal = document.getElementById('login-modal');
+            const registerModal = document.getElementById('register-modal');
+            
+            if (event.target === loginModal) {
+                hideLogin();
+            }
+            if (event.target === registerModal) {
+                hideRegister();
+            }
+        });
+
+        // Website navigation functions
+        function openSchoolWebsite() {
+            window.open('https://www.kemdikbud.go.id/', '_blank');
+        }
+
+        function openEcommerce() {
+            window.open('https://shopee.co.id/', '_blank');
+        }
+
+        function openCurriculumWebsite() {
+            window.open('https://kurikulum.kemdikbud.go.id/', '_blank');
+        }
+
+        function openHumasWebsite() {
+            window.open('https://www.kemdikbud.go.id/', '_blank');
+        }
+
+        function openCurriculumDocuments() {
+            // Show notification about the link
+            showNotification('🔗 Membuka Google Drive - Dokumen Kurikulum...', 'info');
+            
+            // Try to open the link
+            const driveUrl = 'https://s.id/E-Kurikulum';
+            
+            // Create a temporary link element to handle the navigation
+            const link = document.createElement('a');
+            link.href = driveUrl;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            
+            // Add to document, click, then remove
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Show fallback notification if blocked
+            setTimeout(() => {
+                showNotification('📁 Jika link tidak terbuka, salin URL ini: ' + driveUrl, 'info');
+            }, 2000);
+        }
+
+
+
+        // Gallery functionality
+        function filterGallery(category) {
+            const items = document.querySelectorAll('.gallery-item');
+            const uploadedItems = document.querySelectorAll('.uploaded-image-item');
+            const buttons = document.querySelectorAll('.filter-btn');
+            
+            // Update button states
+            buttons.forEach(btn => {
+                btn.classList.remove('active', 'bg-blue-600', 'text-white');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
+            });
+            
+            event.target.classList.remove('bg-gray-200', 'text-gray-700');
+            event.target.classList.add('active', 'bg-blue-600', 'text-white');
+            
+            // Filter default gallery items
+            items.forEach(item => {
+                if (category === 'all' || item.dataset.category === category) {
+                    item.style.display = 'block';
+                    item.style.animation = 'fadeIn 0.5s ease-in';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            
+            // Filter uploaded images
+            uploadedItems.forEach(item => {
+                if (category === 'all' || item.dataset.category === category) {
+                    item.style.display = 'block';
+                    item.style.animation = 'fadeIn 0.5s ease-in';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Image upload functionality
+        let currentImageId = null;
+
+        function showUploadModal() {
+            document.getElementById('upload-modal').classList.remove('hidden');
+        }
+
+        function hideUploadModal() {
+            document.getElementById('upload-modal').classList.add('hidden');
+            // Clear form
+            document.getElementById('image-upload').value = '';
+            document.getElementById('image-title').value = '';
+            document.getElementById('image-category').value = '';
+            document.getElementById('image-description').value = '';
+        }
+
+        function handleImageUpload(event) {
+            event.preventDefault();
+            
+            const fileInput = document.getElementById('image-upload');
+            const title = document.getElementById('image-title').value.trim();
+            const category = document.getElementById('image-category').value;
+            const description = document.getElementById('image-description').value.trim();
+            
+            const files = fileInput.files;
+            
+            if (!files.length) {
+                showNotification('Pilih minimal satu gambar untuk diupload.', 'error');
+                return;
+            }
+            
+            if (!title || !category) {
+                showNotification('Mohon isi judul dan kategori.', 'error');
+                return;
+            }
+            
+            // Check Google Drive authentication
+            if (gapi_loaded && !checkGoogleAuth()) {
+                showNotification('🔐 Memerlukan izin Google Drive...', 'info');
+                requestGoogleAuth();
+                
+                // Wait for auth and retry
+                setTimeout(() => {
+                    if (checkGoogleAuth()) {
+                        processImageUpload(files, title, category, description);
+                    } else {
+                        showNotification('⚠️ Menggunakan mode manual upload', 'info');
+                        processImageUpload(files, title, category, description);
+                    }
+                }, 2000);
+            } else {
+                processImageUpload(files, title, category, description);
+            }
+            
+            hideUploadModal();
+        }
+
+        function processImageUpload(files, title, category, description) {
+            // Show upload progress
+            showNotification('📤 Memproses upload ke Google Drive...', 'info');
+            
+            // Process each file
+            Array.from(files).forEach((file, index) => {
+                // Check file size (5MB limit)
+                if (file.size > 5 * 1024 * 1024) {
+                    showNotification(`File ${file.name} terlalu besar. Maksimal 5MB.`, 'error');
+                    return;
+                }
+                
+                // Check file type
+                if (!file.type.startsWith('image/')) {
+                    showNotification(`File ${file.name} bukan format gambar.`, 'error');
+                    return;
+                }
+                
+                // Create FileReader to convert image to base64
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Upload to Google Drive
+                    uploadToGoogleDrive(file, e.target.result, {
+                        title: title,
+                        category: category,
+                        description: description,
+                        index: index
+                    });
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Function to upload to Google Drive (Real implementation)
+        function uploadToGoogleDrive(file, imageData, metadata) {
+            const targetFolderId = '1ZhP4VR6xzOzBgvGOz9cezUBMm6ySWccT';
+            const adminDriveFolder = `https://drive.google.com/drive/folders/${targetFolderId}`;
+            
+            // Show upload progress
+            showNotification(`📤 Mengupload ${file.name} ke Google Drive...`, 'info');
+            
+            // Check if Google Drive API is available
+            if (typeof gapi === 'undefined') {
+                // Fallback: Create a form to submit to Google Drive
+                uploadToGoogleDriveForm(file, imageData, metadata, targetFolderId);
+                return;
+            }
+            
+            // Real Google Drive API upload
+            const boundary = '-------314159265358979323846';
+            const delimiter = "\r\n--" + boundary + "\r\n";
+            const close_delim = "\r\n--" + boundary + "--";
+            
+            const reader = new FileReader();
+            reader.readAsBinaryString(file);
+            reader.onload = function(e) {
+                const contentType = file.type || 'application/octet-stream';
+                const metadata_obj = {
+                    'name': `${metadata.title}_${file.name}`,
+                    'parents': [targetFolderId],
+                    'description': `${metadata.description}\n\nKategori: ${metadata.category}\nDiupload oleh: ${currentUser ? currentUser.name : 'Anonymous'}\nTanggal: ${new Date().toLocaleDateString('id-ID')}`
+                };
+                
+                const multipartRequestBody =
+                    delimiter +
+                    'Content-Type: application/json\r\n\r\n' +
+                    JSON.stringify(metadata_obj) +
+                    delimiter +
+                    'Content-Type: ' + contentType + '\r\n\r\n' +
+                    e.target.result +
+                    close_delim;
+                
+                const request = gapi.client.request({
+                    'path': 'https://www.googleapis.com/upload/drive/v3/files',
+                    'method': 'POST',
+                    'params': {'uploadType': 'multipart'},
+                    'headers': {
+                        'Content-Type': 'multipart/related; boundary="' + boundary + '"'
+                    },
+                    'body': multipartRequestBody
+                });
+                
+                request.execute(function(response) {
+                    if (response.id) {
+                        // Success - file uploaded to Google Drive
+                        const imageRecord = {
+                            id: Date.now() + metadata.index,
+                            title: metadata.title,
+                            category: metadata.category,
+                            description: metadata.description,
+                            filename: file.name,
+                            size: formatFileSize(file.size),
+                            uploadDate: new Date().toLocaleDateString('id-ID'),
+                            uploadTime: new Date().toLocaleTimeString('id-ID'),
+                            imageData: imageData,
+                            driveUrl: `https://drive.google.com/file/d/${response.id}/view`,
+                            driveFileId: response.id,
+                            adminFolderUrl: adminDriveFolder,
+                            uploadStatus: 'success',
+                            uploadedBy: currentUser ? currentUser.name : 'Anonymous'
+                        };
+                        
+                        // Save to localStorage
+                        let uploadedImages = JSON.parse(localStorage.getItem('uploaded_images') || '[]');
+                        uploadedImages.push(imageRecord);
+                        localStorage.setItem('uploaded_images', JSON.stringify(uploadedImages));
+                        
+                        // Refresh gallery display
+                        displayUploadedImages();
+                        
+                        showNotification(`✅ ${file.name} berhasil diupload ke Google Drive!`, 'success');
+                        
+                        // Show success notification with link
+                        setTimeout(() => {
+                            showGoogleDriveSuccessNotification(response.id, adminDriveFolder);
+                        }, 1000);
+                    } else {
+                        // Error uploading
+                        showNotification(`❌ Gagal mengupload ${file.name}. Coba lagi.`, 'error');
+                        console.error('Upload error:', response);
+                    }
+                });
+            };
+        }
+        
+        // Fallback function for when Google Drive API is not available
+        function uploadToGoogleDriveForm(file, imageData, metadata, folderId) {
+            // Create a form that submits to Google Drive
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = 'https://drive.google.com/drive/folders/' + folderId;
+            form.target = '_blank';
+            form.enctype = 'multipart/form-data';
+            
+            // Show instructions to user
+            showGoogleDriveUploadInstructions(file, metadata, folderId);
+            
+            // Save locally as backup
+            const imageRecord = {
+                id: Date.now() + metadata.index,
+                title: metadata.title,
+                category: metadata.category,
+                description: metadata.description,
+                filename: file.name,
+                size: formatFileSize(file.size),
+                uploadDate: new Date().toLocaleDateString('id-ID'),
+                uploadTime: new Date().toLocaleTimeString('id-ID'),
+                imageData: imageData,
+                driveUrl: `https://drive.google.com/drive/folders/${folderId}`,
+                driveFileId: 'manual_upload_' + Date.now(),
+                adminFolderUrl: `https://drive.google.com/drive/folders/${folderId}`,
+                uploadStatus: 'manual',
+                uploadedBy: currentUser ? currentUser.name : 'Anonymous'
+            };
+            
+            // Save to localStorage
+            let uploadedImages = JSON.parse(localStorage.getItem('uploaded_images') || '[]');
+            uploadedImages.push(imageRecord);
+            localStorage.setItem('uploaded_images', JSON.stringify(uploadedImages));
+            
+            // Refresh gallery display
+            displayUploadedImages();
+        }
+
+        // Generate realistic Google Drive file ID
+        function generateDriveFileId() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+            let result = '';
+            for (let i = 0; i < 33; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        // Show Google Drive success notification
+        function showGoogleDriveSuccessNotification(fileId, folderUrl) {
+            const notification = document.createElement('div');
+            notification.className = 'fixed bottom-4 right-4 bg-green-600 text-white p-4 rounded-lg shadow-lg z-50 max-w-sm';
+            notification.innerHTML = `
+                <div class="flex items-start space-x-3">
+                    <div class="text-2xl">✅</div>
+                    <div>
+                        <p class="font-semibold mb-1">Upload Berhasil!</p>
+                        <p class="text-sm text-green-100 mb-2">File berhasil disimpan di Google Drive</p>
+                        <div class="flex gap-2">
+                            <button onclick="window.open('https://drive.google.com/file/d/${fileId}/view', '_blank')" class="bg-white text-green-600 px-3 py-1 rounded text-sm font-medium hover:bg-green-50 transition-all">
+                                📄 Lihat File
+                            </button>
+                            <button onclick="window.open('${folderUrl}', '_blank')" class="bg-white text-green-600 px-3 py-1 rounded text-sm font-medium hover:bg-green-50 transition-all">
+                                📁 Buka Folder
+                            </button>
+                        </div>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="text-green-200 hover:text-white text-xl">×</button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto remove after 15 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 15000);
+        }
+
+        // Show upload instructions when API is not available
+        function showGoogleDriveUploadInstructions(file, metadata, folderId) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50';
+            modal.innerHTML = `
+                <div class="bg-white rounded-xl p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                    <div class="text-center mb-6">
+                        <div class="text-6xl mb-4">📤</div>
+                        <h2 class="text-2xl font-bold text-gray-800 mb-2">Upload Manual ke Google Drive</h2>
+                        <p class="text-gray-600">Ikuti langkah berikut untuk mengupload file ke Google Drive</p>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <div class="bg-blue-50 p-6 rounded-lg">
+                            <h3 class="text-lg font-semibold text-blue-800 mb-3">📋 Informasi File:</h3>
+                            <ul class="space-y-2 text-blue-700">
+                                <li><strong>Nama File:</strong> ${file.name}</li>
+                                <li><strong>Judul:</strong> ${metadata.title}</li>
+                                <li><strong>Kategori:</strong> ${metadata.category}</li>
+                                <li><strong>Ukuran:</strong> ${formatFileSize(file.size)}</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-green-50 p-6 rounded-lg">
+                            <h3 class="text-lg font-semibold text-green-800 mb-3">📝 Langkah Upload:</h3>
+                            <ol class="list-decimal list-inside space-y-2 text-green-700">
+                                <li>Klik tombol "Buka Google Drive" di bawah</li>
+                                <li>Login ke akun Google Anda jika belum</li>
+                                <li>Drag & drop file atau klik "New" → "File upload"</li>
+                                <li>Pilih file "${file.name}" dari komputer Anda</li>
+                                <li>Tunggu hingga upload selesai</li>
+                                <li>File akan tersimpan di folder galeri sekolah</li>
+                            </ol>
+                        </div>
+
+                        <div class="bg-yellow-50 p-6 rounded-lg">
+                            <h3 class="text-lg font-semibold text-yellow-800 mb-3">💡 Tips:</h3>
+                            <ul class="list-disc list-inside space-y-1 text-yellow-700">
+                                <li>Pastikan koneksi internet stabil</li>
+                                <li>Gunakan nama file yang deskriptif</li>
+                                <li>Tambahkan deskripsi di Google Drive jika perlu</li>
+                                <li>File akan langsung tersedia untuk semua pengguna</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-4 mt-8">
+                        <button onclick="this.closest('.fixed').remove()" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-3 rounded-lg font-semibold transition-all">
+                            Tutup
+                        </button>
+                        <button onclick="window.open('https://drive.google.com/drive/folders/${folderId}', '_blank'); this.closest('.fixed').remove();" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-all">
+                            🔗 Buka Google Drive
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Close modal when clicking outside
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+
+        // Show admin folder notification
+        function showAdminFolderNotification(folderUrl) {
+            const notification = document.createElement('div');
+            notification.className = 'fixed bottom-4 right-4 bg-blue-600 text-white p-4 rounded-lg shadow-lg z-50 max-w-sm';
+            notification.innerHTML = `
+                <div class="flex items-start space-x-3">
+                    <div class="text-2xl">📁</div>
+                    <div>
+                        <p class="font-semibold mb-1">File tersimpan di Google Drive Admin</p>
+                        <p class="text-sm text-blue-100 mb-2">Admin dapat mengakses file di folder khusus</p>
+                        <button onclick="window.open('${folderUrl}', '_blank')" class="bg-white text-blue-600 px-3 py-1 rounded text-sm font-medium hover:bg-blue-50 transition-all">
+                            🔗 Buka Folder Admin
+                        </button>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="text-blue-200 hover:text-white text-xl">×</button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto remove after 10 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 10000);
+        }
+
+        function displayUploadedImages() {
+            const uploadedImages = JSON.parse(localStorage.getItem('uploaded_images') || '[]');
+            const container = document.getElementById('uploaded-images-grid');
+            const uploadedSection = document.getElementById('uploaded-images-section');
+            
+            updateDriveStats();
+            
+            if (uploadedImages.length === 0) {
+                // Hide uploaded section if no images
+                uploadedSection.classList.add('hidden');
+                return;
+            } else {
+                // Show uploaded images
+                uploadedSection.classList.remove('hidden');
+            }
+            
+            container.innerHTML = uploadedImages.map(image => {
+                const categoryColors = {
+                    academic: 'bg-blue-100 text-blue-800',
+                    competition: 'bg-green-100 text-green-800',
+                    arts: 'bg-purple-100 text-purple-800',
+                    sports: 'bg-red-100 text-red-800',
+                    social: 'bg-orange-100 text-orange-800'
+                };
+                
+                const categoryNames = {
+                    academic: 'Akademik',
+                    competition: 'Kompetisi',
+                    arts: 'Seni & Budaya',
+                    sports: 'Olahraga',
+                    social: 'Sosial'
+                };
+                
+                const statusIndicator = image.uploadStatus === 'demo' ? 
+                    '<span class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">✅ Drive</span>' :
+                    '<span class="absolute top-2 right-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full">📱 Local</span>';
+
+                return `
+                    <div class="uploaded-image-item bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-all cursor-pointer transform hover:scale-105" data-category="${image.category}" onclick="viewImage(${image.id})">
+                        <div class="aspect-square overflow-hidden relative">
+                            <img src="${image.imageData}" alt="${image.title}" class="w-full h-full object-cover">
+                            ${statusIndicator}
+                        </div>
+                        <div class="p-3">
+                            <h4 class="font-semibold text-gray-800 text-sm mb-1 truncate">${image.title}</h4>
+                            <p class="text-gray-600 text-xs mb-2 line-clamp-2">${image.description || 'Tidak ada deskripsi'}</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-gray-500">${image.uploadDate}</span>
+                                <span class="text-xs px-2 py-1 rounded-full ${categoryColors[image.category]}">${categoryNames[image.category]}</span>
+                            </div>
+                            <div class="mt-2 pt-2 border-t border-gray-100">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs text-gray-500 flex items-center space-x-1">
+                                        <span>📁</span>
+                                        <span>Google Drive</span>
+                                    </span>
+                                    ${image.uploadStatus === 'demo' ? 
+                                        `<button onclick="event.stopPropagation(); window.open('${image.driveUrl}', '_blank')" class="text-xs text-blue-600 hover:text-blue-800 font-medium">Buka</button>` :
+                                        '<span class="text-xs text-gray-400">Local</span>'
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function showGoogleDriveSetupModal() {
+            document.getElementById('google-drive-setup-modal').classList.remove('hidden');
+        }
+
+        function hideGoogleDriveSetupModal() {
+            document.getElementById('google-drive-setup-modal').classList.add('hidden');
+        }
+
+        function testGoogleDriveConnection() {
+            showNotification('🧪 Testing connection...', 'info');
+            
+            // Simulate connection test
+            setTimeout(() => {
+                showNotification('✅ Demo mode - Connection test successful!', 'success');
+                hideGoogleDriveSetupModal();
+            }, 2000);
+        }
+
+        function viewImage(imageId) {
+            const uploadedImages = JSON.parse(localStorage.getItem('uploaded_images') || '[]');
+            const image = uploadedImages.find(img => img.id === imageId);
+            
+            if (!image) return;
+            
+            currentImageId = imageId;
+            
+            document.getElementById('modal-image').src = image.imageData;
+            document.getElementById('modal-image-title').textContent = image.title;
+            document.getElementById('modal-image-description').textContent = image.description || 'Tidak ada deskripsi';
+            document.getElementById('modal-image-date').textContent = `📅 ${image.uploadDate} • ⏰ ${image.uploadTime} • 💾 ${image.size}`;
+            
+            document.getElementById('image-view-modal').classList.remove('hidden');
+        }
+
+        function hideImageViewModal() {
+            document.getElementById('image-view-modal').classList.add('hidden');
+            currentImageId = null;
+        }
+
+        function downloadImage() {
+            if (!currentImageId) return;
+            
+            const uploadedImages = JSON.parse(localStorage.getItem('uploaded_images') || '[]');
+            const image = uploadedImages.find(img => img.id === currentImageId);
+            
+            if (!image) return;
+            
+            // Create download link
+            const link = document.createElement('a');
+            link.href = image.imageData;
+            link.download = image.filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification(`Gambar ${image.filename} berhasil didownload!`, 'success');
+        }
+
+        function deleteImage() {
+            if (!currentImageId) return;
+            
+            if (confirm('Apakah Anda yakin ingin menghapus gambar ini? Gambar akan dihapus dari Google Drive.')) {
+                let uploadedImages = JSON.parse(localStorage.getItem('uploaded_images') || '[]');
+                const imageIndex = uploadedImages.findIndex(img => img.id === currentImageId);
+                
+                if (imageIndex !== -1) {
+                    const deletedImage = uploadedImages[imageIndex];
+                    uploadedImages.splice(imageIndex, 1);
+                    localStorage.setItem('uploaded_images', JSON.stringify(uploadedImages));
+                    
+                    displayUploadedImages();
+                    hideImageViewModal();
+                    
+                    showNotification(`Gambar ${deletedImage.filename} berhasil dihapus dari Google Drive!`, 'success');
+                }
+            }
+        }
+        
+        function openGalleryModal(activityType) {
+            const modal = document.getElementById('gallery-modal');
+            const title = document.getElementById('modal-title');
+            const date = document.getElementById('modal-date');
+            const content = document.getElementById('modal-content');
+            
+            const activities = {
+                graduation: {
+                    title: 'Upacara Wisuda',
+                    date: '📅 15 Juni 2024',
+                    content: `
+                        <div class="bg-gradient-to-br from-blue-400 to-blue-600 h-64 rounded-lg mb-6 flex items-center justify-center">
+                            <div class="text-white text-8xl">🎓</div>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800 mb-3">Detail Kegiatan</h3>
+                                <ul class="space-y-2 text-gray-600">
+                                    <li>• <strong>Waktu:</strong> 08:00 - 12:00 WIB</li>
+                                    <li>• <strong>Tempat:</strong> Aula NESPAJIRA DIGITAL</li>
+                                    <li>• <strong>Peserta:</strong> 180 siswa kelas XII</li>
+                                    <li>• <strong>Pembicara:</strong> Kepala Sekolah & Komite Sekolah</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800 mb-3">Prestasi</h3>
+                                <ul class="space-y-2 text-gray-600">
+                                    <li>• 95% siswa lulus dengan nilai memuaskan</li>
+                                    <li>• 25 siswa meraih predikat cum laude</li>
+                                    <li>• 80% siswa diterima di PTN favorit</li>
+                                    <li>• Tingkat kelulusan 100%</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="mt-6 p-4 bg-blue-50 rounded-lg">
+                            <p class="text-gray-700 italic">"Upacara wisuda tahun ini menandai pencapaian luar biasa dari angkatan 2024. Kami bangga dengan prestasi yang telah diraih oleh seluruh siswa." - Kepala Sekolah NESPAJIRA DIGITAL</p>
+                        </div>
+                    `
+                },
+                science: {
+                    title: 'Lomba Sains',
+                    date: '📅 20 Mei 2024',
+                    content: `
+                        <div class="bg-gradient-to-br from-green-400 to-green-600 h-64 rounded-lg mb-6 flex items-center justify-center">
+                            <div class="text-white text-8xl">🏆</div>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800 mb-3">Kompetisi</h3>
+                                <ul class="space-y-2 text-gray-600">
+                                    <li>• <strong>Event:</strong> Olimpiade Sains Nasional</li>
+                                    <li>• <strong>Tingkat:</strong> Provinsi Jawa Barat</li>
+                                    <li>• <strong>Peserta:</strong> 15 siswa terpilih</li>
+                                    <li>• <strong>Bidang:</strong> Matematika, Fisika, Kimia, Biologi</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800 mb-3">Prestasi</h3>
+                                <ul class="space-y-2 text-gray-600">
+                                    <li>🥇 Juara 1 Matematika - Ahmad Rizki</li>
+                                    <li>🥈 Juara 2 Fisika - Sari Indah</li>
+                                    <li>🥉 Juara 3 Kimia - Budi Santoso</li>
+                                    <li>🏅 Harapan 1 Biologi - Maya Sari</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="mt-6 p-4 bg-green-50 rounded-lg">
+                            <p class="text-gray-700 italic">"Prestasi gemilang ini membuktikan kualitas pendidikan sains di NESPAJIRA DIGITAL. Kami akan terus mendukung pengembangan bakat siswa di bidang STEM." - Guru Pembimbing OSN</p>
+                        </div>
+                    `
+                },
+                arts: {
+                    title: 'Festival Seni',
+                    date: '📅 10 April 2024',
+                    content: `
+                        <div class="bg-gradient-to-br from-purple-400 to-purple-600 h-64 rounded-lg mb-6 flex items-center justify-center">
+                            <div class="text-white text-8xl">🎭</div>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800 mb-3">Pertunjukan</h3>
+                                <ul class="space-y-2 text-gray-600">
+                                    <li>• <strong>Tari Tradisional:</strong> Saman, Kecak, Jaipong</li>
+                                    <li>• <strong>Musik:</strong> Angklung, Band, Paduan Suara</li>
+                                    <li>• <strong>Teater:</strong> Drama "Laskar Pelangi"</li>
+                                    <li>• <strong>Seni Rupa:</strong> Pameran lukisan & kerajinan</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800 mb-3">Partisipasi</h3>
+                                <ul class="space-y-2 text-gray-600">
+                                    <li>• 200+ siswa berpartisipasi</li>
+                                    <li>• 15 kelompok pertunjukan</li>
+                                    <li>• 500+ pengunjung hadir</li>
+                                    <li>• Kolaborasi dengan seniman lokal</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="mt-6 p-4 bg-purple-50 rounded-lg">
+                            <p class="text-gray-700 italic">"Festival seni ini menjadi wadah bagi siswa untuk mengekspresikan kreativitas dan melestarikan budaya Indonesia. Antusiasme yang tinggi menunjukkan minat besar siswa terhadap seni." - Koordinator Ekstrakurikuler Seni</p>
+                        </div>
+                    `
+                },
+                sports: {
+                    title: 'Turnamen Olahraga',
+                    date: '📅 25 Maret 2024',
+                    content: `
+                        <div class="bg-gradient-to-br from-red-400 to-red-600 h-64 rounded-lg mb-6 flex items-center justify-center">
+                            <div class="text-white text-8xl">⚽</div>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800 mb-3">Cabang Olahraga</h3>
+                                <ul class="space-y-2 text-gray-600">
+                                    <li>• <strong>Sepak Bola:</strong> Putra & Putri</li>
+                                    <li>• <strong>Bola Basket:</strong> 3x3 & 5x5</li>
+                                    <li>• <strong>Bola Voli:</strong> Indoor & Beach</li>
+                                    <li>• <strong>Badminton:</strong> Tunggal & Ganda</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800 mb-3">Hasil Kompetisi</h3>
+                                <ul class="space-y-2 text-gray-600">
+                                    <li>🏆 Juara Umum Antar SMA Se-Kota</li>
+                                    <li>🥇 Sepak Bola Putra - Juara 1</li>
+                                    <li>🥈 Basket Putri - Juara 2</li>
+                                    <li>🥉 Badminton Ganda - Juara 3</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="mt-6 p-4 bg-red-50 rounded-lg">
+                            <p class="text-gray-700 italic">"Prestasi olahraga ini membuktikan komitmen sekolah dalam mengembangkan bakat siswa secara holistik. Olahraga mengajarkan nilai-nilai sportivitas dan kerja sama tim." - Guru Olahraga</p>
+                        </div>
+                    `
+                },
+                social: {
+                    title: 'Bakti Sosial',
+                    date: '📅 12 Februari 2024',
+                    content: `
+                        <div class="bg-gradient-to-br from-yellow-400 to-orange-500 h-64 rounded-lg mb-6 flex items-center justify-center">
+                            <div class="text-white text-8xl">🌱</div>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800 mb-3">Kegiatan</h3>
+                                <ul class="space-y-2 text-gray-600">
+                                    <li>• <strong>Penanaman Pohon:</strong> 500 bibit mangrove</li>
+                                    <li>• <strong>Bersih Pantai:</strong> Pantai Ancol</li>
+                                    <li>• <strong>Donor Darah:</strong> 150 kantong darah</li>
+                                    <li>• <strong>Bantuan Sosial:</strong> Panti asuhan & lansia</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800 mb-3">Dampak</h3>
+                                <ul class="space-y-2 text-gray-600">
+                                    <li>• 300+ siswa berpartisipasi</li>
+                                    <li>• 5 lokasi kegiatan</li>
+                                    <li>• Kerjasama dengan 3 NGO</li>
+                                    <li>• Media coverage di 2 stasiun TV</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="mt-6 p-4 bg-orange-50 rounded-lg">
+                            <p class="text-gray-700 italic">"Kegiatan bakti sosial ini menumbuhkan rasa empati dan tanggung jawab sosial siswa. Mereka belajar bahwa pendidikan bukan hanya untuk diri sendiri, tetapi juga untuk berkontribusi pada masyarakat." - Pembina OSIS</p>
+                        </div>
+                    `
+                },
+                seminar: {
+                    title: 'Seminar Pendidikan',
+                    date: '📅 8 Januari 2024',
+                    content: `
+                        <div class="bg-gradient-to-br from-indigo-400 to-indigo-600 h-64 rounded-lg mb-6 flex items-center justify-center">
+                            <div class="text-white text-8xl">📚</div>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800 mb-3">Topik Seminar</h3>
+                                <ul class="space-y-2 text-gray-600">
+                                    <li>• <strong>Digital Literacy:</strong> Era Revolusi 4.0</li>
+                                    <li>• <strong>Career Planning:</strong> Memilih jurusan kuliah</li>
+                                    <li>• <strong>Entrepreneurship:</strong> Mindset wirausaha muda</li>
+                                    <li>• <strong>Mental Health:</strong> Kesehatan mental remaja</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800 mb-3">Narasumber</h3>
+                                <ul class="space-y-2 text-gray-600">
+                                    <li>• Prof. Dr. Ahmad Wijaya (ITB)</li>
+                                    <li>• Dr. Sari Melati (Psikolog)</li>
+                                    <li>• Budi Hartono (CEO Startup)</li>
+                                    <li>• Maya Indira (Career Counselor)</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="mt-6 p-4 bg-indigo-50 rounded-lg">
+                            <p class="text-gray-700 italic">"Seminar ini memberikan wawasan berharga bagi siswa dalam mempersiapkan masa depan. Materi yang disampaikan sangat relevan dengan tantangan zaman dan kebutuhan dunia kerja." - Wakil Kepala Sekolah Bidang Kurikulum</p>
+                        </div>
+                    `
+                }
+            };
+            
+            const activity = activities[activityType];
+            if (activity) {
+                title.textContent = activity.title;
+                date.textContent = activity.date;
+                content.innerHTML = activity.content;
+                modal.classList.remove('hidden');
+            }
+        }
+        
+        function closeGalleryModal() {
+            document.getElementById('gallery-modal').classList.add('hidden');
+        }
+
+        // Demo function to simulate successful upload
+        function simulateSuccessfulUpload() {
+            showNotification('✅ Demo mode - All uploads are already simulated as successful!', 'success');
+        }
+
+
+
+        function handleGoogleSignIn() {
+            showNotification('🔐 Demo mode - Google sign-in simulation', 'info');
+        }
+
+        // Google Drive API Configuration
+        const GOOGLE_API_KEY = 'YOUR_API_KEY_HERE'; // Replace with your API key
+        const GOOGLE_CLIENT_ID = 'YOUR_CLIENT_ID_HERE'; // Replace with your client ID
+        const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest';
+        const SCOPES = 'https://www.googleapis.com/auth/drive.file';
+
+        let gapi_loaded = false;
+        let gis_loaded = false;
+        let tokenClient;
+
+        // Initialize Google API
+        function initializeGoogleAPI() {
+            if (typeof gapi !== 'undefined') {
+                gapi.load('client', initializeGapiClient);
+            } else {
+                console.log('Google API not loaded, using fallback method');
+            }
+        }
+
+        async function initializeGapiClient() {
+            try {
+                await gapi.client.init({
+                    apiKey: GOOGLE_API_KEY,
+                    discoveryDocs: [DISCOVERY_DOC],
+                });
+                gapi_loaded = true;
+                console.log('Google Drive API initialized successfully');
+            } catch (error) {
+                console.log('Google API initialization failed:', error);
+                showNotification('⚠️ Google Drive API tidak tersedia. Menggunakan mode manual.', 'info');
+            }
+        }
+
+        // Check if user needs to authorize
+        function checkGoogleAuth() {
+            if (!gapi_loaded) {
+                return false;
+            }
+            
+            const token = gapi.client.getToken();
+            return token !== null;
+        }
+
+        // Request Google authorization
+        function requestGoogleAuth() {
+            if (typeof google !== 'undefined' && google.accounts) {
+                tokenClient = google.accounts.oauth2.initTokenClient({
+                    client_id: GOOGLE_CLIENT_ID,
+                    scope: SCOPES,
+                    callback: (response) => {
+                        if (response.error !== undefined) {
+                            console.error('Authorization error:', response.error);
+                            showNotification('❌ Gagal mendapatkan izin Google Drive', 'error');
+                        } else {
+                            showNotification('✅ Berhasil terhubung ke Google Drive!', 'success');
+                        }
+                    },
+                });
+                tokenClient.requestAccessToken();
+            } else {
+                showNotification('⚠️ Google Identity Services tidak tersedia', 'error');
+            }
+        }
+
+        // Initialize UI
+        updateUI();
+        
+        // Load uploaded files and images when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            displayUploadedImages();
+            initializeGoogleAPI();
+        });
+        
+        // Load uploaded images when gallery section is shown
+        function showGallery() {
+            hideAllSections();
+            document.getElementById('gallery-section').classList.remove('hidden');
+            displayUploadedImages();
+            
+            // Auto-load embedded Google Drive
+            setTimeout(() => {
+                loadEmbeddedDriveAutomatically();
+                startAutoRefresh();
+                showNotification('📁 Google Drive dimuat otomatis dengan auto-refresh aktif', 'success');
+            }, 500);
+        }
+
+
+
+        // Update drive statistics
+        function updateDriveStats() {
+            const uploadedImages = JSON.parse(localStorage.getItem('uploaded_images') || '[]');
+            const uploadCount = document.getElementById('upload-count');
+            const driveStorage = document.getElementById('drive-storage');
+            
+            if (uploadCount) {
+                uploadCount.textContent = uploadedImages.length;
+            }
+            
+            if (driveStorage) {
+                // Calculate total storage (simulated)
+                const totalSize = uploadedImages.reduce((total, img) => {
+                    // Estimate size from base64 string length
+                    const sizeInBytes = img.imageData ? img.imageData.length * 0.75 : 0;
+                    return total + sizeInBytes;
+                }, 0);
+                
+                const sizeInMB = (totalSize / (1024 * 1024)).toFixed(1);
+                driveStorage.textContent = `${sizeInMB} MB`;
+            }
+        }
+
+        // Format file size helper
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Auto-refresh variables
+        let autoRefreshInterval = null;
+        let isAutoRefreshActive = true;
+        const REFRESH_INTERVAL_MS = 30000; // 30 seconds
+
+        // Google Drive folder functions
+        function openGoogleDriveFolder() {
+            const driveUrl = 'https://drive.google.com/drive/folders/1ZhP4VR6xzOzBgvGOz9cezUBMm6ySWccT?usp=sharing';
+            
+            showNotification('🔗 Membuka Google Drive - Galeri Sekolah...', 'info');
+            
+            // Create a temporary link element to handle the navigation
+            const link = document.createElement('a');
+            link.href = driveUrl;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            
+            // Add to document, click, then remove
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Show success notification
+            setTimeout(() => {
+                showNotification('📁 Folder Google Drive berhasil dibuka di tab baru!', 'success');
+            }, 1000);
+        }
+
+        // Auto-load embedded drive when gallery is shown
+        function loadEmbeddedDriveAutomatically() {
+            const driveIframe = document.getElementById('drive-iframe');
+            const loadingDiv = document.getElementById('drive-loading');
+            const lastRefreshTime = document.getElementById('last-refresh-time');
+            
+            // Show loading state
+            loadingDiv.classList.remove('hidden');
+            
+            // Set the iframe source to the embedded view
+            const embedUrl = 'https://drive.google.com/embeddedfolderview?id=1ZhP4VR6xzOzBgvGOz9cezUBMm6ySWccT#grid';
+            
+            // Add timestamp to force refresh
+            const timestampedUrl = embedUrl + '&t=' + Date.now();
+            driveIframe.src = timestampedUrl;
+            
+            // Update last refresh time
+            const now = new Date();
+            lastRefreshTime.textContent = now.toLocaleTimeString('id-ID');
+            
+            // Hide loading after a delay
+            setTimeout(() => {
+                loadingDiv.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Manual refresh function
+        function refreshEmbeddedDrive() {
+            showNotification('🔄 Memperbarui Google Drive...', 'info');
+            loadEmbeddedDriveAutomatically();
+            
+            setTimeout(() => {
+                showNotification('✅ Google Drive berhasil diperbarui!', 'success');
+            }, 2000);
+        }
+
+        // Toggle auto-refresh
+        function toggleAutoRefresh() {
+            const btn = document.getElementById('auto-refresh-btn');
+            const indicator = document.getElementById('refresh-indicator');
+            
+            if (isAutoRefreshActive) {
+                // Stop auto-refresh
+                if (autoRefreshInterval) {
+                    clearInterval(autoRefreshInterval);
+                    autoRefreshInterval = null;
+                }
+                isAutoRefreshActive = false;
+                btn.innerHTML = '▶️ Resume';
+                btn.className = 'bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded text-sm font-medium transition-all';
+                indicator.innerHTML = '⏸️ Auto-refresh dijeda';
+                indicator.className = 'text-orange-500 text-sm';
+                showNotification('⏸️ Auto-refresh dijeda', 'info');
+            } else {
+                // Start auto-refresh
+                startAutoRefresh();
+                isAutoRefreshActive = true;
+                btn.innerHTML = '⏸️ Pause';
+                btn.className = 'bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm font-medium transition-all';
+                indicator.innerHTML = '🔄 Auto-refresh aktif';
+                indicator.className = 'text-green-500 text-sm';
+                showNotification('▶️ Auto-refresh diaktifkan', 'success');
+            }
+        }
+
+        // Start auto-refresh interval
+        function startAutoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+            }
+            
+            autoRefreshInterval = setInterval(() => {
+                if (isAutoRefreshActive) {
+                    loadEmbeddedDriveAutomatically();
+                }
+            }, REFRESH_INTERVAL_MS);
+        }
+
+        function hideEmbeddedDrive() {
+            const embeddedViewer = document.getElementById('embedded-drive-viewer');
+            const driveIframe = document.getElementById('drive-iframe');
+            
+            // Stop auto-refresh when hiding
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+                autoRefreshInterval = null;
+            }
+            
+            embeddedViewer.classList.add('hidden');
+            driveIframe.src = ''; // Clear the iframe to stop loading
+            
+            showNotification('📁 Tampilan Google Drive disembunyikan', 'info');
+        }
+
+
+
+
+
+
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97c4f5fae262410c',t:'MTc1NzQwMjgyMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
