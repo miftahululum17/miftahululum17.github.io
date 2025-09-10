@@ -321,11 +321,12 @@
                         </div>
                     </div>
                     <div class="relative">
-                        <iframe id="curriculum-drive-iframe" src="" class="w-full h-64 border-0"></iframe>
+                        <iframe id="curriculum-drive-iframe" src="" class="w-full h-96 border-0" style="min-height: 400px;"></iframe>
                         <div class="absolute inset-0 bg-gray-100 flex items-center justify-center" id="curriculum-drive-loading">
                             <div class="text-center">
                                 <div class="animate-spin text-2xl mb-2">⏳</div>
-                                <p class="text-gray-600 text-sm">Memuat Google Drive...</p>
+                                <p class="text-gray-600 text-sm">Memuat Google Drive dalam tampilan grid...</p>
+                                <p class="text-gray-500 text-xs mt-1">Dokumen akan ditampilkan dalam format thumbnail</p>
                             </div>
                         </div>
                     </div>
@@ -480,11 +481,12 @@
                         </div>
                     </div>
                     <div class="relative">
-                        <iframe id="drive-iframe" src="" class="w-full h-64 border-0"></iframe>
+                        <iframe id="drive-iframe" src="" class="w-full h-96 border-0" style="min-height: 400px;"></iframe>
                         <div class="absolute inset-0 bg-gray-100 flex items-center justify-center" id="drive-loading">
                             <div class="text-center">
                                 <div class="animate-spin text-2xl mb-2">⏳</div>
-                                <p class="text-gray-600 text-sm">Memuat Google Drive...</p>
+                                <p class="text-gray-600 text-sm">Memuat Google Drive dalam tampilan grid...</p>
+                                <p class="text-gray-500 text-xs mt-1">Foto akan ditampilkan dalam format thumbnail</p>
                             </div>
                         </div>
                     </div>
@@ -1337,7 +1339,7 @@
             setTimeout(() => {
                 loadEmbeddedCurriculumDriveAutomatically();
                 startCurriculumAutoRefresh();
-                showNotification('📚 Google Drive Dokumen Kurikulum dimuat dalam tampilan grid dengan auto-refresh aktif', 'success');
+                showNotification('📚 Google Drive Dokumen Kurikulum dimuat dalam tampilan grid - dokumen terlihat sebagai thumbnail!', 'success');
             }, 500);
         }
 
@@ -2208,7 +2210,7 @@
             setTimeout(() => {
                 loadEmbeddedDriveAutomatically();
                 startAutoRefresh();
-                showNotification('📁 Google Drive dimuat dalam tampilan grid dengan auto-refresh aktif', 'success');
+                showNotification('📸 Google Drive Galeri dimuat dalam tampilan grid - foto akan terlihat sebagai thumbnail!', 'success');
             }, 500);
         }
 
@@ -2283,35 +2285,40 @@
             // Show loading state
             loadingDiv.classList.remove('hidden');
             
-            // Set the iframe source to the embedded view with grid layout
-            const embedUrl = 'https://drive.google.com/embeddedfolderview?id=1ktNIeEYkrY_whbMjbWBlSOQNNrTJ6S7lc-NPd4u8GVHbcUbnS3P4Wc-jh0u-3TNVsom0Wnw-&usp=drive_web#grid';
+            // Use proper Google Drive embed URL with grid view parameters
+            const folderId = '1ktNIeEYkrY_whbMjbWBlSOQNNrTJ6S7lc-NPd4u8GVHbcUbnS3P4Wc-jh0u-3TNVsom0Wnw-';
+            const embedUrl = `https://drive.google.com/embeddedfolderview?id=${folderId}&usp=drive_web&view=grid&resourcekey=`;
             
-            // Add timestamp and force grid view
-            const timestampedUrl = embedUrl + '&t=' + Date.now() + '&view=grid';
+            // Add timestamp to force refresh and ensure grid view
+            const timestampedUrl = embedUrl + '&t=' + Date.now() + '#grid';
             driveIframe.src = timestampedUrl;
             
             // Update last refresh time
             const now = new Date();
             lastRefreshTime.textContent = now.toLocaleTimeString('id-ID');
             
-            // Hide loading after a delay and force grid view
+            // Hide loading after a delay and try to force grid view
             setTimeout(() => {
                 loadingDiv.classList.add('hidden');
                 
-                // Try to force grid view through iframe manipulation
+                // Force grid view by reloading with specific parameters
                 try {
-                    const iframe = document.getElementById('curriculum-drive-iframe');
-                    if (iframe && iframe.contentWindow) {
-                        // Force grid view by manipulating the iframe URL
-                        const currentSrc = iframe.src;
-                        if (!currentSrc.includes('view=grid')) {
-                            iframe.src = currentSrc + (currentSrc.includes('?') ? '&' : '?') + 'view=grid';
-                        }
+                    const iframe = document.getElementById('drive-iframe');
+                    if (iframe) {
+                        // Try multiple grid view parameters
+                        const gridUrl = `https://drive.google.com/embeddedfolderview?id=${folderId}&usp=drive_web&view=grid&resourcekey=&t=${Date.now()}#grid`;
+                        iframe.src = gridUrl;
+                        
+                        // Additional attempt after a short delay
+                        setTimeout(() => {
+                            const finalUrl = `https://drive.google.com/embeddedfolderview?id=${folderId}&usp=drive_web&view=grid#grid`;
+                            iframe.src = finalUrl;
+                        }, 1000);
                     }
                 } catch (e) {
-                    console.log('Cross-origin restriction, using URL parameters instead');
+                    console.log('Using fallback grid view method');
                 }
-            }, 3000);
+            }, 2000);
         }
 
         // Manual refresh function
@@ -2498,35 +2505,40 @@
             // Show loading state
             loadingDiv.classList.remove('hidden');
             
-            // Set the iframe source to the embedded view with grid layout for curriculum
-            const embedUrl = 'https://drive.google.com/embeddedfolderview?id=1ABC123CurriculumFolderID&usp=drive_web#grid';
+            // Use proper Google Drive embed URL with grid view parameters for curriculum
+            const curriculumFolderId = '1ABC123CurriculumFolderID';
+            const embedUrl = `https://drive.google.com/embeddedfolderview?id=${curriculumFolderId}&usp=drive_web&view=grid&resourcekey=`;
             
-            // Add timestamp and force grid view
-            const timestampedUrl = embedUrl + '&t=' + Date.now() + '&view=grid';
+            // Add timestamp to force refresh and ensure grid view
+            const timestampedUrl = embedUrl + '&t=' + Date.now() + '#grid';
             driveIframe.src = timestampedUrl;
             
             // Update last refresh time
             const now = new Date();
             lastRefreshTime.textContent = now.toLocaleTimeString('id-ID');
             
-            // Hide loading after a delay and force grid view
+            // Hide loading after a delay and try to force grid view
             setTimeout(() => {
                 loadingDiv.classList.add('hidden');
                 
-                // Try to force grid view through iframe manipulation
+                // Force grid view by reloading with specific parameters
                 try {
                     const iframe = document.getElementById('curriculum-drive-iframe');
-                    if (iframe && iframe.contentWindow) {
-                        // Force grid view by manipulating the iframe URL
-                        const currentSrc = iframe.src;
-                        if (!currentSrc.includes('view=grid')) {
-                            iframe.src = currentSrc + (currentSrc.includes('?') ? '&' : '?') + 'view=grid';
-                        }
+                    if (iframe) {
+                        // Try multiple grid view parameters
+                        const gridUrl = `https://drive.google.com/embeddedfolderview?id=${curriculumFolderId}&usp=drive_web&view=grid&resourcekey=&t=${Date.now()}#grid`;
+                        iframe.src = gridUrl;
+                        
+                        // Additional attempt after a short delay
+                        setTimeout(() => {
+                            const finalUrl = `https://drive.google.com/embeddedfolderview?id=${curriculumFolderId}&usp=drive_web&view=grid#grid`;
+                            iframe.src = finalUrl;
+                        }, 1000);
                     }
                 } catch (e) {
-                    console.log('Cross-origin restriction, using URL parameters instead');
+                    console.log('Using fallback grid view method for curriculum');
                 }
-            }, 3000);
+            }, 2000);
         }
 
         // Manual refresh function for curriculum
@@ -2659,5 +2671,5 @@
 
 
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97cdb2ed467bfe23',t:'MTc1NzQ5NDQ0OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97cdb9c4c280fe23',t:'MTc1NzQ5NDcyOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
