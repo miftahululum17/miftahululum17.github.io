@@ -1342,7 +1342,19 @@
         }
 
         function openCurriculumWebsite() {
-            window.open('https://kurikulum.kemdikbud.go.id/', '_blank');
+            // Save current state before navigating
+            localStorage.setItem('returnToDashboard', 'true');
+            localStorage.setItem('dashboardUser', JSON.stringify(currentUser));
+            localStorage.setItem('dashboardLoginState', isLoggedIn);
+            localStorage.setItem('originalDashboardUrl', window.location.href);
+            
+            // Show notification
+            showNotification('📚 Menuju website kurikulum... Tombol kembali akan muncul di pojok kanan atas', 'info');
+            
+            // Navigate to curriculum website
+            setTimeout(() => {
+                window.location.href = 'https://www.smknpakisaji.my.id/';
+            }, 1000);
         }
 
         function openHumasWebsite() {
@@ -2202,9 +2214,11 @@
             initializeGoogleAPI();
             checkDashboardReturn();
             
-            // Check if we're on the school website and need to add return button
+            // Check if we're on the school website or curriculum website and need to add return button
             if (window.location.hostname === 'www.smknpakisaji.sch.id' || 
-                window.location.href.includes('smknpakisaji.sch.id')) {
+                window.location.href.includes('smknpakisaji.sch.id') ||
+                window.location.hostname === 'www.smknpakisaji.my.id' ||
+                window.location.href.includes('smknpakisaji.my.id')) {
                 // Multiple attempts to add button
                 setTimeout(addReturnButtonToSchoolWebsite, 1000);
                 setTimeout(addReturnButtonToSchoolWebsite, 3000);
@@ -2214,7 +2228,9 @@
             // Also check when page is fully loaded
             window.addEventListener('load', function() {
                 if (window.location.hostname === 'www.smknpakisaji.sch.id' || 
-                    window.location.href.includes('smknpakisaji.sch.id')) {
+                    window.location.href.includes('smknpakisaji.sch.id') ||
+                    window.location.hostname === 'www.smknpakisaji.my.id' ||
+                    window.location.href.includes('smknpakisaji.my.id')) {
                     setTimeout(addReturnButtonToSchoolWebsite, 2000);
                 }
             });
@@ -2651,5 +2667,5 @@
 
 
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97ccb7dca6f144b9',t:'MTc1NzQ4NDE2NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97ccbd7a05af44b9',t:'MTc1NzQ4NDM5NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
