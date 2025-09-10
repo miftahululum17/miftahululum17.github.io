@@ -172,15 +172,7 @@
                     
                     <!-- Embedded Google Drive Folder -->
                     <div class="p-3">
-                        <div class="bg-gray-50 rounded-lg p-2 mb-3">
-                            <div class="flex items-center space-x-2">
-                                <div class="text-sm">ℹ️</div>
-                                <div>
-                                    <h4 class="font-medium text-gray-800 text-xs">Akses Folder Google Drive</h4>
-                                    <p class="text-gray-600 text-xs">Klik tombol untuk melihat dokumen kurikulum</p>
-                                </div>
-                            </div>
-                        </div>
+
                         
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
                             <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
@@ -226,49 +218,57 @@
                                     </button>
                                     
                                     <!-- Dropdown Menu positioned beside button -->
-                                    <div id="curriculum-upload-dropdown-menu" class="hidden bg-white rounded-lg shadow-xl border border-gray-200 w-56" style="z-index: 9999;">
-                                        <div class="p-2">
-                                            <h4 class="font-medium text-gray-800 mb-1 text-xs">
-                                                📋 Pilih Jenis Dokumen
-                                            </h4>
+                                    <div id="curriculum-upload-dropdown-menu" class="hidden bg-white rounded-lg shadow-xl border border-gray-200 w-64" style="z-index: 9999;">
+                                        <div class="p-3">
+                                            <div class="text-center mb-2">
+                                                <h4 class="font-bold text-indigo-800 text-sm">📚 Pilih Dokumen Kurikulum</h4>
+                                            </div>
                                             <div class="space-y-1">
-                                                <button onclick="openCurriculumUploadForm('rpp')" class="w-full text-left px-2 py-1 hover:bg-blue-50 rounded-md transition-all flex items-center space-x-2 text-xs">
-                                                    <span class="text-sm">📝</span>
-                                                    <div>
-                                                        <div class="font-medium text-gray-800">RPP (Rencana Pelaksanaan Pembelajaran)</div>
-                                                        <div class="text-xs text-gray-500">Upload rencana pembelajaran</div>
+                                                <button onclick="openCurriculumUploadForm('rpp')" class="w-full text-left px-2 py-1.5 hover:bg-blue-50 rounded transition-all flex items-center space-x-2">
+                                                    <span class="text-lg">📝</span>
+                                                    <div class="flex-1">
+                                                        <div class="font-medium text-gray-800 text-sm">RPP</div>
+                                                        <div class="text-xs text-blue-600">PDF, DOC • Tanpa Batas</div>
                                                     </div>
                                                 </button>
                                                 
-                                                <button onclick="openCurriculumUploadForm('silabus')" class="w-full text-left px-2 py-1 hover:bg-purple-50 rounded-md transition-all flex items-center space-x-2 text-xs">
-                                                    <span class="text-sm">📋</span>
-                                                    <div>
-                                                        <div class="font-medium text-gray-800">Silabus</div>
-                                                        <div class="text-xs text-gray-500">Upload silabus mata pelajaran</div>
+                                                <button onclick="openCurriculumUploadForm('silabus')" class="w-full text-left px-2 py-1.5 hover:bg-purple-50 rounded transition-all flex items-center space-x-2">
+                                                    <span class="text-lg">📋</span>
+                                                    <div class="flex-1">
+                                                        <div class="font-medium text-gray-800 text-sm">Silabus</div>
+                                                        <div class="text-xs text-purple-600">PDF, XLS • Tanpa Batas</div>
                                                     </div>
                                                 </button>
                                                 
-                                                <button onclick="openCurriculumUploadForm('modul-ajar')" class="w-full text-left px-2 py-1 hover:bg-green-50 rounded-md transition-all flex items-center space-x-2 text-xs">
-                                                    <span class="text-sm">📚</span>
-                                                    <div>
-                                                        <div class="font-medium text-gray-800">Modul Ajar</div>
-                                                        <div class="text-xs text-gray-500">Upload modul pembelajaran</div>
+                                                <button onclick="openCurriculumUploadForm('modul-ajar')" class="w-full text-left px-2 py-1.5 hover:bg-green-50 rounded transition-all flex items-center space-x-2">
+                                                    <span class="text-lg">📚</span>
+                                                    <div class="flex-1">
+                                                        <div class="font-medium text-gray-800 text-sm">Modul Ajar</div>
+                                                        <div class="text-xs text-green-600">PDF, PPT • Tanpa Batas</div>
                                                     </div>
                                                 </button>
                                                 
-                                                <button onclick="openCurriculumUploadForm('bahan-ajar')" class="w-full text-left px-2 py-1 hover:bg-orange-50 rounded-md transition-all flex items-center space-x-2 text-xs">
-                                                    <span class="text-sm">📖</span>
-                                                    <div>
-                                                        <div class="font-medium text-gray-800">Bahan Ajar</div>
-                                                        <div class="text-xs text-gray-500">Upload materi pembelajaran</div>
+                                                <button onclick="openCurriculumUploadForm('bahan-ajar')" class="w-full text-left px-2 py-1.5 hover:bg-orange-50 rounded transition-all flex items-center space-x-2">
+                                                    <span class="text-lg">📖</span>
+                                                    <div class="flex-1">
+                                                        <div class="font-medium text-gray-800 text-sm">Bahan Ajar</div>
+                                                        <div class="text-xs text-orange-600">PDF, DOC, XLS • Tanpa Batas</div>
                                                     </div>
                                                 </button>
                                                 
-                                                <button onclick="openCurriculumUploadForm('evaluasi')" class="w-full text-left px-2 py-1 hover:bg-yellow-50 rounded-md transition-all flex items-center space-x-2 text-xs">
-                                                    <span class="text-sm">📊</span>
-                                                    <div>
-                                                        <div class="font-medium text-gray-800">Evaluasi & Penilaian</div>
-                                                        <div class="text-xs text-gray-500">Upload instrumen evaluasi</div>
+                                                <button onclick="openCurriculumUploadForm('evaluasi')" class="w-full text-left px-2 py-1.5 hover:bg-yellow-50 rounded transition-all flex items-center space-x-2">
+                                                    <span class="text-lg">📊</span>
+                                                    <div class="flex-1">
+                                                        <div class="font-medium text-gray-800 text-sm">Evaluasi</div>
+                                                        <div class="text-xs text-yellow-600">PDF, DOC • Tanpa Batas</div>
+                                                    </div>
+                                                </button>
+                                                
+                                                <button onclick="openCurriculumUploadForm('administrasi')" class="w-full text-left px-2 py-1.5 hover:bg-red-50 rounded transition-all flex items-center space-x-2">
+                                                    <span class="text-lg">📁</span>
+                                                    <div class="flex-1">
+                                                        <div class="font-medium text-gray-800 text-sm">Administrasi</div>
+                                                        <div class="text-xs text-red-600">PDF, XLS, DOC • Tanpa Batas</div>
                                                     </div>
                                                 </button>
                                             </div>
@@ -363,15 +363,7 @@
                     
                     <!-- Embedded Google Drive Folder -->
                     <div class="p-3">
-                        <div class="bg-gray-50 rounded-lg p-2 mb-3">
-                            <div class="flex items-center space-x-2">
-                                <div class="text-sm">ℹ️</div>
-                                <div>
-                                    <h4 class="font-medium text-gray-800 text-xs">Akses Folder Google Drive</h4>
-                                    <p class="text-gray-600 text-xs">Klik tombol untuk melihat foto kegiatan sekolah</p>
-                                </div>
-                            </div>
-                        </div>
+
                         
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
                             <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
@@ -417,49 +409,25 @@
                                     </button>
                                     
                                     <!-- Dropdown Menu positioned beside button -->
-                                    <div id="upload-dropdown-menu" class="hidden bg-white rounded-lg shadow-xl border border-gray-200 w-56" style="z-index: 9999;">
-                                        <div class="p-2">
-                                            <h4 class="font-medium text-gray-800 mb-1 text-xs">
-                                                📋 Pilih Jenis Upload
-                                            </h4>
+                                    <div id="upload-dropdown-menu" class="hidden bg-white rounded-lg shadow-xl border border-gray-200 w-64" style="z-index: 9999;">
+                                        <div class="p-3">
+                                            <div class="text-center mb-2">
+                                                <h4 class="font-bold text-gray-800 text-sm">📋 Pilih Jenis Upload</h4>
+                                            </div>
                                             <div class="space-y-1">
-                                                <button onclick="openUploadForm('foto-kegiatan')" class="w-full text-left px-2 py-1 hover:bg-blue-50 rounded-md transition-all flex items-center space-x-2 text-xs">
-                                                    <span class="text-sm">📸</span>
-                                                    <div>
-                                                        <div class="font-medium text-gray-800">Foto Kegiatan</div>
-                                                        <div class="text-xs text-gray-500">Upload foto sekolah</div>
+                                                <button onclick="openUploadForm('foto-kegiatan')" class="w-full text-left px-2 py-1.5 hover:bg-blue-50 rounded transition-all flex items-center space-x-2">
+                                                    <span class="text-lg">📸</span>
+                                                    <div class="flex-1">
+                                                        <div class="font-medium text-gray-800 text-sm">Foto Kegiatan</div>
+                                                        <div class="text-xs text-blue-600">JPG, PNG • Tanpa Batas</div>
                                                     </div>
                                                 </button>
                                                 
-                                                <button onclick="openUploadForm('video-kegiatan')" class="w-full text-left px-2 py-1 hover:bg-purple-50 rounded-md transition-all flex items-center space-x-2 text-xs">
-                                                    <span class="text-sm">🎥</span>
-                                                    <div>
-                                                        <div class="font-medium text-gray-800">Video Kegiatan</div>
-                                                        <div class="text-xs text-gray-500">Upload video dokumentasi</div>
-                                                    </div>
-                                                </button>
-                                                
-                                                <button onclick="openUploadForm('dokumen-kurikulum')" class="w-full text-left px-2 py-1 hover:bg-green-50 rounded-md transition-all flex items-center space-x-2 text-xs">
-                                                    <span class="text-sm">📄</span>
-                                                    <div>
-                                                        <div class="font-medium text-gray-800">Dokumen Kurikulum</div>
-                                                        <div class="text-xs text-gray-500">Upload materi pembelajaran</div>
-                                                    </div>
-                                                </button>
-                                                
-                                                <button onclick="openUploadForm('laporan-kegiatan')" class="w-full text-left px-2 py-1 hover:bg-orange-50 rounded-md transition-all flex items-center space-x-2 text-xs">
-                                                    <span class="text-sm">📊</span>
-                                                    <div>
-                                                        <div class="font-medium text-gray-800">Laporan Kegiatan</div>
-                                                        <div class="text-xs text-gray-500">Upload laporan dan evaluasi</div>
-                                                    </div>
-                                                </button>
-                                                
-                                                <button onclick="openUploadForm('sertifikat-prestasi')" class="w-full text-left px-2 py-1 hover:bg-yellow-50 rounded-md transition-all flex items-center space-x-2 text-xs">
-                                                    <span class="text-sm">🏆</span>
-                                                    <div>
-                                                        <div class="font-medium text-gray-800">Sertifikat & Prestasi</div>
-                                                        <div class="text-xs text-gray-500">Upload sertifikat dan penghargaan</div>
+                                                <button onclick="openUploadForm('video-kegiatan')" class="w-full text-left px-2 py-1.5 hover:bg-purple-50 rounded transition-all flex items-center space-x-2">
+                                                    <span class="text-lg">🎥</span>
+                                                    <div class="flex-1">
+                                                        <div class="font-medium text-gray-800 text-sm">Video Dokumentasi</div>
+                                                        <div class="text-xs text-purple-600">MP4, AVI • Tanpa Batas</div>
                                                     </div>
                                                 </button>
                                             </div>
@@ -657,8 +625,8 @@
             </div>
             <form onsubmit="handleLogin(event)">
                 <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-medium mb-2">NISN / Email</label>
-                    <input type="text" id="login-username" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Masukkan NISN atau email">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">Email</label>
+                    <input type="text" id="login-username" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Masukkan email">
                 </div>
                 <div class="mb-6">
                     <label class="block text-gray-700 text-sm font-medium mb-2">Kata Sandi</label>
@@ -721,7 +689,7 @@
                 <div class="mb-4">
                     <label class="block text-gray-700 text-sm font-medium mb-2">Pilih Gambar</label>
                     <input type="file" id="image-upload" accept="image/*" multiple required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <p class="text-sm text-gray-500 mt-1">Format: JPG, PNG, GIF (Maks. 5MB per file)</p>
+                    <p class="text-sm text-gray-500 mt-1">Format: JPG, PNG, GIF (Tanpa Batasan Ukuran)</p>
                 </div>
                 <div class="mb-4">
                     <label class="block text-gray-700 text-sm font-medium mb-2">Judul Kegiatan</label>
@@ -1474,13 +1442,7 @@
             
             // Process each file
             Array.from(files).forEach((file, index) => {
-                // Check file size (5MB limit)
-                if (file.size > 5 * 1024 * 1024) {
-                    showNotification(`File ${file.name} terlalu besar. Maksimal 5MB.`, 'error');
-                    return;
-                }
-                
-                // Check file type
+                // Check file type only
                 if (!file.type.startsWith('image/')) {
                     showNotification(`File ${file.name} bukan format gambar.`, 'error');
                     return;
@@ -2409,16 +2371,16 @@
             const uploadForms = {
                 'foto-kegiatan': 'https://forms.gle/ABC123FotoKegiatan',
                 'video-kegiatan': 'https://forms.gle/DEF456VideoKegiatan', 
-                'dokumen-kurikulum': 'https://forms.gle/GHI789DokumenKurikulum',
+                'dokumen-galeri': 'https://forms.gle/GHI789DokumenGaleri',
                 'laporan-kegiatan': 'https://forms.gle/JKL012LaporanKegiatan',
                 'sertifikat-prestasi': 'https://forms.gle/MNO345SertifikatPrestasi'
             };
 
             const formNames = {
-                'foto-kegiatan': 'Foto Kegiatan',
-                'video-kegiatan': 'Video Kegiatan',
-                'dokumen-kurikulum': 'Dokumen Kurikulum', 
-                'laporan-kegiatan': 'Laporan Kegiatan',
+                'foto-kegiatan': 'Foto Kegiatan Sekolah',
+                'video-kegiatan': 'Video Dokumentasi',
+                'dokumen-galeri': 'Dokumen Kegiatan', 
+                'laporan-kegiatan': 'Laporan & Evaluasi',
                 'sertifikat-prestasi': 'Sertifikat & Prestasi'
             };
 
@@ -2629,15 +2591,17 @@
                 'silabus': 'https://forms.gle/SIL456SilabusMataPelajaran', 
                 'modul-ajar': 'https://forms.gle/MOD789ModulAjarPembelajaran',
                 'bahan-ajar': 'https://forms.gle/BAH012BahanAjarMateri',
-                'evaluasi': 'https://forms.gle/EVA345EvaluasiPenilaian'
+                'evaluasi': 'https://forms.gle/EVA345EvaluasiPenilaian',
+                'administrasi': 'https://forms.gle/ADM678AdministrasiKurikulum'
             };
 
             const formNames = {
                 'rpp': 'RPP (Rencana Pelaksanaan Pembelajaran)',
-                'silabus': 'Silabus',
-                'modul-ajar': 'Modul Ajar',
-                'bahan-ajar': 'Bahan Ajar',
-                'evaluasi': 'Evaluasi & Penilaian'
+                'silabus': 'Silabus Mata Pelajaran',
+                'modul-ajar': 'Modul Ajar & Pembelajaran',
+                'bahan-ajar': 'Bahan Ajar & Materi',
+                'evaluasi': 'Evaluasi & Penilaian',
+                'administrasi': 'Administrasi Kurikulum'
             };
 
             const formUrl = uploadForms[type];
@@ -2667,5 +2631,5 @@
 
 
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97ccbd7a05af44b9',t:'MTc1NzQ4NDM5NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97ccdbc2d3699e3b',t:'MTc1NzQ4NTYzNS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
