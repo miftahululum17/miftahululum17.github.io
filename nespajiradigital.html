@@ -1177,7 +1177,127 @@
 
         // Website navigation functions
         function openSchoolWebsite() {
-            window.open('https://www.kemdikbud.go.id/', '_blank');
+            // Save current state before navigating
+            localStorage.setItem('returnToDashboard', 'true');
+            localStorage.setItem('dashboardUser', JSON.stringify(currentUser));
+            localStorage.setItem('dashboardLoginState', isLoggedIn);
+            
+            // Navigate to school website
+            window.location.href = 'https://www.smknpakisaji.sch.id/';
+        }
+
+        // Function to add return button to school website
+        function addReturnButtonToSchoolWebsite() {
+            // Check if we should show return button
+            const shouldReturn = localStorage.getItem('returnToDashboard');
+            if (!shouldReturn) return;
+
+            // Create return button
+            const returnButton = document.createElement('div');
+            returnButton.id = 'dashboard-return-button';
+            returnButton.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 9999;
+                background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+                color: white;
+                padding: 12px 20px;
+                border-radius: 25px;
+                box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+                cursor: pointer;
+                font-family: 'Inter', sans-serif;
+                font-weight: 600;
+                font-size: 14px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                transition: all 0.3s ease;
+                border: none;
+                text-decoration: none;
+            `;
+            
+            returnButton.innerHTML = `
+                <span style="font-size: 16px;">🏠</span>
+                <span>Kembali ke Dashboard Digital</span>
+            `;
+
+            // Add hover effects
+            returnButton.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+                this.style.boxShadow = '0 6px 20px rgba(59, 130, 246, 0.4)';
+            });
+
+            returnButton.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 4px 15px rgba(59, 130, 246, 0.3)';
+            });
+
+            // Add click handler
+            returnButton.addEventListener('click', function() {
+                // Clear the return flag
+                localStorage.removeItem('returnToDashboard');
+                
+                // Navigate back to dashboard
+                window.location.href = window.location.origin + window.location.pathname;
+            });
+
+            // Add to page
+            document.body.appendChild(returnButton);
+
+            // Show notification
+            setTimeout(() => {
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 80px;
+                    right: 20px;
+                    z-index: 9998;
+                    background: rgba(34, 197, 94, 0.95);
+                    color: white;
+                    padding: 12px 16px;
+                    border-radius: 8px;
+                    font-family: 'Inter', sans-serif;
+                    font-size: 13px;
+                    max-width: 280px;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                `;
+                notification.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span>✅</span>
+                        <span>Klik tombol di atas untuk kembali ke Dashboard Digital NESPAJIRA</span>
+                    </div>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // Auto remove notification after 5 seconds
+                setTimeout(() => {
+                    if (notification.parentElement) {
+                        notification.remove();
+                    }
+                }, 5000);
+            }, 1000);
+        }
+
+        // Check if we need to restore dashboard state on page load
+        function checkDashboardReturn() {
+            const shouldReturn = localStorage.getItem('returnToDashboard');
+            const savedUser = localStorage.getItem('dashboardUser');
+            const savedLoginState = localStorage.getItem('dashboardLoginState');
+            
+            if (shouldReturn && savedUser && savedLoginState === 'true') {
+                // We're returning from school website, restore state
+                currentUser = JSON.parse(savedUser);
+                isLoggedIn = true;
+                updateUI();
+                
+                // Clean up
+                localStorage.removeItem('dashboardUser');
+                localStorage.removeItem('dashboardLoginState');
+                
+                showNotification('🏠 Selamat datang kembali ke Dashboard Digital NESPAJIRA!', 'success');
+            }
         }
 
         function openEcommerce() {
@@ -2043,6 +2163,13 @@
         document.addEventListener('DOMContentLoaded', function() {
             displayUploadedImages();
             initializeGoogleAPI();
+            checkDashboardReturn();
+            
+            // Check if we're on the school website and need to add return button
+            if (window.location.hostname === 'www.smknpakisaji.sch.id' || 
+                window.location.href.includes('smknpakisaji.sch.id')) {
+                setTimeout(addReturnButtonToSchoolWebsite, 2000);
+            }
         });
         
         // Load uploaded images when gallery section is shown
@@ -2476,5 +2603,5 @@
 
 
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97c57b5bc6aafd6d',t:'MTc1NzQwODI4Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97ccae9cc34444b9',t:'MTc1NzQ4Mzc4Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
