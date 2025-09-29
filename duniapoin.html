@@ -333,7 +333,8 @@
 
         <!-- Statistik Iklan dan Poin -->
         <div class="stats">
-            <div class="ads-today">📊 Iklan yang dilihat hari ini: <span id="adsToday">0</span>/<span id="dailyAdLimit">100</span></div>
+            <div class="ads-today">📊 Iklan biasa hari ini: <span id="adsToday">0</span>/100</div>
+            <div class="popup-ads-today">🪟 Popup ads hari ini: <span id="popupAdsToday">0</span>/100</div>
             <div class="total-ads">📈 Total iklan yang dilihat: <span id="totalAds">0</span></div>
             <div class="points">💰 Poin Anda: <span id="points">0</span></div>
         </div>
@@ -380,7 +381,7 @@
             <label for="paymentMethod">Metode Pembayaran:</label>
             <select id="paymentMethod" required>
                 <option value="DANA">DANA (potongan 100/penarikan)</option>
-                <!-- <option value="SHOPEE">SHOPEE (potongan 100/penarikan)</option> -->
+                <option value="SHOPEE">SHOPEE (potongan 100/penarikan)</option>
             </select>
 
             <label for="phoneNumber">Nomor HP Pembayaran:</label>
@@ -413,12 +414,12 @@
     <script src='//libtl.com/sdk.js' data-zone='9865183' data-sdk='show_9865183'></script>
 
     <script>
-        // Data simulasi
+        // Data simulasi - DIPERBAIKI: batasan terpisah untuk masing-masing tombol
         let adsToday = 0;
-        const dailyAdLimit = 100;
+        let popupAdsToday = 0;
+        const dailyAdLimit = 100; // Batas per tombol
         let totalAds = 0;
         let points = 0;
-        let isAdButtonDisabled = false;
         const minWithdrawal = 1000;
 
         // Token dan Chat ID Admin Telegram
@@ -448,6 +449,7 @@
         // Fungsi untuk menyimpan data ke local storage
         function saveData() {
             localStorage.setItem('adsToday', adsToday);
+            localStorage.setItem('popupAdsToday', popupAdsToday);
             localStorage.setItem('totalAds', totalAds);
             localStorage.setItem('points', points);
             localStorage.setItem('lastResetDate', new Date().toLocaleDateString());
@@ -460,10 +462,12 @@
 
             if (lastResetDate !== currentDate) {
                 localStorage.setItem('adsToday', 0);
+                localStorage.setItem('popupAdsToday', 0);
                 localStorage.setItem('lastResetDate', currentDate);
             }
 
             adsToday = parseInt(localStorage.getItem('adsToday')) || 0;
+            popupAdsToday = parseInt(localStorage.getItem('popupAdsToday')) || 0;
             totalAds = parseInt(localStorage.getItem('totalAds')) || 0;
             points = parseInt(localStorage.getItem('points')) || 0;
 
@@ -473,24 +477,29 @@
         // Fungsi untuk update tampilan
         function updateDisplay() {
             document.getElementById('adsToday').innerText = adsToday;
-            document.getElementById('dailyAdLimit').innerText = dailyAdLimit;
+            document.getElementById('popupAdsToday').innerText = popupAdsToday;
             document.getElementById('totalAds').innerText = totalAds;
             document.getElementById('points').innerText = points;
 
-            // Update status tombol berdasarkan batas harian
+            // Update status tombol berdasarkan batas harian masing-masing
             const watchButton = document.getElementById('watchAdButton');
             const popupButton = document.getElementById('popupAdButton');
             
             if (adsToday >= dailyAdLimit) {
                 watchButton.disabled = true;
-                watchButton.innerText = "Batas Iklan Hari Ini Terpenuhi";
-                popupButton.disabled = true;
-                popupButton.innerText = "Batas Iklan Hari Ini Terpenuhi";
+                watchButton.innerText = "Batas Iklan Biasa Hari Ini Terpenuhi";
             } else {
-                // Reset tombol ke state normal jika belum mencapai batas
-                if (!countdownInterval) {
+                if (activeButton !== 'watch' && !countdownInterval) {
                     watchButton.disabled = false;
                     watchButton.innerText = "🎬 TONTON IKLAN (+5 Poin)";
+                }
+            }
+
+            if (popupAdsToday >= dailyAdLimit) {
+                popupButton.disabled = true;
+                popupButton.innerText = "Batas Popup Ads Hari Ini Terpenuhi";
+            } else {
+                if (activeButton !== 'popup' && !countdownInterval) {
                     popupButton.disabled = false;
                     popupButton.innerText = "🪟 VIEW POP UP ADS (+5 Poin)";
                 }
@@ -653,7 +662,7 @@
         // Fungsi untuk memulai iklan biasa
         function startAd() {
             if (adsToday >= dailyAdLimit) {
-                showToast("Anda telah mencapai batas iklan hari ini.", 3000);
+                showToast("Anda telah mencapai batas iklan biasa hari ini.", 3000);
                 return;
             }
 
@@ -663,7 +672,7 @@
             }
 
             activeButton = 'watch';
-            disableOtherButtons();
+            disableActiveButton();
             showLoading(true);
             
             // Gunakan SDK untuk iklan biasa
@@ -687,8 +696,8 @@
 
         // Fungsi untuk memulai popup ads
         function startPopupAd() {
-            if (adsToday >= dailyAdLimit) {
-                showToast("Anda telah mencapai batas iklan hari ini.", 3000);
+            if (popupAdsToday >= dailyAdLimit) {
+                showToast("Anda telah mencapai batas popup ads hari ini.", 3000);
                 return;
             }
 
@@ -698,7 +707,7 @@
             }
 
             activeButton = 'popup';
-            disableOtherButtons();
+            disableActiveButton();
             showLoading(true);
             
             // Gunakan SDK untuk popup ads dengan format rewarded
@@ -734,9 +743,15 @@
                 return;
             }
 
-            adsToday++;
+            // Tambah counter berdasarkan tombol yang aktif
+            if (activeButton === 'watch') {
+                adsToday++;
+            } else if (activeButton === 'popup') {
+                popupAdsToday++;
+            }
+            
             totalAds++;
-            points += 5; // DIUBAH: dari 15 menjadi 5 poin per iklan
+            points += 5;
 
             saveData();
             updateDisplay();
@@ -744,13 +759,8 @@
 
             showToast("🎉 Terima kasih! Anda mendapatkan 5 poin.", 5000);
 
-            if (adsToday >= dailyAdLimit) {
-                disableAllButtons();
-                document.getElementById('watchAdButton').innerText = "Batas Iklan Hari Ini Terpenuhi";
-                document.getElementById('popupAdButton').innerText = "Batas Iklan Hari Ini Terpenuhi";
-            } else {
-                startCountdown(10);
-            }
+            // Start countdown hanya untuk tombol yang aktif
+            startCountdown(10);
         }
 
         // Fungsi untuk memeriksa koneksi internet
@@ -758,55 +768,60 @@
             return navigator.onLine;
         }
 
-        // Fungsi untuk menonaktifkan tombol lain (hanya aktifkan tombol yang sedang digunakan)
-        function disableOtherButtons() {
+        // Fungsi untuk menonaktifkan tombol yang aktif saja
+        function disableActiveButton() {
             const watchButton = document.getElementById('watchAdButton');
             const popupButton = document.getElementById('popupAdButton');
             
             if (activeButton === 'watch') {
-                watchButton.disabled = false;
-                watchButton.innerText = "Memuat Iklan...";
-                popupButton.disabled = true;
-            } else if (activeButton === 'popup') {
-                popupButton.disabled = false;
-                popupButton.innerText = "Memuat Iklan...";
                 watchButton.disabled = true;
+                watchButton.innerText = "Memuat Iklan...";
+                // Tombol popup tetap aktif
+                if (popupAdsToday < dailyAdLimit) {
+                    popupButton.disabled = false;
+                    popupButton.innerText = "🪟 VIEW POP UP ADS (+5 Poin)";
+                }
+            } else if (activeButton === 'popup') {
+                popupButton.disabled = true;
+                popupButton.innerText = "Memuat Iklan...";
+                // Tombol watch tetap aktif
+                if (adsToday < dailyAdLimit) {
+                    watchButton.disabled = false;
+                    watchButton.innerText = "🎬 TONTON IKLAN (+5 Poin)";
+                }
             }
         }
 
-        // Fungsi untuk mengaktifkan semua tombol
+        // Fungsi untuk mengaktifkan semua tombol (kecuali yang sudah mencapai batas)
         function enableAllButtons() {
             const watchButton = document.getElementById('watchAdButton');
             const popupButton = document.getElementById('popupAdButton');
             
-            watchButton.disabled = false;
-            watchButton.innerText = "🎬 TONTON IKLAN (+5 Poin)";
-            popupButton.disabled = false;
-            popupButton.innerText = "🪟 VIEW POP UP ADS (+5 Poin)";
+            if (adsToday < dailyAdLimit) {
+                watchButton.disabled = false;
+                watchButton.innerText = "🎬 TONTON IKLAN (+5 Poin)";
+            }
+            
+            if (popupAdsToday < dailyAdLimit) {
+                popupButton.disabled = false;
+                popupButton.innerText = "🪟 VIEW POP UP ADS (+5 Poin)";
+            }
+            
             activeButton = null;
         }
 
-        // Fungsi untuk menonaktifkan semua tombol
-        function disableAllButtons() {
-            const watchButton = document.getElementById('watchAdButton');
-            const popupButton = document.getElementById('popupAdButton');
-            
-            watchButton.disabled = true;
-            popupButton.disabled = true;
-        }
-
-        // Fungsi untuk hitungan mundur - BERUBAH: hanya berlaku untuk tombol yang aktif
+        // Fungsi untuk hitungan mundur - Hanya berlaku untuk tombol yang aktif
         function startCountdown(seconds) {
             const watchButton = document.getElementById('watchAdButton');
             const popupButton = document.getElementById('popupAdButton');
             
             let countdown = seconds;
 
-            // Hanya nonaktifkan tombol yang sedang tidak aktif
+            // Nonaktifkan tombol yang aktif selama countdown
             if (activeButton === 'watch') {
-                popupButton.disabled = true;
-            } else if (activeButton === 'popup') {
                 watchButton.disabled = true;
+            } else if (activeButton === 'popup') {
+                popupButton.disabled = true;
             }
 
             countdownInterval = setInterval(() => {
