@@ -345,10 +345,10 @@
         </div>
 
         <!-- Tombol untuk melihat iklan -->
-        <button id="watchAdButton" onclick="startAd()">🎬 TONTON IKLAN (+15 Poin)</button>
+        <button id="watchAdButton" onclick="startAd()">🎬 TONTON IKLAN (+5 Poin)</button>
 
         <!-- Tombol View Pop Up Ads -->
-        <button id="popupAdButton" class="popup-ad-button" onclick="startPopupAd()">🪟 VIEW POP UP ADS (+15 Poin)</button>
+        <button id="popupAdButton" class="popup-ad-button" onclick="startPopupAd()">🪟 VIEW POP UP ADS (+5 Poin)</button>
 
         <!-- Tombol Penarikan Poin -->
         <button id="withdrawButton" onclick="showWithdrawalForm()">💳 Penarikan Poin</button>
@@ -380,7 +380,7 @@
             <label for="paymentMethod">Metode Pembayaran:</label>
             <select id="paymentMethod" required>
                 <option value="DANA">DANA (potongan 100/penarikan)</option>
-                <option value="SHOPEE">SHOPEE (potongan 100/penarikan)</option>
+                <!-- <option value="SHOPEE">SHOPEE (potongan 100/penarikan)</option> -->
             </select>
 
             <label for="phoneNumber">Nomor HP Pembayaran:</label>
@@ -419,11 +419,15 @@
         let totalAds = 0;
         let points = 0;
         let isAdButtonDisabled = false;
-        const minWithdrawal = 5000;
+        const minWithdrawal = 1000;
 
         // Token dan Chat ID Admin Telegram
         const botToken = '7035581953:AAGinoLxWqPTJ6odVATZxQj6kRvCEpTk9OI';
         const adminChatId = '306327811';
+
+        // Variabel untuk mengelola status tombol secara bergantian
+        let activeButton = null;
+        let countdownInterval = null;
 
         // Fungsi untuk menampilkan pesan mengambang
         function showToast(message, duration = 3000) {
@@ -473,7 +477,7 @@
             document.getElementById('totalAds').innerText = totalAds;
             document.getElementById('points').innerText = points;
 
-            // Update status tombol
+            // Update status tombol berdasarkan batas harian
             const watchButton = document.getElementById('watchAdButton');
             const popupButton = document.getElementById('popupAdButton');
             
@@ -482,6 +486,14 @@
                 watchButton.innerText = "Batas Iklan Hari Ini Terpenuhi";
                 popupButton.disabled = true;
                 popupButton.innerText = "Batas Iklan Hari Ini Terpenuhi";
+            } else {
+                // Reset tombol ke state normal jika belum mencapai batas
+                if (!countdownInterval) {
+                    watchButton.disabled = false;
+                    watchButton.innerText = "🎬 TONTON IKLAN (+5 Poin)";
+                    popupButton.disabled = false;
+                    popupButton.innerText = "🪟 VIEW POP UP ADS (+5 Poin)";
+                }
             }
         }
 
@@ -650,7 +662,8 @@
                 return;
             }
 
-            disableAdButtons();
+            activeButton = 'watch';
+            disableOtherButtons();
             showLoading(true);
             
             // Gunakan SDK untuk iklan biasa
@@ -667,7 +680,7 @@
             } catch (error) {
                 console.error('Error loading ad:', error);
                 showToast("Iklan tidak dapat dimuat. Silakan coba lagi.", 3000);
-                enableAdButtons();
+                enableAllButtons();
                 showLoading(false);
             }
         }
@@ -684,7 +697,8 @@
                 return;
             }
 
-            disableAdButtons();
+            activeButton = 'popup';
+            disableOtherButtons();
             showLoading(true);
             
             // Gunakan SDK untuk popup ads dengan format rewarded
@@ -697,7 +711,7 @@
                         // User menutup iklan atau terjadi error
                         console.error('Popup ad error:', e);
                         showToast("Iklan popup ditutup atau gagal dimuat.", 3000);
-                        enableAdButtons();
+                        enableAllButtons();
                         showLoading(false);
                     });
                 } else {
@@ -706,7 +720,7 @@
             } catch (error) {
                 console.error('Error loading popup ad:', error);
                 showToast("Iklan popup tidak dapat dimuat. Silakan coba lagi.", 3000);
-                enableAdButtons();
+                enableAllButtons();
                 showLoading(false);
             }
         }
@@ -715,23 +729,23 @@
         function onAdComplete() {
             if (!checkInternetConnection()) {
                 showToast("⚠️ Koneksi internet terputus! Poin tidak tersimpan.", 5000);
-                enableAdButtons();
+                enableAllButtons();
                 showLoading(false);
                 return;
             }
 
             adsToday++;
             totalAds++;
-            points += 15;
+            points += 5; // DIUBAH: dari 15 menjadi 5 poin per iklan
 
             saveData();
             updateDisplay();
             showLoading(false);
 
-            showToast("🎉 Terima kasih! Anda mendapatkan 15 poin.", 5000);
+            showToast("🎉 Terima kasih! Anda mendapatkan 5 poin.", 5000);
 
             if (adsToday >= dailyAdLimit) {
-                disableAdButtons();
+                disableAllButtons();
                 document.getElementById('watchAdButton').innerText = "Batas Iklan Hari Ini Terpenuhi";
                 document.getElementById('popupAdButton').innerText = "Batas Iklan Hari Ini Terpenuhi";
             } else {
@@ -744,46 +758,71 @@
             return navigator.onLine;
         }
 
-        // Fungsi untuk menonaktifkan semua tombol iklan
-        function disableAdButtons() {
+        // Fungsi untuk menonaktifkan tombol lain (hanya aktifkan tombol yang sedang digunakan)
+        function disableOtherButtons() {
             const watchButton = document.getElementById('watchAdButton');
             const popupButton = document.getElementById('popupAdButton');
             
-            watchButton.disabled = true;
-            watchButton.innerText = "Memuat Iklan...";
-            popupButton.disabled = true;
-            popupButton.innerText = "Memuat Iklan...";
+            if (activeButton === 'watch') {
+                watchButton.disabled = false;
+                watchButton.innerText = "Memuat Iklan...";
+                popupButton.disabled = true;
+            } else if (activeButton === 'popup') {
+                popupButton.disabled = false;
+                popupButton.innerText = "Memuat Iklan...";
+                watchButton.disabled = true;
+            }
         }
 
-        // Fungsi untuk mengaktifkan semua tombol iklan
-        function enableAdButtons() {
+        // Fungsi untuk mengaktifkan semua tombol
+        function enableAllButtons() {
             const watchButton = document.getElementById('watchAdButton');
             const popupButton = document.getElementById('popupAdButton');
             
             watchButton.disabled = false;
-            watchButton.innerText = "🎬 TONTON IKLAN (+15 Poin)";
+            watchButton.innerText = "🎬 TONTON IKLAN (+5 Poin)";
             popupButton.disabled = false;
-            popupButton.innerText = "🪟 VIEW POP UP ADS (+15 Poin)";
+            popupButton.innerText = "🪟 VIEW POP UP ADS (+5 Poin)";
+            activeButton = null;
         }
 
-        // Fungsi untuk hitungan mundur
+        // Fungsi untuk menonaktifkan semua tombol
+        function disableAllButtons() {
+            const watchButton = document.getElementById('watchAdButton');
+            const popupButton = document.getElementById('popupAdButton');
+            
+            watchButton.disabled = true;
+            popupButton.disabled = true;
+        }
+
+        // Fungsi untuk hitungan mundur - BERUBAH: hanya berlaku untuk tombol yang aktif
         function startCountdown(seconds) {
             const watchButton = document.getElementById('watchAdButton');
             const popupButton = document.getElementById('popupAdButton');
             
             let countdown = seconds;
 
-            watchButton.disabled = true;
-            popupButton.disabled = true;
+            // Hanya nonaktifkan tombol yang sedang tidak aktif
+            if (activeButton === 'watch') {
+                popupButton.disabled = true;
+            } else if (activeButton === 'popup') {
+                watchButton.disabled = true;
+            }
 
-            const interval = setInterval(() => {
-                watchButton.innerText = `Tunggu ${countdown} detik...`;
-                popupButton.innerText = `Tunggu ${countdown} detik...`;
+            countdownInterval = setInterval(() => {
+                // Update teks hanya pada tombol yang aktif
+                if (activeButton === 'watch') {
+                    watchButton.innerText = `Tunggu ${countdown} detik...`;
+                } else if (activeButton === 'popup') {
+                    popupButton.innerText = `Tunggu ${countdown} detik...`;
+                }
+                
                 countdown--;
 
                 if (countdown < 0) {
-                    clearInterval(interval);
-                    enableAdButtons();
+                    clearInterval(countdownInterval);
+                    countdownInterval = null;
+                    enableAllButtons();
                 }
             }, 1000);
         }
