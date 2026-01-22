@@ -3,221 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Reward Modern</title>
+    <title>Quiz Reward - Admin & User</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <script src='//libtl.com/sdk.js' data-zone='9865183' data-sdk='show_9865183'></script>
     
     <style>
-        .glass-morphism {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
+        .glass { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        body { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); min-height: 100vh; overflow-x: hidden; }
+        .toast-notif { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; padding: 12px 24px; border-radius: 12px; font-weight: bold; pointer-events: none; }
     </style>
 </head>
-<body class="text-white font-sans pb-20">
+<body class="text-white font-sans">
 
-    <div id="auth-section" class="container mx-auto px-4 py-10 max-w-md">
-        <div class="glass-morphism rounded-3xl p-8 shadow-2xl animate__animated animate__fadeInDown">
-            <h2 id="auth-title" class="text-3xl font-bold text-center mb-6">Masuk</h2>
+    <div id="toast-container" class="toast-notif hidden animate__animated"></div>
+
+    <div id="auth-section" class="container mx-auto px-4 py-20 max-w-md">
+        <div class="glass rounded-3xl p-8 shadow-2xl animate__animated animate__fadeInDown">
+            <h2 id="auth-title" class="text-3xl font-extrabold text-center mb-8 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Selamat Datang</h2>
             
-            <div id="auth-form">
-                <input type="text" id="username" placeholder="Username" class="w-full p-4 mb-4 rounded-xl bg-white/20 border-none text-white placeholder-white/60 focus:ring-2 focus:ring-yellow-400 outline-none">
+            <div class="space-y-4">
+                <input type="text" id="username" placeholder="Username" class="w-full p-4 rounded-xl bg-white/10 border-none text-white outline-none focus:ring-2 focus:ring-cyan-500 transition">
+                <input type="password" id="password" placeholder="Password" class="w-full p-4 rounded-xl bg-white/10 border-none text-white outline-none focus:ring-2 focus:ring-cyan-500 transition">
                 
-                <div id="login-buttons">
-                    <button onclick="handleLogin()" class="w-full bg-yellow-400 hover:bg-yellow-500 text-purple-900 font-bold py-4 rounded-xl transition duration-300 mb-4 shadow-lg">Login</button>
-                    <p class="text-center text-sm">Belum punya akun? <span onclick="toggleAuth(false)" class="underline cursor-pointer">Daftar User</span></p>
+                <div id="login-btns">
+                    <button onclick="handleLogin()" class="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-4 rounded-xl transition shadow-lg mb-4">Masuk</button>
+                    <p class="text-center text-sm opacity-70">Belum ada akun? <span onclick="toggleAuth(false)" class="text-cyan-400 cursor-pointer font-bold">Daftar</span></p>
                 </div>
 
-                <div id="register-buttons" class="hidden">
-                    <button onclick="handleRegister()" class="w-full bg-green-400 hover:bg-green-500 text-white font-bold py-4 rounded-xl transition duration-300 mb-4 shadow-lg">Daftar Sekarang</button>
-                    <p class="text-center text-sm">Sudah punya akun? <span onclick="toggleAuth(true)" class="underline cursor-pointer">Login</span></p>
+                <div id="reg-btns" class="hidden">
+                    <button onclick="handleRegister()" class="w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-4 rounded-xl transition shadow-lg mb-4">Buat Akun</button>
+                    <p class="text-center text-sm opacity-70">Sudah punya akun? <span onclick="toggleAuth(true)" class="text-purple-400 cursor-pointer font-bold">Kembali Login</span></p>
                 </div>
             </div>
         </div>
     </div>
 
     <div id="main-app" class="hidden container mx-auto px-4 py-8 max-w-md animate__animated animate__fadeIn">
-        <div class="flex justify-between items-center mb-6 glass-morphism p-4 rounded-2xl">
+        <div class="flex justify-between items-center mb-6 glass p-4 rounded-2xl border-l-4 border-cyan-500">
             <div>
-                <p class="text-xs opacity-70">Username</p>
-                <p id="display-user" class="font-bold text-lg text-yellow-300"></p>
+                <p class="text-[10px] uppercase tracking-widest opacity-60">Pemain</p>
+                <p id="display-user" class="font-bold text-cyan-300"></p>
             </div>
             <div class="text-right">
-                <p class="text-xs opacity-70">Total Poin</p>
-                <p id="display-points" class="font-bold text-2xl text-green-400">0</p>
+                <p class="text-[10px] uppercase tracking-widest opacity-60">Koin Saya</p>
+                <p id="display-points" class="font-black text-2xl text-yellow-400">0</p>
             </div>
         </div>
 
-        <div class="glass-morphism rounded-3xl p-8 shadow-2xl text-center relative overflow-hidden">
-            <div id="notif" class="hidden absolute top-0 left-0 w-full p-2 text-sm font-bold animate__animated"></div>
-            
-            <h3 class="text-xl mb-4">Berapa hasil dari:</h3>
-            <div id="question" class="text-5xl font-black mb-8 text-yellow-300">0 + 0</div>
+        <div class="glass rounded-3xl p-8 text-center shadow-2xl">
+            <p class="text-sm opacity-70 mb-2">Selesaikan Tantangan:</p>
+            <div id="question" class="text-5xl font-black mb-8 text-white drop-shadow-md">0 + 0</div>
 
-            <div id="options" class="grid grid-cols-2 gap-4 mb-8">
-                </div>
+            <div id="options" class="grid grid-cols-2 gap-4 mb-8"></div>
 
             <div class="space-y-4">
-                <button onclick="generateQuiz()" class="w-full bg-blue-500 hover:bg-blue-600 py-3 rounded-xl font-semibold transition">Ganti Soal</button>
-                <button id="btn-ads" disabled onclick="showMonetagAd()" class="w-full bg-gray-500 text-white py-4 rounded-xl font-bold shadow-lg cursor-not-allowed transition duration-500">
-                    🎁 Lihat Iklan Reward (+5 Poin)
+                <button id="btn-ads" disabled onclick="showMonetagAd()" class="w-full bg-gray-600 text-gray-400 py-4 rounded-xl font-bold transition-all duration-300">
+                    🎁 Ambil Hadiah (Ads)
                 </button>
+                <button onclick="generateQuiz()" class="w-full bg-white/5 hover:bg-white/10 py-3 rounded-xl text-sm transition">Ganti Soal</button>
             </div>
         </div>
 
-        <button onclick="logout()" class="mt-8 w-full text-red-300 font-semibold underline">Logout</button>
+        <button onclick="logout()" class="mt-8 w-full text-gray-500 text-sm hover:text-white transition">Keluar dari Aplikasi</button>
     </div>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white/10 backdrop-blur-md border-t border-white/20 p-4 flex justify-around items-center z-50">
-        <div class="text-center flex flex-col items-center opacity-50 cursor-pointer" onclick="showSection('quiz')">
-            <span class="text-xl">🎮</span>
-            <span class="text-[10px]">Quiz</span>
+    <nav id="bottom-panel" class="hidden fixed bottom-0 left-0 right-0 glass border-t border-white/10 p-4 flex justify-around items-center z-50 animate__animated animate__slideInUp">
+        <div class="flex flex-col items-center text-cyan-400">
+            <span class="text-2xl">🎮</span>
+            <span class="text-[10px] font-bold">QUIZ</span>
         </div>
-        <div class="text-center flex flex-col items-center opacity-50 cursor-pointer" onclick="alert('Menu Poin Aktif')">
-            <span class="text-xl">💰</span>
-            <span class="text-[10px]">Poin</span>
+        <div class="flex flex-col items-center opacity-50">
+            <span class="text-2xl">💰</span>
+            <span class="text-[10px] font-bold">POIN</span>
         </div>
-        <div class="text-center flex flex-col items-center opacity-50 cursor-pointer" onclick="alert('Halaman Admin (Segera)')">
-            <span class="text-xl">🛡️</span>
-            <span class="text-[10px]">Admin</span>
+        <div id="admin-menu" class="hidden flex flex-col items-center text-red-400">
+            <span class="text-2xl">🛡️</span>
+            <span class="text-[10px] font-bold">ADMIN</span>
         </div>
     </nav>
 
     <script>
-        // Database Sederhana (Local Storage)
-        let users = JSON.parse(localStorage.getItem('quiz_users')) || {};
+        // Data Default (Admin statis untuk contoh)
+        let users = JSON.parse(localStorage.getItem('quiz_db')) || {
+            "admin": { password: "admin", points: 0, role: "admin" }
+        };
         let currentUser = null;
-        let currentCorrectAnswer = null;
+        let currentAns = null;
 
-        // --- AUTH FUNCTIONS ---
-        function toggleAuth(isLogin) {
-            const title = document.getElementById('auth-title');
-            const loginBtns = document.getElementById('login-buttons');
-            const regBtns = document.getElementById('register-buttons');
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast-container');
+            toast.innerText = msg;
+            toast.className = `toast-notif animate__animated animate__fadeInDown ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}`;
+            toast.classList.remove('hidden');
             
-            title.innerText = isLogin ? "Masuk" : "Daftar User";
-            loginBtns.classList.toggle('hidden', !isLogin);
-            regBtns.classList.toggle('hidden', isLogin);
+            setTimeout(() => {
+                toast.classList.replace('animate__fadeInDown', 'animate__fadeOutUp');
+                setTimeout(() => toast.classList.add('hidden'), 500);
+            }, 2500);
+        }
+
+        function toggleAuth(isLogin) {
+            document.getElementById('auth-title').innerText = isLogin ? "Selamat Datang" : "Daftar Akun";
+            document.getElementById('login-btns').classList.toggle('hidden', !isLogin);
+            document.getElementById('reg-btns').classList.toggle('hidden', isLogin);
         }
 
         function handleRegister() {
-            const user = document.getElementById('username').value.trim();
-            if (!user) return alert("Isi username!");
-            
-            if (users[user]) {
-                alert("❌ Username '" + user + "' sudah digunakan. Pilih yang lain!");
-            } else {
-                users[user] = { points: 0 };
-                saveData();
-                alert("✅ Pendaftaran Berhasil! Silakan Login.");
-                toggleAuth(true);
-            }
+            const u = document.getElementById('username').value.trim();
+            const p = document.getElementById('password').value.trim();
+            if(!u || !p) return showToast("Lengkapi data!", "error");
+            if(users[u]) return showToast("Username sudah dipakai!", "error");
+
+            users[u] = { password: p, points: 0, role: "user" };
+            localStorage.setItem('quiz_db', JSON.stringify(users));
+            showToast("Akun berhasil dibuat!");
+            toggleAuth(true);
         }
 
         function handleLogin() {
-            const user = document.getElementById('username').value.trim();
-            if (users[user]) {
-                currentUser = user;
+            const u = document.getElementById('username').value.trim();
+            const p = document.getElementById('password').value.trim();
+            
+            if(users[u] && users[u].password === p) {
+                currentUser = u;
                 document.getElementById('auth-section').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
-                document.getElementById('display-user').innerText = currentUser;
-                document.getElementById('display-points').innerText = users[currentUser].points;
+                document.getElementById('bottom-panel').classList.remove('hidden');
+                
+                // Cek Role Admin
+                if(users[u].role === "admin") {
+                    document.getElementById('admin-menu').classList.remove('hidden');
+                }
+
+                document.getElementById('display-user').innerText = u;
+                document.getElementById('display-points').innerText = users[u].points;
                 generateQuiz();
+                showToast("Halo, " + u + "!");
             } else {
-                alert("❌ Akun tidak ditemukan!");
+                showToast("User/Password Salah!", "error");
             }
         }
 
-        function logout() {
-            currentUser = null;
-            location.reload();
-        }
-
-        // --- QUIZ LOGIC ---
         function generateQuiz() {
-            const btnAds = document.getElementById('btn-ads');
-            btnAds.disabled = true;
-            btnAds.className = "w-full bg-gray-500 text-white py-4 rounded-xl font-bold cursor-not-allowed";
+            const btn = document.getElementById('btn-ads');
+            btn.disabled = true;
+            btn.className = "w-full bg-gray-600 text-gray-400 py-4 rounded-xl font-bold";
             
-            const num1 = Math.floor(Math.random() * 100) + 1;
-            const num2 = Math.floor(Math.random() * 100) + 1;
-            currentCorrectAnswer = num1 + num2;
+            const n1 = Math.floor(Math.random() * 100) + 1;
+            const n2 = Math.floor(Math.random() * 100) + 1;
+            currentAns = n1 + n2;
+            document.getElementById('question').innerText = `${n1} + ${n2}`;
 
-            document.getElementById('question').innerText = `${num1} + ${num2}`;
-            
-            // Buat pilihan jawaban (1 benar, 3 salah)
-            let options = [currentCorrectAnswer];
-            while(options.length < 4) {
-                let wrong = currentCorrectAnswer + (Math.floor(Math.random() * 20) - 10);
-                if (!options.includes(wrong) && wrong > 0) options.push(wrong);
+            let opts = [currentAns];
+            while(opts.length < 4) {
+                let w = currentAns + (Math.floor(Math.random() * 20) - 10);
+                if(!opts.includes(w) && w > 0) opts.push(w);
             }
-            
-            // Acak posisi
-            options.sort(() => Math.random() - 0.5);
+            opts.sort(() => Math.random() - 0.5);
 
-            const optionsContainer = document.getElementById('options');
-            optionsContainer.innerHTML = '';
-            options.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.innerText = opt;
-                btn.className = "bg-white/20 hover:bg-yellow-400 hover:text-purple-900 p-4 rounded-xl font-bold transition duration-300 animate__animated animate__zoomIn";
-                btn.onclick = () => checkAnswer(opt);
-                optionsContainer.appendChild(btn);
+            const container = document.getElementById('options');
+            container.innerHTML = '';
+            opts.forEach(o => {
+                const b = document.createElement('button');
+                b.innerText = o;
+                b.className = "glass hover:bg-cyan-500 py-4 rounded-xl font-bold transition duration-300";
+                b.onclick = () => {
+                    if(o === currentAns) {
+                        showToast("Benar! Ambil hadiahmu.");
+                        btn.disabled = false;
+                        btn.className = "w-full bg-gradient-to-r from-yellow-400 to-orange-500 text-black py-4 rounded-xl font-bold shadow-lg animate__animated animate__pulse animate__infinite";
+                    } else {
+                        showToast("Salah, coba lagi!", "error");
+                    }
+                };
+                container.appendChild(b);
             });
         }
 
-        function checkAnswer(selected) {
-            const notif = document.getElementById('notif');
-            notif.classList.remove('hidden', 'animate__fadeOutUp', 'animate__fadeInDown', 'bg-green-500', 'bg-red-500');
-            
-            if (selected === currentCorrectAnswer) {
-                notif.innerText = "🎉 Benar! Klik Iklan untuk Poin.";
-                notif.classList.add('bg-green-500', 'animate__fadeInDown');
-                
-                // Aktifkan Tombol Iklan
-                const btnAds = document.getElementById('btn-ads');
-                btnAds.disabled = false;
-                btnAds.className = "w-full bg-gradient-to-r from-yellow-400 to-orange-500 text-purple-900 py-4 rounded-xl font-bold shadow-lg animate__animated animate__pulse animate__infinite cursor-pointer";
-            } else {
-                notif.innerText = "❌ Salah! Coba lagi.";
-                notif.classList.add('bg-red-500', 'animate__fadeInDown');
-            }
-
-            setTimeout(() => {
-                notif.classList.add('animate__fadeOutUp');
-            }, 2000);
-        }
-
-        // --- MONETAG INTEGRATION ---
         function showMonetagAd() {
-            // Memanggil SDK Monetag
             show_9865183().then(() => {
-                // Eksekusi setelah iklan selesai ditonton
                 users[currentUser].points += 5;
-                saveData();
+                localStorage.setItem('quiz_db', JSON.stringify(users));
                 document.getElementById('display-points').innerText = users[currentUser].points;
-                
-                // Disable kembali tombol setelah klik
-                const btnAds = document.getElementById('btn-ads');
-                btnAds.disabled = true;
-                btnAds.className = "w-full bg-gray-500 text-white py-4 rounded-xl font-bold cursor-not-allowed";
-                
-                alert('Selamat! Anda mendapatkan 5 poin.');
-                generateQuiz(); // Reset soal setelah dapat poin
-            }).catch((e) => {
-                alert("Gagal memuat iklan. Pastikan Adblock mati.");
-            });
+                document.getElementById('btn-ads').disabled = true;
+                document.getElementById('btn-ads').className = "w-full bg-gray-600 text-gray-400 py-4 rounded-xl font-bold";
+                showToast("Poin +5 Berhasil ditambahkan!");
+                generateQuiz();
+            }).catch(() => showToast("Gagal memuat iklan", "error"));
         }
 
-        function saveData() {
-            localStorage.setItem('quiz_users', JSON.stringify(users));
-        }
+        function logout() { location.reload(); }
     </script>
 </body>
 </html>
