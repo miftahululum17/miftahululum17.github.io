@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Reward Pro - Auto Sync & Broadcast</title>
+    <title>Quiz Reward Pro - Admin Control v4</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <script src='//libtl.com/sdk.js' data-zone='9865183' data-sdk='show_9865183'></script>
@@ -25,11 +25,11 @@
 
     <div id="broadcast-modal" class="hidden fixed inset-0 z-[1000] flex items-center justify-center p-6">
         <div class="absolute inset-0 bg-black/80 backdrop-blur-md"></div>
-        <div class="glass w-full max-w-sm p-8 rounded-[2.5rem] text-center relative animate__animated animate__bounceIn">
+        <div class="glass w-full max-w-sm p-8 rounded-[2.5rem] text-center relative animate__animated animate__bounceIn border border-blue-500/30">
             <span class="text-5xl block mb-4">📢</span>
             <h2 class="text-xl font-black mb-2 text-blue-400">PENGUMUMAN</h2>
             <p id="broadcast-text" class="text-sm opacity-80 mb-6 font-medium">---</p>
-            <button onclick="closeBroadcast()" class="w-full bg-blue-600 py-3 rounded-2xl font-bold">Oke, Mengerti</button>
+            <button onclick="closeBroadcast()" class="w-full bg-blue-600 py-3 rounded-2xl font-bold">Oke, Siap!</button>
         </div>
     </div>
 
@@ -38,7 +38,7 @@
             <h2 class="text-2xl font-black mb-4">SETUP ADMIN</h2>
             <input type="text" id="setup-user" placeholder="Username Admin" class="w-full p-4 rounded-2xl bg-white/5 mb-3 border border-white/10 outline-none">
             <input type="password" id="setup-pass" placeholder="Password Admin" class="w-full p-4 rounded-2xl bg-white/5 mb-6 border border-white/10 outline-none">
-            <button onclick="saveSetupAdmin()" class="w-full bg-blue-600 py-4 rounded-2xl font-bold">MULAI APLIKASI</button>
+            <button onclick="saveSetupAdmin()" class="w-full bg-blue-600 py-4 rounded-2xl font-bold">SIMPAN & MULAI</button>
         </div>
     </div>
 
@@ -67,10 +67,12 @@
         </div>
 
         <div id="quiz-view" class="px-6 mt-6">
-            <div class="glass p-10 rounded-[3rem] text-center shadow-2xl">
+            <div class="glass p-10 rounded-[3rem] text-center shadow-2xl border border-white/5">
                 <h1 id="question" class="text-6xl font-black mb-10">0 + 0</h1>
                 <div id="options-grid" class="grid grid-cols-2 gap-4"></div>
-                <button id="ad-btn" disabled onclick="playAd()" class="w-full mt-8 bg-gray-800 text-gray-500 py-4 rounded-2xl font-bold">🎁 KLAIM REWARD (ADS)</button>
+                <button id="ad-btn" disabled onclick="playAd()" class="w-full mt-8 bg-gray-800 text-gray-500 py-4 rounded-2xl font-bold transition-all">
+                    🎁 KLAIM <span id="ad-reward-display">5</span> POIN
+                </button>
             </div>
         </div>
 
@@ -89,16 +91,19 @@
 
     <div id="admin-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/95 backdrop-blur-md" onclick="closeAdmin()"></div>
-        <div class="glass w-full max-w-2xl max-h-[90vh] rounded-[2.5rem] p-8 relative flex flex-col">
+        <div class="glass w-full max-w-2xl max-h-[90vh] rounded-[2.5rem] p-8 relative flex flex-col border border-red-500/20 shadow-2xl">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-black text-red-500 uppercase tracking-tighter italic">Control Center</h2>
+                <h2 class="text-xl font-black text-red-500 italic">ADMIN CONTROL</h2>
                 <button onclick="closeAdmin()" class="text-2xl opacity-50">&times;</button>
             </div>
-            <div class="flex space-x-2 mb-6">
-                <button onclick="switchAdminTab('users')" id="tab-u" class="flex-1 bg-red-600 py-3 rounded-xl font-bold text-[10px]">USERS</button>
-                <button onclick="switchAdminTab('wd')" id="tab-w" class="flex-1 bg-white/10 py-3 rounded-xl font-bold text-[10px] opacity-50">WITHDRAW</button>
-                <button onclick="adminBroadcast()" class="flex-1 bg-blue-600 py-3 rounded-xl font-bold text-[10px]">BROADCAST</button>
+            
+            <div class="grid grid-cols-4 gap-2 mb-6">
+                <button onclick="switchAdminTab('users')" id="tab-u" class="bg-red-600 py-3 rounded-xl font-bold text-[8px]">USERS</button>
+                <button onclick="switchAdminTab('wd')" id="tab-w" class="bg-white/10 py-3 rounded-xl font-bold text-[8px] opacity-50">WITHDRAW</button>
+                <button onclick="adminSetAdReward()" class="bg-yellow-600 py-3 rounded-xl font-bold text-[8px]">SET POIN IKLAN</button>
+                <button onclick="adminBroadcast()" class="bg-blue-600 py-3 rounded-xl font-bold text-[8px]">BROADCAST</button>
             </div>
+            
             <div id="admin-content" class="overflow-y-auto flex-1 pr-2 custom-scrollbar"></div>
         </div>
     </div>
@@ -107,11 +112,16 @@
         <div onclick="showSection('quiz')" id="nav-quiz" class="flex flex-col items-center cursor-pointer text-blue-500"><span class="text-2xl">🎮</span><span class="text-[10px] font-bold">QUIZ</span></div>
         <div onclick="showSection('points')" id="nav-points" class="flex flex-col items-center cursor-pointer opacity-30"><span class="text-2xl">💰</span><span class="text-[10px] font-bold">POIN</span></div>
         <div id="admin-btn" class="hidden flex flex-col items-center cursor-pointer text-red-500"><span class="text-2xl">⚙️</span><span class="text-[10px] font-bold">ADMIN</span></div>
-        <div onclick="location.reload()" class="flex flex-col items-center cursor-pointer opacity-30"><span class="text-2xl">🚪</span><span class="text-[10px] font-bold">OUT</span></div>
+        <div onclick="location.reload()" class="flex flex-col items-center cursor-pointer opacity-30"><span class="text-2xl">🚪</span><span class="text-[10px] font-bold">LOGOUT</span></div>
     </nav>
 
     <script>
-        let db = JSON.parse(localStorage.getItem('quiz_sync_v3_db')) || { global_broadcast: { msg: "", time: 0 } };
+        // Data Structure with Global Settings
+        let db = JSON.parse(localStorage.getItem('quiz_sync_v4_db')) || { 
+            global_broadcast: { msg: "", time: 0 },
+            config: { ad_reward: 5 }
+        };
+        
         let activeUser = null;
         let rightAnswer = 0;
         let adminTab = 'users';
@@ -125,20 +135,19 @@
                 document.getElementById('auth-page').classList.add('hide-section');
                 document.getElementById('setup-page').classList.remove('hide-section');
             }
-            // AUTO SYNC SETTINGS (Setiap 2 Detik)
             setInterval(syncData, 2000);
         };
 
         function syncData() {
-            // Tarik data terbaru dari LocalStorage
-            db = JSON.parse(localStorage.getItem('quiz_sync_v3_db')) || db;
+            db = JSON.parse(localStorage.getItem('quiz_sync_v4_db')) || db;
             
             if(activeUser) {
-                // Update Points & History Otomatis
                 updatePointsDisplay();
+                // Update tampilan hadiah iklan di tombol secara real-time
+                document.getElementById('ad-reward-display').innerText = db.config.ad_reward;
+                
                 if(currentSection === 'points') renderUserHistory();
                 
-                // Cek Broadcast Baru
                 if(db.global_broadcast && db.global_broadcast.time > lastBroadcastTime) {
                     showBroadcast(db.global_broadcast.msg);
                     lastBroadcastTime = db.global_broadcast.time;
@@ -149,18 +158,18 @@
         function notify(text, isError = false) {
             const t = document.getElementById('toast');
             t.innerText = text;
-            t.className = `toast-box animate__animated animate__fadeInDown ${isError ? 'bg-red-600' : 'bg-blue-600'}`;
+            t.className = `toast-box animate__animated animate__fadeInDown ${isError ? 'bg-red-600' : 'bg-green-600'}`;
             t.classList.remove('hidden');
             setTimeout(() => t.classList.add('hidden'), 3000);
         }
 
-        function saveDB() { localStorage.setItem('quiz_sync_v3_db', JSON.stringify(db)); }
+        function saveDB() { localStorage.setItem('quiz_sync_v4_db', JSON.stringify(db)); }
 
         // --- AUTH ---
         function saveSetupAdmin() {
             const u = document.getElementById('setup-user').value.trim();
             const p = document.getElementById('setup-pass').value.trim();
-            if(!u || !p) return notify("Input kosong!", true);
+            if(!u || !p) return notify("Lengkapi data admin!", true);
             db[u] = { pass: p, points: 0, role: 'admin', history: [], blocked: false };
             saveDB(); location.reload();
         }
@@ -170,7 +179,7 @@
             const p = document.getElementById('pass-input').value.trim();
             const user = db[u];
             if(user && user.pass === p) {
-                if(user.blocked) return notify("Blocked!", true);
+                if(user.blocked) return notify("Akun Anda diblokir!", true);
                 activeUser = u;
                 document.getElementById('auth-page').classList.add('hide-section');
                 document.getElementById('main-app').classList.remove('hide-section');
@@ -181,11 +190,11 @@
                 }
                 document.getElementById('display-name').innerText = u;
                 syncData(); showSection('quiz');
-            } else { notify("Login Gagal!", true); }
+            } else { notify("Username/Password salah!", true); }
         }
 
         function switchAuth(isL) {
-            document.getElementById('auth-title').innerText = isL ? "Login" : "Daftar";
+            document.getElementById('auth-title').innerText = isL ? "Login" : "Daftar Akun";
             document.getElementById('login-area').classList.toggle('hidden', !isL);
             document.getElementById('reg-area').classList.toggle('hidden', isL);
         }
@@ -193,12 +202,12 @@
         function doRegister() {
             const u = document.getElementById('user-input').value.trim();
             const p = document.getElementById('pass-input').value.trim();
-            if(db[u]) return notify("Username ada!", true);
+            if(db[u]) return notify("Username sudah dipakai!", true);
             db[u] = { pass: p, points: 0, role: 'user', history: [], blocked: false };
-            saveDB(); notify("Terdaftar!"); switchAuth(true);
+            saveDB(); notify("Berhasil Daftar!"); switchAuth(true);
         }
 
-        // --- GAME ---
+        // --- GAME LOGIC ---
         function showSection(name) {
             currentSection = name;
             document.getElementById('quiz-view').classList.toggle('hide-section', name !== 'quiz');
@@ -226,9 +235,10 @@
                 btn.innerText = v; btn.className = "glass p-6 rounded-2xl font-black text-2xl hover:bg-blue-600 transition";
                 btn.onclick = () => {
                     if(v === rightAnswer) {
-                        notify("Benar!"); adBtn.disabled = false;
-                        adBtn.className = "w-full mt-8 bg-yellow-500 text-black py-4 rounded-2xl font-black animate__animated animate__heartBeat cursor-pointer";
-                    } else notify("Salah!", true);
+                        notify("BENAR! Silakan klaim poin.");
+                        adBtn.disabled = false;
+                        adBtn.className = "w-full mt-8 bg-yellow-500 text-black py-4 rounded-2xl font-black animate__animated animate__pulse animate__infinite cursor-pointer shadow-xl shadow-yellow-500/20";
+                    } else notify("Jawaban Salah!", true);
                 };
                 grid.appendChild(btn);
             });
@@ -236,20 +246,24 @@
 
         function playAd() {
             show_9865183().then(() => {
-                db[activeUser].points += 5; saveDB(); updatePointsDisplay();
-                notify("+5 Poin!"); initQuiz();
-            }).catch(() => notify("Ads Error", true));
+                const reward = db.config.ad_reward || 5;
+                db[activeUser].points += reward;
+                saveDB(); updatePointsDisplay();
+                notify("+" + reward + " Poin Berhasil!"); initQuiz();
+            }).catch(() => notify("Iklan gagal dimuat!", true));
         }
 
-        // --- WITHDRAW ---
+        // --- WITHDRAW LOGIC ---
         function submitWD() {
             const amount = parseInt(document.getElementById('wd-amount').value);
             const num = document.getElementById('wd-dana').value.trim();
             const name = document.getElementById('wd-name').value.trim();
-            if(db[activeUser].points < amount || !amount) return notify("Poin kurang!", true);
+            if(!amount || !num || !name) return notify("Lengkapi formulir!", true);
+            if(db[activeUser].points < amount) return notify("Poin tidak cukup!", true);
+            
             db[activeUser].points -= amount;
             db[activeUser].history.unshift({ id: Date.now(), user: activeUser, amount, num, name, status: 'Pending', note: '' });
-            saveDB(); renderUserHistory(); notify("Diajukan!");
+            saveDB(); renderUserHistory(); notify("Berhasil diajukan!");
         }
 
         function renderUserHistory() {
@@ -258,9 +272,9 @@
             db[activeUser].history.forEach(i => {
                 cont.innerHTML += `
                 <div class="glass p-4 rounded-2xl border-l-4 ${i.status==='Pending'?'border-yellow-500':(i.status==='Diterima'?'border-green-500':'border-red-500')}">
-                    <div class="flex justify-between items-start">
-                        <span class="font-bold">${i.amount} Poin</span>
-                        <span class="text-[8px] px-2 py-1 rounded status-${i.status.toLowerCase()}">${i.status}</span>
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="font-bold text-lg">${i.amount} Poin</span>
+                        <span class="text-[8px] px-2 py-1 rounded status-${i.status.toLowerCase()} font-bold">${i.status}</span>
                     </div>
                     <p class="text-[9px] opacity-40">${i.num} | ${i.name}</p>
                     ${i.note ? `<p class="text-[9px] text-blue-300 mt-2 bg-white/5 p-2 rounded">Note: ${i.note}</p>` : ''}
@@ -268,11 +282,11 @@
             });
         }
 
-        // --- ADMIN ---
+        // --- ADMIN SYSTEM ---
         function switchAdminTab(t) {
             adminTab = t;
-            document.getElementById('tab-u').className = t === 'users' ? 'flex-1 bg-red-600 py-3 rounded-xl font-bold text-[10px]' : 'flex-1 bg-white/10 py-3 rounded-xl font-bold text-[10px] opacity-50';
-            document.getElementById('tab-w').className = t === 'wd' ? 'flex-1 bg-red-600 py-3 rounded-xl font-bold text-[10px]' : 'flex-1 bg-white/10 py-3 rounded-xl font-bold text-[10px] opacity-50';
+            document.getElementById('tab-u').className = t === 'users' ? 'bg-red-600 py-3 rounded-xl font-bold text-[8px]' : 'bg-white/10 py-3 rounded-xl font-bold text-[8px] opacity-50';
+            document.getElementById('tab-w').className = t === 'wd' ? 'bg-red-600 py-3 rounded-xl font-bold text-[8px]' : 'bg-white/10 py-3 rounded-xl font-bold text-[8px] opacity-50';
             renderAdminContent();
         }
 
@@ -281,32 +295,32 @@
             cont.innerHTML = '';
             if(adminTab === 'users') {
                 Object.keys(db).forEach(u => {
-                    if(u === 'global_broadcast') return;
+                    if(u === 'global_broadcast' || u === 'config') return;
                     const user = db[u];
                     cont.innerHTML += `
                     <div class="glass p-4 rounded-2xl mb-2 flex justify-between items-center ${user.blocked?'opacity-30':''}">
-                        <div><p class="font-bold text-xs">${u}</p><p class="text-[10px] text-yellow-500">${user.points} Pts</p></div>
+                        <div><p class="font-bold text-xs">${u}</p><p class="text-[10px] text-yellow-500 font-bold">${user.points} Pts</p></div>
                         <div class="flex space-x-1">
-                            <button onclick="admPass('${u}')" class="bg-blue-600 p-2 rounded text-[8px]">PASS</button>
-                            <button onclick="admPoin('${u}')" class="bg-yellow-600 p-2 rounded text-[8px]">POIN</button>
-                            <button onclick="admBlock('${u}')" class="bg-red-600 p-2 rounded text-[8px]">${user.blocked?'UN':'BLCK'}</button>
+                            <button onclick="admPass('${u}')" class="bg-blue-600/20 text-blue-400 p-2 rounded text-[8px] font-bold">PASS</button>
+                            <button onclick="admPoin('${u}')" class="bg-yellow-600/20 text-yellow-400 p-2 rounded text-[8px] font-bold">POIN</button>
+                            <button onclick="admBlock('${u}')" class="bg-red-600/20 text-red-400 p-2 rounded text-[8px] font-bold">${user.blocked?'UNBLCK':'BLOCK'}</button>
                         </div>
                     </div>`;
                 });
             } else {
                 Object.keys(db).forEach(u => {
-                    if(u === 'global_broadcast') return;
+                    if(u === 'global_broadcast' || u === 'config') return;
                     db[u].history.forEach(h => {
                         cont.innerHTML += `
-                        <div class="glass p-4 rounded-xl mb-2 text-[10px]">
-                            <p><b>USER:</b> ${h.user} | <b>STATUS:</b> ${h.status}</p>
-                            <p>${h.amount} Pts -> ${h.num} (${h.name})</p>
-                            <div class="flex space-x-2 mt-2">
+                        <div class="glass p-4 rounded-xl mb-2 text-[10px] border border-white/5">
+                            <p><b>USER:</b> ${h.user} | <b>STATUS:</b> <span class="status-${h.status.toLowerCase()} px-1 rounded">${h.status}</span></p>
+                            <p class="mt-1">${h.amount} Pts -> ${h.num} (${h.name})</p>
+                            <div class="flex space-x-2 mt-3">
                                 ${h.status==='Pending' ? `
-                                <button onclick="admWD('${h.user}', ${h.id}, 'Diterima')" class="bg-green-600 px-3 py-1 rounded">TERIMA</button>
-                                <button onclick="admWD('${h.user}', ${h.id}, 'Ditolak')" class="bg-red-600 px-3 py-1 rounded">TOLAK</button>
+                                <button onclick="admWD('${h.user}', ${h.id}, 'Diterima')" class="bg-green-600 px-3 py-1 rounded font-bold">TERIMA</button>
+                                <button onclick="admWD('${h.user}', ${h.id}, 'Ditolak')" class="bg-red-600 px-3 py-1 rounded font-bold">TOLAK</button>
                                 `:''}
-                                <button onclick="admDelLog('${h.user}', ${h.id})" class="bg-white/10 px-3 py-1 rounded text-red-400">HAPUS LOG</button>
+                                <button onclick="admDelLog('${h.user}', ${h.id})" class="bg-white/10 px-3 py-1 rounded text-red-400 font-bold">HAPUS LOG</button>
                             </div>
                         </div>`;
                     });
@@ -314,8 +328,17 @@
             }
         }
 
+        function adminSetAdReward() {
+            const val = prompt("Atur jumlah poin yang didapat user setelah nonton iklan:", db.config.ad_reward);
+            if(val !== null && !isNaN(val)) {
+                db.config.ad_reward = parseInt(val);
+                saveDB();
+                notify("Poin Iklan diatur ke: " + val);
+            }
+        }
+
         function adminBroadcast() {
-            const msg = prompt("Masukkan pesan broadcast untuk SEMUA user:");
+            const msg = prompt("Kirim pesan broadcast ke semua user:");
             if(msg) {
                 db.global_broadcast = { msg: msg, time: Date.now() };
                 saveDB(); notify("Broadcast Terkirim!");
@@ -330,7 +353,7 @@
         function closeBroadcast() { document.getElementById('broadcast-modal').classList.add('hidden'); }
 
         function admWD(u, id, s) {
-            const note = prompt("Catatan (Opsional):");
+            const note = prompt("Berikan catatan untuk user:");
             const idx = db[u].history.findIndex(i => i.id === id);
             if(idx !== -1) {
                 db[u].history[idx].status = s;
@@ -341,15 +364,15 @@
         }
 
         function admDelLog(u, id) {
-            if(confirm("Hapus permanen log ini?")) {
+            if(confirm("Hapus log penarikan ini secara manual?")) {
                 db[u].history = db[u].history.filter(i => i.id !== id);
-                saveDB(); renderAdminContent(); notify("Log Dihapus", true);
+                saveDB(); renderAdminContent(); notify("Log Terhapus", true);
             }
         }
 
-        function admPass(u) { const p = prompt("Pass Baru:"); if(p) { db[u].pass = p; saveDB(); notify("Updated!"); } }
-        function admPoin(u) { const p = prompt("Set Poin:", db[u].points); if(p) { db[u].points = parseInt(p); saveDB(); notify("Updated!"); } }
-        function admBlock(u) { if(db[u].role==='admin') return; db[u].blocked = !db[u].blocked; saveDB(); renderAdminContent(); notify("Updated!"); }
+        function admPass(u) { const p = prompt("Password Baru:"); if(p) { db[u].pass = p; saveDB(); notify("Pass Diupdate!"); } }
+        function admPoin(u) { const p = prompt("Set Total Poin:", db[u].points); if(p) { db[u].points = parseInt(p); saveDB(); notify("Poin Diupdate!"); } }
+        function admBlock(u) { if(db[u].role==='admin') return; db[u].blocked = !db[u].blocked; saveDB(); renderAdminContent(); notify("Status Diupdate!"); }
 
         function updatePointsDisplay() { document.getElementById('display-points').innerText = db[activeUser].points; }
         function openAdmin() { document.getElementById('admin-modal').classList.remove('hidden'); switchAdminTab('users'); }
