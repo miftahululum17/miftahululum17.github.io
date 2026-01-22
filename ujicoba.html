@@ -2,133 +2,205 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz & Ads Mini App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Modern Quiz Mini App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src='//libtl.com/sdk.js' data-zone='9865183' data-sdk='show_9865183'></script>
+    
     <style>
+        :root {
+            --primary-color: #248bcf;
+            --success-color: #31b545;
+            --error-color: #ef4444;
+            --bg-color: var(--tg-theme-bg-color, #f5f7fa);
+            --card-bg: var(--tg-theme-secondary-bg-color, #ffffff);
+            --text-color: var(--tg-theme-text-color, #2d3436);
+        }
+
         body {
-            background-color: var(--tg-theme-bg-color, #ffffff);
-            color: var(--tg-theme-text-color, #000000);
-            font-family: sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 50px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
-        .card {
-            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+
+        .app-container {
+            width: 90%;
+            max-width: 400px;
             padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            width: 85%;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
         }
-        .quiz-container { margin-bottom: 20px; }
-        .question { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
-        input {
-            width: 60px;
-            padding: 10px;
-            font-size: 18px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
             text-align: center;
         }
-        .btn {
-            display: block;
-            width: 100%;
-            margin-top: 10px;
-            padding: 12px;
-            border-radius: 10px;
+
+        .header h2 { margin: 0; font-size: 1.2rem; opacity: 0.8; }
+        
+        .question-box {
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 25px 0;
+            color: var(--primary-color);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .option-btn {
+            background: var(--bg-color);
+            border: 2px solid transparent;
+            padding: 15px;
+            border-radius: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option-btn:active { transform: scale(0.95); }
+        .option-btn.correct { background: var(--success-color); color: white; }
+        .option-btn.wrong { background: var(--error-color); color: white; }
+
+        .ad-section {
+            border-top: 1px solid rgba(0,0,0,0.05);
+            padding-top: 20px;
+        }
+
+        .btn-ad {
+            background: var(--primary-color);
+            color: white;
             border: none;
+            width: 100%;
+            padding: 14px;
+            border-radius: 14px;
             font-weight: bold;
+            font-size: 1rem;
             cursor: pointer;
         }
-        .btn-check { background-color: #31b545; color: white; }
-        .btn-ads { background-color: var(--tg-theme-button-color, #248bcf); color: white; margin-top: 20px; }
-        
-        /* Gaya Toast Sederhana */
+
+        /* Toast Modern */
         #toast {
-            visibility: hidden;
-            min-width: 200px;
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            border-radius: 10px;
-            padding: 16px;
             position: fixed;
-            z-index: 1;
-            bottom: 30px;
-            font-size: 14px;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            border-radius: 50px;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+            z-index: 1000;
         }
-        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
-        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
-        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+        #toast.show { opacity: 1; transform: translateX(-50%) translateY(10px); }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <div class="quiz-container">
-            <div class="question" id="quiz-text">Memuat soal...</div>
-            <input type="number" id="user-answer" placeholder="?">
-            <button class="btn btn-check" onclick="cekJawaban()">Cek Jawaban</button>
-        </div>
-
-        <hr style="border: 0.5px solid #ccc; margin: 20px 0;">
-
-        <p>Butuh lebih banyak poin?</p>
-        <button class="btn btn-ads" onclick="putarVideo()">LIHAT IKLAN VIDEO</button>
-    </div>
-
     <div id="toast"></div>
+
+    <div class="app-container">
+        <div class="card">
+            <div class="header">
+                <h2>Quiz Matematika</h2>
+            </div>
+
+            <div class="question-box" id="question">0 + 0</div>
+
+            <div class="options-grid" id="options-container">
+                </div>
+
+            <div class="ad-section">
+                <button class="btn-ad" onclick="putarIklan()">📺 Tonton Iklan (Reward)</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
+        tg.ready();
 
-        let angka1, angka2, hasilBenar;
+        let correctAnswer;
 
-        // Fungsi membuat soal acak
-        function buatSoal() {
-            angka1 = Math.floor(Math.random() * 100) + 1;
-            angka2 = Math.floor(Math.random() * 100) + 1;
-            hasilBenar = angka1 + angka2;
-            document.getElementById('quiz-text').innerText = `${angka1} + ${angka2} =`;
-            document.getElementById('user-answer').value = "";
+        function showToast(text, type) {
+            const toast = document.getElementById('toast');
+            toast.innerText = text;
+            toast.style.backgroundColor = type === 'success' ? '#31b545' : '#ef4444';
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
         }
 
-        // Fungsi Toast (Pesan Singkat)
-        function showToast(pesan, warna) {
-            const toast = document.getElementById("toast");
-            toast.innerText = pesan;
-            toast.style.backgroundColor = warna;
-            toast.className = "show";
-            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
-        }
+        function generateQuiz() {
+            const n1 = Math.floor(Math.random() * 100) + 1;
+            const n2 = Math.floor(Math.random() * 100) + 1;
+            correctAnswer = n1 + n2;
 
-        function cekJawaban() {
-            const jawabanUser = parseInt(document.getElementById('user-answer').value);
-            if (jawabanUser === hasilBenar) {
-                showToast("✅ Benar! Kamu pintar.", "#31b545");
-                setTimeout(buatSoal, 2000); // Ganti soal setelah 2 detik
-            } else {
-                showToast("❌ Salah! Coba lagi ya.", "#e91e63");
+            document.getElementById('question').innerText = `${n1} + ${n2}`;
+
+            // Buat 3 jawaban salah yang dekat dengan jawaban asli
+            let options = [correctAnswer];
+            while(options.length < 4) {
+                let wrong = correctAnswer + (Math.floor(Math.random() * 21) - 10);
+                if(wrong !== correctAnswer && wrong > 0 && !options.includes(wrong)) {
+                    options.push(wrong);
+                }
             }
-        }
 
-        function putarVideo() {
-            show_9865183().then(() => {
-                tg.showAlert("Iklan selesai! Kamu mendapatkan reward tambahan.");
-            }).catch((err) => {
-                tg.showAlert("Iklan belum siap atau gagal dimuat.");
+            // Acak posisi pilihan (Fisher-Yates Shuffle)
+            options.sort(() => Math.random() - 0.5);
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(opt, btn);
+                container.appendChild(btn);
             });
         }
 
-        // Jalankan soal pertama saat buka aplikasi
-        buatSoal();
+        function checkAnswer(selected, btn) {
+            const allBtns = document.querySelectorAll('.option-btn');
+            allBtns.forEach(b => b.style.pointerEvents = 'none'); // Disable klik ganda
+
+            if(selected === correctAnswer) {
+                btn.classList.add('correct');
+                showToast("Bagus! Jawaban Benar ✅", "success");
+                setTimeout(generateQuiz, 1500);
+            } else {
+                btn.classList.add('wrong');
+                showToast("Ups! Jawaban Salah ❌", "error");
+                // Tunjukkan jawaban yang benar setelah salah
+                setTimeout(generateQuiz, 1500);
+            }
+        }
+
+        function putarIklan() {
+            show_9865183().then(() => {
+                tg.showAlert("Terima kasih! Bonus poin telah ditambahkan.");
+            }).catch(() => {
+                tg.showConfirm("Iklan belum tersedia, coba lagi?");
+            });
+        }
+
+        // Mulai kuis pertama
+        generateQuiz();
     </script>
 </body>
 </html>
