@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Modern Quiz & Toast</title>
+    <title>Compact Quiz App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src='//libtl.com/sdk.js' data-zone='9865183' data-sdk='show_9865183'></script>
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
@@ -27,92 +27,80 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            align-items: center; /* Konten di tengah secara horizontal */
         }
 
-        /* --- TOAST SYSTEM --- */
-        #toast-container {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 9999;
-            width: 80%;
-            max-width: 300px;
-            pointer-events: none;
-        }
-
+        /* Toast System */
+        #toast-container { position: fixed; top: 15px; left: 50%; transform: translateX(-50%); z-index: 9999; }
         .toast {
-            background: white;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 15px;
-            font-weight: 600;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-            margin-bottom: 10px;
-            animation: toastIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards,
-                       toastOut 0.5s 2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            background: white; color: white; padding: 10px 18px; border-radius: 12px;
+            font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 8px;
+            animation: tIn 0.4s ease forwards, tOut 0.4s 2s ease forwards;
         }
+        @keyframes tIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes tOut { to { opacity: 0; transform: translateY(-10px); } }
 
-        @keyframes toastIn {
-            from { opacity: 0; transform: translateY(-50px) scale(0.9); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
+        /* App Container */
+        #app { width: 100%; max-width: 400px; padding: 15px; flex: 1; display: flex; flex-direction: column; justify-content: center; }
 
-        @keyframes toastOut {
-            from { opacity: 1; transform: translateY(0) scale(1); }
-            to { opacity: 0; transform: translateY(-20px) scale(0.9); }
-        }
+        .page { display: none; }
+        .page.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* --- UI COMPONENTS --- */
-        #app { flex: 1; padding: 20px; overflow-y: auto; }
-        .page { display: none; animation: slideUp 0.4s ease; }
-        .page.active { display: block; }
-
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
+        /* Kompak Card */
         .card {
             background: var(--card-bg);
             backdrop-filter: blur(10px);
-            border-radius: 28px;
-            padding: 24px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.05);
+            border-radius: 20px;
+            padding: 15px; /* Lebih kecil */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             text-align: center;
         }
 
         .question {
-            font-size: 42px;
+            font-size: 28px; /* Lebih kecil */
             font-weight: 800;
-            margin: 20px 0;
+            margin: 10px 0;
             color: var(--primary);
         }
 
-        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px auto;
+            max-width: 240px; /* Batasi lebar grid jawaban */
+        }
+
         .opt-btn {
-            background: var(--bg); border: 2px solid rgba(0,0,0,0.05);
-            padding: 18px; border-radius: 20px; font-size: 18px; font-weight: 700;
+            background: var(--bg); border: none;
+            padding: 12px; border-radius: 12px;
+            font-size: 16px; font-weight: 700;
             color: var(--text); cursor: pointer; transition: 0.2s;
         }
-        .opt-btn.correct { background: var(--success); color: white; border-color: var(--success); }
-        .opt-btn.wrong { background: var(--danger); color: white; border-color: var(--danger); }
+        .opt-btn.correct { background: var(--success); color: white; }
+        .opt-btn.wrong { background: var(--danger); color: white; }
 
+        /* Tombol Ringkas (Tidak Panjang) */
         .btn-main {
             background: var(--primary); color: white; border: none;
-            padding: 18px; border-radius: 20px; width: 100%;
-            font-weight: 800; font-size: 16px; transition: 0.3s;
+            padding: 10px 20px; border-radius: 12px;
+            display: inline-flex; align-items: center; gap: 8px;
+            font-weight: 700; font-size: 14px; cursor: pointer;
+            transition: 0.3s;
+            margin: 0 auto; /* Tengah */
         }
-        .btn-main:disabled { background: #ccc; opacity: 0.5; }
+        .btn-main:disabled { background: #ccc; opacity: 0.6; cursor: not-allowed; }
 
+        /* Navbar */
         .navbar {
+            width: 100%; max-width: 400px;
             background: var(--card-bg); display: flex; justify-content: space-around;
-            padding: 15px 10px 25px; border-top: 1px solid rgba(0,0,0,0.05);
-            border-radius: 24px 24px 0 0;
+            padding: 10px 0 20px; border-radius: 20px 20px 0 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.03);
         }
-        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 12px; opacity: 0.4; transition: 0.3s; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; opacity: 0.4; }
         .nav-item.active { opacity: 1; color: var(--primary); }
     </style>
 </head>
@@ -123,69 +111,62 @@
     <div id="app">
         <section id="quiz" class="page active">
             <div class="card">
-                <div style="font-size: 12px; font-weight: bold; color: var(--primary);">PENJUMLAHAN ACAK</div>
+                <small style="opacity: 0.6; font-weight: bold;">KUIS PENJUMLAHAN</small>
                 <div class="question" id="q-text">-- + --</div>
+                
                 <div class="options-grid" id="q-options"></div>
-                <button onclick="initQuiz()" style="background:none; border:none; color:var(--primary); font-weight:600; cursor:pointer; margin-bottom: 20px;">
-                    <i class='bx bx-refresh'></i> Lewati
-                </button>
-                <div style="border-top: 1px solid rgba(0,0,0,0.05); padding-top: 20px;">
+                
+                <div style="margin: 10px 0;">
+                    <button onclick="initQuiz()" style="background:none; border:none; color:var(--primary); font-size: 12px; cursor:pointer;">
+                        <i class='bx bx-refresh'></i> Ganti Soal
+                    </button>
+                </div>
+
+                <div style="border-top: 1px solid rgba(0,0,0,0.05); padding-top: 15px; text-align: center;">
                     <button id="ad-btn" class="btn-main" onclick="handleAd()" disabled>
-                        <i class='bx bx-lock-alt'></i> Jawab Benar Dahulu
+                        <i class='bx bx-play-circle'></i> Tonton Iklan
                     </button>
                 </div>
             </div>
         </section>
 
         <section id="poin" class="page">
-            <div class="card">
-                <i class='bx bxs-badge-check' style="font-size: 50px; color: #f1c40f;"></i>
-                <h3>Saldo Poin</h3>
-                <div style="font-size: 48px; font-weight: 900;" id="user-poin">0</div>
+            <div class="card" style="max-width: 250px; margin: 0 auto;">
+                <i class='bx bxs-coin-stack' style="font-size: 32px; color: #f1c40f;"></i>
+                <h4>Saldo Poin</h4>
+                <div style="font-size: 32px; font-weight: 900;" id="user-poin">0</div>
             </div>
         </section>
 
         <section id="admin" class="page">
-            <div class="card">
-                <h3>Pengaturan</h3>
-                <button onclick="resetData()" style="color:var(--danger); background:none; border:1px solid var(--danger); padding:10px; width:100%; border-radius:12px;">Reset Poin</button>
+            <div class="card" style="max-width: 250px; margin: 0 auto;">
+                <h4>Admin</h4>
+                <button onclick="resetData()" style="color:var(--danger); background:none; border:1px solid var(--danger); padding:8px; width:100%; border-radius:10px; font-size: 12px;">Reset Data</button>
             </div>
         </section>
     </div>
 
     <nav class="navbar">
-        <div class="nav-item active" onclick="navTo('quiz', this)"><i class='bx bxs-game' style="font-size:24px"></i><span>Quiz</span></div>
-        <div class="nav-item" onclick="navTo('poin', this)"><i class='bx bxs-wallet' style="font-size:24px"></i><span>Poin</span></div>
-        <div class="nav-item" onclick="navTo('admin', this)"><i class='bx bxs-cog' style="font-size:24px"></i><span>Admin</span></div>
+        <div class="nav-item active" onclick="navTo('quiz', this)"><i class='bx bxs-game' style="font-size:20px"></i><span>Main</span></div>
+        <div class="nav-item" onclick="navTo('poin', this)"><i class='bx bxs-wallet' style="font-size:20px"></i><span>Dompet</span></div>
+        <div class="nav-item" onclick="navTo('admin', this)"><i class='bx bxs-cog' style="font-size:20px"></i><span>Admin</span></div>
     </nav>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        let ans;
-        let p = parseInt(localStorage.getItem('pts')) || 0;
+        let ans, p = parseInt(localStorage.getItem('pts')) || 0;
         const ab = document.getElementById('ad-btn');
 
-        // FUNGSI TOAST MODERN
-        function showToast(message, type) {
+        function showToast(msg, type) {
             const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            
-            // Set warna & icon berdasarkan tipe
-            if(type === 'success') {
-                toast.style.backgroundColor = 'var(--success)';
-                toast.innerHTML = `<i class='bx bxs-check-circle'></i> ${message}`;
-            } else {
-                toast.style.backgroundColor = 'var(--danger)';
-                toast.innerHTML = `<i class='bx bxs-x-circle'></i> ${message}`;
-            }
-
-            container.appendChild(toast);
-            
-            // Hapus elemen setelah animasi selesai (2.5 detik)
-            setTimeout(() => { toast.remove(); }, 2500);
+            const t = document.createElement('div');
+            t.className = 'toast';
+            t.style.backgroundColor = type === 'success' ? 'var(--success)' : 'var(--danger)';
+            t.innerHTML = `<i class='bx ${type==='success'?'bx-check-circle':'bx-x-circle'}'></i> ${msg}`;
+            container.appendChild(t);
+            setTimeout(() => t.remove(), 2500);
         }
 
         function navTo(id, el) {
@@ -203,7 +184,6 @@
 
         function initQuiz() {
             ab.disabled = true;
-            ab.innerHTML = "<i class='bx bx-lock-alt'></i> Jawab Benar Dahulu";
             const a = Math.floor(Math.random() * 50) + 1;
             const b = Math.floor(Math.random() * 50) + 1;
             ans = a + b;
@@ -225,16 +205,12 @@
                 btn.onclick = () => {
                     if(o === ans) {
                         btn.classList.add('correct');
-                        tg.HapticFeedback.notificationOccurred('success');
-                        showToast("Jawaban Benar! +5 Poin", "success");
-                        p += 5; refreshPoin();
-                        ab.disabled = false;
-                        ab.innerHTML = "<i class='bx bx-play-circle'></i> Tonton Iklan (+50)";
+                        showToast("+5 Poin!", "success");
+                        p += 5; refreshPoin(); ab.disabled = false;
                         document.querySelectorAll('.opt-btn').forEach(x => x.onclick = null);
                     } else {
                         btn.classList.add('wrong');
-                        tg.HapticFeedback.notificationOccurred('error');
-                        showToast("Jawaban Salah! Coba lagi.", "error");
+                        showToast("Salah!", "error");
                         setTimeout(initQuiz, 1000);
                     }
                 };
@@ -246,17 +222,12 @@
             ab.disabled = true;
             show_9865183().then(() => {
                 p += 50; refreshPoin();
-                showToast("Iklan Selesai! +50 Poin", "success");
+                showToast("+50 Poin!", "success");
                 initQuiz();
-            }).catch(() => {
-                showToast("Iklan gagal dimuat.", "error");
-                initQuiz();
-            });
+            }).catch(() => { showToast("Gagal!", "error"); initQuiz(); });
         }
 
-        function resetData() {
-            localStorage.clear(); location.reload();
-        }
+        function resetData() { localStorage.clear(); location.reload(); }
 
         refreshPoin();
         initQuiz();
