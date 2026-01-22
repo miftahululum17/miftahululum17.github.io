@@ -29,44 +29,32 @@
             display: flex; flex-direction: column; overflow: hidden;
         }
 
-        /* --- TOAST --- */
+        /* TOAST SYSTEM */
         #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; width: 90%; max-width: 300px; pointer-events: none; }
-        .toast { background: white; color: var(--text); padding: 12px 20px; border-radius: 18px; font-weight: 700; font-size: 13px; margin-bottom: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-left: 6px solid var(--primary); display: flex; align-items: center; gap: 10px; animation: toastIn 0.4s forwards; }
+        .toast { background: white; color: var(--text); padding: 12px 20px; border-radius: 18px; font-weight: 700; font-size: 13px; margin-bottom: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-left: 6px solid var(--primary); display: flex; align-items: center; gap: 10px; animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         @keyframes toastIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- UI COMPONENTS --- */
+        /* APP CONTENT */
         #app { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .page { display: none; width: 100%; max-width: var(--quiz-width); }
         .page.active { display: block; animation: fadeUp 0.5s ease; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         .card { background: var(--card-glass); backdrop-filter: blur(20px); border-radius: 35px; padding: 25px; border: 1px solid rgba(255,255,255,0.5); box-shadow: 0 15px 35px rgba(0,0,0,0.05); text-align: center; width: 100%; }
-        
-        /* Persistent Header Style */
-        .persistent-header { 
-            display: flex; justify-content: space-between; align-items: center; 
-            margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-        .user-tag { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 14px; color: var(--text); }
-        .logout-btn { color: var(--danger); font-size: 22px; cursor: pointer; transition: 0.2s; }
-        .logout-btn:hover { transform: scale(1.1); }
-
         .question { font-size: 3rem; font-weight: 800; margin: 15px 0; background: linear-gradient(to bottom, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 15px 0; }
-        .opt-btn { background: white; border: none; padding: 16px; border-radius: 20px; font-size: 1.1rem; font-weight: 800; cursor: pointer; color: var(--text); box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+        .opt-btn { background: white; border: none; padding: 16px; border-radius: 20px; font-size: 1.1rem; font-weight: 800; cursor: pointer; color: var(--text); }
         .opt-btn.correct { background: var(--success); color: white; }
         .opt-btn.wrong { background: var(--danger); color: white; }
 
-        .btn-main { background: linear-gradient(to right, var(--primary), var(--accent)); color: white; border: none; padding: 16px; border-radius: 20px; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: 0.3s; }
-        .btn-main:disabled { background: var(--disabled); color: #7f8c8d; cursor: not-allowed; opacity: 0.6; box-shadow: none; }
+        .btn-main { background: linear-gradient(to right, var(--primary), var(--accent)); color: white; border: none; padding: 16px; border-radius: 20px; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: 0.3s; box-shadow: 0 8px 15px rgba(108, 92, 231, 0.2); }
+        .btn-main:disabled { background: var(--disabled); color: #7f8c8d; cursor: not-allowed; box-shadow: none; transform: none; opacity: 0.6; }
 
         /* NAVBAR */
         .nav-container { padding-bottom: 30px; display: flex; justify-content: center; }
         .navbar { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 10px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid white; width: 100%; max-width: var(--quiz-width); margin: 0 20px; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; flex: 1; color: #b2bec3; cursor: pointer; transition: 0.3s; }
-        .nav-item i { font-size: 22px; }
-        .nav-item span { font-size: 9px; font-weight: 800; margin-top: 4px; }
-        .nav-item.active { color: var(--accent); transform: translateY(-3px); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; flex: 1; color: #b2bec3; cursor: pointer; }
+        .nav-item.active { color: var(--accent); }
     </style>
 </head>
 <body>
@@ -76,27 +64,18 @@
     <div id="app">
         <section id="quiz" class="page active">
             <div class="card">
-                <div class="persistent-header">
-                    <div class="user-tag">
-                        <i class='bx bxs-user-circle' style="color: var(--primary); font-size: 20px;"></i>
-                        <span class="curr-user-display">User</span>
-                    </div>
-                    <i class='bx bx-power-off logout-btn' onclick="handleLogout()" title="Keluar"></i>
-                </div>
-
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: rgba(255,255,255,0.4); padding: 8px 15px; border-radius: 15px;">
                     <span style="font-size: 11px; font-weight: 800; opacity: 0.5;">POIN ANDA</span>
                     <div style="font-weight: 800; color: #f39c12;"><i class='bx bxs-coin'></i> <span id="mini-poin">0</span></div>
                 </div>
-
                 <div class="question" id="q-text">-- + --</div>
                 <div class="options-grid" id="q-options"></div>
                 
                 <div style="margin-top: 20px;">
                     <button id="ad-btn" class="btn-main" onclick="handleAd()" disabled>
-                        <i class='bx bxs-video-plus'></i> Klaim +50 Poin (Iklan)
+                        <i class='bx bxs-video-plus'></i> Tonton Iklan (+50 Poin)
                     </button>
-                    <p id="ad-hint" style="font-size: 11px; margin-top: 10px; opacity: 0.5; font-weight: 600;">Jawab benar untuk mengaktifkan iklan</p>
+                    <p id="ad-hint" style="font-size: 11px; margin-top: 8px; opacity: 0.5; font-weight: 600;">Jawab benar untuk klaim poin</p>
                 </div>
             </div>
         </section>
@@ -110,16 +89,9 @@
 
         <section id="saya" class="page">
             <div class="card">
-                <div class="persistent-header">
-                    <span style="font-weight: 800; opacity: 0.5;">PROFIL</span>
-                    <i class='bx bx-power-off logout-btn' onclick="handleLogout()"></i>
-                </div>
-                <i class='bx bxs-user-pin' style="font-size: 60px; color: var(--accent); margin: 10px 0;"></i>
-                <h2 class="curr-user-display" style="font-weight: 800; margin: 0;">User</h2>
-                <p style="font-size: 13px; opacity: 0.5;">Pemain Aktif</p>
-                <button class="btn-main" style="background: var(--danger); margin-top: 25px;" onclick="handleLogout()">
-                    Logout Sekarang
-                </button>
+                <i class='bx bxs-user-pin' style="font-size: 50px; color: var(--accent);"></i>
+                <h2 id="display-user">User</h2>
+                <button class="btn-main" style="background: var(--danger); margin-top: 20px;" onclick="localStorage.removeItem('session'); location.reload();">Logout</button>
             </div>
         </section>
     </div>
@@ -150,13 +122,6 @@
             setTimeout(() => t.remove(), 2500);
         }
 
-        function handleLogout() {
-            if(confirm("Apakah Anda ingin keluar?")) {
-                localStorage.removeItem('session');
-                location.reload();
-            }
-        }
-
         function refreshPoin() {
             document.getElementById('mini-poin').innerText = p;
             document.getElementById('user-poin').innerText = p;
@@ -170,8 +135,9 @@
         }
 
         function initQuiz() {
+            // Reset tombol iklan setiap soal baru
             document.getElementById('ad-btn').disabled = true;
-            document.getElementById('ad-hint').innerText = "Jawab benar untuk mengaktifkan iklan";
+            document.getElementById('ad-hint').innerText = "Jawab benar untuk klaim poin";
             
             const a = Math.floor(Math.random() * 50) + 1, b = Math.floor(Math.random() * 50) + 1;
             ans = a + b;
@@ -185,7 +151,7 @@
             opts.sort(() => Math.random() - 0.5);
             
             const cont = document.getElementById('q-options');
-            cont.innerHTML = ''; // Header tidak terhapus karena berada di luar kontainer ini
+            cont.innerHTML = '';
             opts.forEach(o => {
                 const btn = document.createElement('button');
                 btn.className = 'opt-btn';
@@ -193,9 +159,10 @@
                 btn.onclick = () => {
                     if(o === ans) {
                         btn.classList.add('correct');
-                        showToast("Benar! Tombol poin terbuka.", "success");
+                        showToast("Benar! Sekarang tonton iklan.", "success");
+                        // AKTIFKAN TOMBOL IKLAN
                         document.getElementById('ad-btn').disabled = false;
-                        document.getElementById('ad-hint').innerText = "Klik tombol di bawah untuk ambil poin! 🔓";
+                        document.getElementById('ad-hint').innerText = "Tombol poin aktif! 🔓";
                         document.querySelectorAll('.opt-btn').forEach(x => x.onclick = null);
                     } else {
                         btn.classList.add('wrong');
@@ -209,14 +176,17 @@
 
         function handleAd() {
             const btn = document.getElementById('ad-btn');
-            btn.disabled = true;
+            btn.disabled = true; // Hindari double click
+            
+            // PANGGIL IKLAN
             show_9865183().then(() => {
+                // HANYA BERTAMBAH DI SINI
                 p += 50; 
                 refreshPoin();
-                showToast("Berhasil! +50 Poin.", "success");
-                setTimeout(initQuiz, 1000);
+                showToast("Sukses! +50 Poin ditambahkan.", "success");
+                setTimeout(initQuiz, 1000); // Ganti soal setelah iklan
             }).catch(() => {
-                showToast("Iklan gagal dimuat.", "error");
+                showToast("Gagal memuat iklan.", "error");
                 btn.disabled = false;
             });
         }
@@ -226,18 +196,17 @@
             document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             el.classList.add('active');
-            tg.HapticFeedback.impactOccurred('light');
         }
 
         // Jalankan saat start
         if(currentUser) {
             p = currentUser.points || 0;
-            document.querySelectorAll('.curr-user-display').forEach(el => el.innerText = currentUser.username);
+            document.getElementById('display-user').innerText = currentUser.username;
             refreshPoin();
             initQuiz();
         } else {
-            // Arahkan ke sistem login jika sesi kosong
-            window.location.href = "login.html"; 
+            // Jika belum login (opsional: arahkan ke halaman login Anda sebelumnya)
+            alert("Silakan login terlebih dahulu");
         }
     </script>
 </body>
