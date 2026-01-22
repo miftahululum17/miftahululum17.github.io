@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Compact UI Quiz</title>
+    <title>Quiz Saya</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src='//libtl.com/sdk.js' data-zone='9865183' data-sdk='show_9865183'></script>
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
@@ -76,52 +76,30 @@
         }
         .btn-main:disabled { background: #ccc; opacity: 0.5; }
 
-        /* --- COMPACT NAVBAR (Tombol & Logo Only) --- */
-        .nav-container {
-            padding-bottom: 20px;
-            display: flex;
-            justify-content: center;
-        }
-
+        /* --- COMPACT NAVBAR --- */
+        .nav-container { padding-bottom: 20px; display: flex; justify-content: center; }
         .navbar {
             background: var(--card-bg);
             backdrop-filter: blur(20px);
-            display: flex;
-            gap: 10px;
-            padding: 8px;
-            border-radius: 50px; /* Bentuk Pill/Capsule */
+            display: flex; gap: 10px; padding: 8px;
+            border-radius: 50px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.1);
             border: 1px solid rgba(255,255,255,0.2);
         }
 
         .nav-item {
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            color: var(--text);
-            font-size: 24px;
-            opacity: 0.5;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
+            width: 50px; height: 50px; display: flex; align-items: center;
+            justify-content: center; border-radius: 50%; color: var(--text);
+            font-size: 24px; opacity: 0.5; transition: 0.3s; cursor: pointer;
         }
 
-        .nav-item.active {
-            background: var(--primary);
-            color: white;
-            opacity: 1;
-            transform: scale(1.1);
-            box-shadow: 0 4px 12px rgba(0,136,204,0.3);
-        }
+        .nav-item.active { background: var(--primary); color: white; opacity: 1; transform: scale(1.1); }
 
         /* Toast */
         #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; }
         .toast {
             background: var(--primary); color: white; padding: 10px 20px; border-radius: 12px;
-            font-weight: 600; font-size: 13px; margin-bottom: 5px;
-            animation: tIn 0.3s ease forwards;
+            font-weight: 600; font-size: 13px; margin-bottom: 5px; animation: tIn 0.3s ease forwards;
         }
         @keyframes tIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -154,10 +132,16 @@
             </div>
         </section>
 
-        <section id="admin" class="page">
+        <section id="saya" class="page">
             <div class="card">
-                <h3>Admin</h3>
-                <button onclick="resetData()" style="color:var(--danger); border:1px solid var(--danger); background:none; padding:10px; width:100%; border-radius:12px; font-weight:bold;">Reset Data</button>
+                <i class='bx bxs-user-circle' style="font-size: 4rem; color: var(--primary);"></i>
+                <h2 style="margin: 10px 0;">Profil Saya</h2>
+                <p id="user-name" style="font-weight: 600; opacity: 0.7;">Telegram User</p>
+                <div style="border-top: 1px solid rgba(0,0,0,0.05); margin-top: 20px; padding-top: 20px;">
+                    <button onclick="resetData()" style="color:var(--danger); border:1px solid var(--danger); background:none; padding:12px; width:100%; border-radius:15px; font-weight:bold; cursor:pointer;">
+                        Hapus Progres Data
+                    </button>
+                </div>
             </div>
         </section>
     </div>
@@ -166,7 +150,7 @@
         <nav class="navbar">
             <div class="nav-item active" onclick="navTo('quiz', this)"><i class='bx bxs-grid-alt'></i></div>
             <div class="nav-item" onclick="navTo('poin', this)"><i class='bx bxs-coin-stack'></i></div>
-            <div class="nav-item" onclick="navTo('admin', this)"><i class='bx bxs-user-circle'></i></div>
+            <div class="nav-item" onclick="navTo('saya', this)"><i class='bx bxs-user'></i></div>
         </nav>
     </div>
 
@@ -176,6 +160,11 @@
 
         let ans, p = parseInt(localStorage.getItem('pts')) || 0;
         const ab = document.getElementById('ad-btn');
+
+        // Mengambil nama user dari Telegram
+        if (tg.initDataUnsafe?.user) {
+            document.getElementById('user-name').innerText = tg.initDataUnsafe.user.first_name;
+        }
 
         function showToast(msg, type) {
             const container = document.getElementById('toast-container');
@@ -239,7 +228,9 @@
         }
 
         function resetData() {
-            if(confirm("Reset?")) { localStorage.clear(); location.reload(); }
+            tg.showConfirm("Yakin ingin menghapus semua poin?", (ok) => {
+                if(ok) { localStorage.clear(); location.reload(); }
+            });
         }
 
         refreshPoin(); initQuiz();
