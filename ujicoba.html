@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Responsive Quiz App</title>
+    <title>Compact UI Quiz</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src='//libtl.com/sdk.js' data-zone='9865183' data-sdk='show_9865183'></script>
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
@@ -31,113 +31,99 @@
             overflow: hidden;
         }
 
-        /* Toast Container */
-        #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; width: 90%; max-width: 320px; }
-        .toast {
-            background: white; color: white; padding: 14px 20px; border-radius: 16px;
-            font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 10px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1); margin-bottom: 10px;
-            animation: tIn 0.4s ease forwards, tOut 0.4s 2s ease forwards;
-        }
-        @keyframes tIn { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes tOut { to { opacity: 0; transform: translateY(-20px); } }
-
         #app { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .page { display: none; width: 100%; }
-        .page.active { display: block; animation: fadeIn 0.4s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .page.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Card Styling */
+        /* Card System */
         .card {
             background: var(--card-bg);
             backdrop-filter: blur(12px);
-            border-radius: 30px;
-            padding: 25px 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.05);
             text-align: center;
             width: 100%;
-            max-width: 360px;
+            max-width: 340px;
             margin: 0 auto;
-            border: 1px solid rgba(255,255,255,0.3);
         }
 
-        /* Skor Di Atas Soal */
         .score-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(0,0,0,0.03);
-            padding: 8px 15px;
-            border-radius: 15px;
-            margin-bottom: 15px;
-        }
-        .score-badge {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-weight: 800;
-            color: #f1c40f;
-            font-size: 1.1rem;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(0,0,0,0.04); padding: 6px 12px; border-radius: 12px; margin-bottom: 10px;
         }
 
-        .question {
-            font-size: 3.2rem;
-            font-weight: 900;
-            margin: 15px 0;
-            color: var(--primary);
-            letter-spacing: -1px;
-        }
+        .question { font-size: 2.8rem; font-weight: 900; margin: 15px 0; color: var(--primary); }
 
         .options-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin: 20px auto;
-            max-width: 280px;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+            margin: 15px auto; max-width: 260px;
         }
 
         .opt-btn {
-            background: var(--bg);
-            border: 2px solid transparent;
-            padding: 16px 10px;
-            border-radius: 18px;
-            font-size: 1.2rem;
-            font-weight: 800;
-            color: var(--text);
-            cursor: pointer;
-            transition: 0.2s;
+            background: var(--bg); border: none; padding: 14px;
+            border-radius: 15px; font-size: 1.1rem; font-weight: 800;
+            color: var(--text); cursor: pointer;
         }
-        .opt-btn.correct { background: var(--success); color: white; transform: scale(1.05); }
+        .opt-btn.correct { background: var(--success); color: white; }
         .opt-btn.wrong { background: var(--danger); color: white; }
 
         .btn-main {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 18px;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
-            box-shadow: 0 6px 20px rgba(0,136,204,0.25);
+            background: var(--primary); color: white; border: none;
+            padding: 12px 24px; border-radius: 15px; font-weight: 700;
+            display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
         }
-        .btn-main:disabled { background: #b2bec3; opacity: 0.5; box-shadow: none; }
+        .btn-main:disabled { background: #ccc; opacity: 0.5; }
+
+        /* --- COMPACT NAVBAR (Tombol & Logo Only) --- */
+        .nav-container {
+            padding-bottom: 20px;
+            display: flex;
+            justify-content: center;
+        }
 
         .navbar {
             background: var(--card-bg);
+            backdrop-filter: blur(20px);
             display: flex;
-            justify-content: space-around;
-            padding: 15px 10px 30px;
-            border-radius: 30px 30px 0 0;
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.04);
+            gap: 10px;
+            padding: 8px;
+            border-radius: 50px; /* Bentuk Pill/Capsule */
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
         }
-        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 12px; font-weight: 600; opacity: 0.4; color: var(--text); }
-        .nav-item.active { opacity: 1; color: var(--primary); }
 
-        .big-poin { font-size: 4rem; font-weight: 900; color: #f1c40f; }
+        .nav-item {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: var(--text);
+            font-size: 24px;
+            opacity: 0.5;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+            opacity: 1;
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0,136,204,0.3);
+        }
+
+        /* Toast */
+        #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; }
+        .toast {
+            background: var(--primary); color: white; padding: 10px 20px; border-radius: 12px;
+            font-weight: 600; font-size: 13px; margin-bottom: 5px;
+            animation: tIn 0.3s ease forwards;
+        }
+        @keyframes tIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -148,52 +134,41 @@
         <section id="quiz" class="page active">
             <div class="card">
                 <div class="score-header">
-                    <span style="font-size: 0.7rem; font-weight: 700; opacity: 0.5;">POIN KAMU</span>
-                    <div class="score-badge">
-                        <i class='bx bxs-coin-stack'></i>
-                        <span id="mini-poin">0</span>
-                    </div>
+                    <small style="font-weight: 800; opacity: 0.4;">SALDO</small>
+                    <div style="font-weight: 900; color: #f1c40f;"><i class='bx bxs-coin'></i> <span id="mini-poin">0</span></div>
                 </div>
-
                 <div class="question" id="q-text">-- + --</div>
-                
                 <div class="options-grid" id="q-options"></div>
-                
-                <button onclick="initQuiz()" style="background:none; border:none; color:var(--primary); font-size: 13px; font-weight:700; cursor:pointer; margin-bottom: 15px;">
-                    <i class='bx bx-refresh'></i> Lewati Soal
-                </button>
-
-                <div style="border-top: 2px solid rgba(0,0,0,0.03); padding-top: 20px;">
-                    <button id="ad-btn" class="btn-main" onclick="handleAd()" disabled>
-                        <i class='bx bx-play-circle'></i> Bonus Iklan
-                    </button>
+                <button onclick="initQuiz()" style="background:none; border:none; color:var(--primary); font-size: 12px; font-weight:700; cursor:pointer; margin-bottom: 10px;">Ganti Soal</button>
+                <div style="border-top: 1px solid rgba(0,0,0,0.05); padding-top: 15px;">
+                    <button id="ad-btn" class="btn-main" onclick="handleAd()" disabled><i class='bx bx-play'></i> Iklan</button>
                 </div>
             </div>
         </section>
 
         <section id="poin" class="page">
             <div class="card">
-                <i class='bx bxs-wallet' style="font-size: 3.5rem; color: #f1c40f;"></i>
-                <h2 style="margin: 10px 0;">Total Saldo</h2>
-                <div class="big-poin" id="user-poin">0</div>
+                <i class='bx bxs-wallet' style="font-size: 3rem; color: #f1c40f;"></i>
+                <h2 style="margin: 10px 0;">Poin</h2>
+                <div style="font-size: 3rem; font-weight: 900;" id="user-poin">0</div>
             </div>
         </section>
 
         <section id="admin" class="page">
             <div class="card">
-                <h2>Setelan</h2>
-                <button onclick="resetData()" style="color:var(--danger); background:rgba(214, 48, 49, 0.1); border:none; padding:15px; width:100%; border-radius:15px; font-weight: 800;">
-                    RESET SEMUA POIN
-                </button>
+                <h3>Admin</h3>
+                <button onclick="resetData()" style="color:var(--danger); border:1px solid var(--danger); background:none; padding:10px; width:100%; border-radius:12px; font-weight:bold;">Reset Data</button>
             </div>
         </section>
     </div>
 
-    <nav class="navbar">
-        <div class="nav-item active" onclick="navTo('quiz', this)"><i class='bx bxs-game' style="font-size:24px"></i><span>Quiz</span></div>
-        <div class="nav-item" onclick="navTo('poin', this)"><i class='bx bxs-wallet' style="font-size:24px"></i><span>Dompet</span></div>
-        <div class="nav-item" onclick="navTo('admin', this)"><i class='bx bxs-cog' style="font-size:24px"></i><span>Admin</span></div>
-    </nav>
+    <div class="nav-container">
+        <nav class="navbar">
+            <div class="nav-item active" onclick="navTo('quiz', this)"><i class='bx bxs-grid-alt'></i></div>
+            <div class="nav-item" onclick="navTo('poin', this)"><i class='bx bxs-coin-stack'></i></div>
+            <div class="nav-item" onclick="navTo('admin', this)"><i class='bx bxs-user-circle'></i></div>
+        </nav>
+    </div>
 
     <script>
         const tg = window.Telegram.WebApp;
@@ -207,9 +182,9 @@
             const t = document.createElement('div');
             t.className = 'toast';
             t.style.backgroundColor = type === 'success' ? 'var(--success)' : 'var(--danger)';
-            t.innerHTML = `<i class='bx ${type==='success'?'bx-check-double':'bx-error-circle'}'></i> ${msg}`;
+            t.innerText = msg;
             container.appendChild(t);
-            setTimeout(() => t.remove(), 2500);
+            setTimeout(() => t.remove(), 2000);
         }
 
         function navTo(id, el) {
@@ -217,47 +192,38 @@
             document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             el.classList.add('active');
-            tg.HapticFeedback.impactOccurred('medium');
+            tg.HapticFeedback.impactOccurred('light');
         }
 
         function refreshPoin() {
-            // Update di semua tampilan poin
-            document.getElementById('mini-poin').innerText = p.toLocaleString();
-            document.getElementById('user-poin').innerText = p.toLocaleString();
+            document.getElementById('mini-poin').innerText = p;
+            document.getElementById('user-poin').innerText = p;
             localStorage.setItem('pts', p);
         }
 
         function initQuiz() {
             ab.disabled = true;
-            const a = Math.floor(Math.random() * 50) + 1;
-            const b = Math.floor(Math.random() * 50) + 1;
+            const a = Math.floor(Math.random() * 50) + 1, b = Math.floor(Math.random() * 50) + 1;
             ans = a + b;
             document.getElementById('q-text').innerText = `${a} + ${b}`;
-
             let opts = [ans];
             while(opts.length < 4) {
                 let w = ans + (Math.floor(Math.random() * 10) - 5);
                 if(w !== ans && w > 0 && !opts.includes(w)) opts.push(w);
             }
             opts.sort(() => Math.random() - 0.5);
-
             const cont = document.getElementById('q-options');
             cont.innerHTML = '';
             opts.forEach(o => {
                 const btn = document.createElement('button');
-                btn.className = 'opt-btn';
-                btn.innerText = o;
+                btn.className = 'opt-btn'; btn.innerText = o;
                 btn.onclick = () => {
                     if(o === ans) {
-                        btn.classList.add('correct');
-                        showToast("Benar! +5 Poin", "success");
+                        btn.classList.add('correct'); showToast("Benar!", "success");
                         p += 5; refreshPoin(); ab.disabled = false;
                         document.querySelectorAll('.opt-btn').forEach(x => x.onclick = null);
-                        tg.HapticFeedback.notificationOccurred('success');
                     } else {
-                        btn.classList.add('wrong');
-                        showToast("Salah!", "error");
-                        tg.HapticFeedback.notificationOccurred('error');
+                        btn.classList.add('wrong'); showToast("Salah!", "error");
                         setTimeout(initQuiz, 1000);
                     }
                 };
@@ -268,23 +234,15 @@
         function handleAd() {
             ab.disabled = true;
             show_9865183().then(() => {
-                p += 50; refreshPoin();
-                showToast("Bonus +50 Poin!", "success");
-                initQuiz();
-            }).catch(() => { 
-                showToast("Iklan Belum Siap", "error"); 
-                initQuiz(); 
-            });
+                p += 50; refreshPoin(); showToast("+50 Poin!", "success"); initQuiz();
+            }).catch(() => { initQuiz(); });
         }
 
         function resetData() {
-            tg.showConfirm("Hapus semua poin?", (res) => {
-                if(res) { localStorage.clear(); location.reload(); }
-            });
+            if(confirm("Reset?")) { localStorage.clear(); location.reload(); }
         }
 
-        refreshPoin();
-        initQuiz();
+        refreshPoin(); initQuiz();
     </script>
 </body>
 </html>
