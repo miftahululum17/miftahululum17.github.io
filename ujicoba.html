@@ -44,7 +44,6 @@
 
         .card { background: var(--card-glass); backdrop-filter: blur(25px); border-radius: 35px; padding: 25px; border: 1px solid white; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.05); }
         
-        /* PERSISTENT HEADER & SALDO (PERBESAR) */
         .persistent-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .user-tag { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 15px; color: var(--primary); }
         
@@ -57,7 +56,6 @@
         .saldo-label { font-weight: 800; opacity: 0.4; font-size: 11px; letter-spacing: 1px; }
         .saldo-value { font-weight: 800; color: #f39c12; font-size: 24px; display: flex; align-items: center; gap: 8px; }
 
-        /* QUIZ TEXT (PERBESAR) */
         .question { font-size: 3.8rem; font-weight: 800; margin: 15px 0; color: var(--text); letter-spacing: -2px; }
         
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
@@ -70,12 +68,17 @@
 
         .btn-skip { background: none; border: none; color: var(--primary); font-weight: 800; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; margin: 5px auto; opacity: 0.6; }
 
-        /* NAVBAR (BESARKAN MENU) */
+        /* NAVBAR (3 MENU) */
         #nav-container { padding-bottom: 30px; display: none; justify-content: center; }
-        .navbar { background: white; display: flex; width: 90%; max-width: 360px; padding: 12px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
-        .nav-item { flex: 1; text-align: center; color: #b2bec3; font-size: 12px; font-weight: 800; cursor: pointer; transition: 0.3s; }
+        .navbar { background: white; display: flex; width: 95%; max-width: 380px; padding: 12px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+        .nav-item { flex: 1; text-align: center; color: #b2bec3; font-size: 11px; font-weight: 800; cursor: pointer; transition: 0.3s; }
         .nav-item i { font-size: 24px; display: block; margin-bottom: 2px; }
         .nav-item.active { color: var(--accent); transform: translateY(-3px); }
+
+        /* STYLE KHUSUS HALAMAN SAYA */
+        .profile-avatar { width: 80px; height: 80px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); color: var(--accent); font-size: 40px; }
+        .stat-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 20px; }
+        .stat-item { background: rgba(255,255,255,0.5); padding: 15px; border-radius: 20px; text-align: left; display: flex; align-items: center; gap: 15px; }
     </style>
 </head>
 <body>
@@ -102,19 +105,18 @@
             <div class="card">
                 <div class="persistent-header">
                     <div class="user-tag"><i class='bx bxs-user-circle' style="font-size: 24px;"></i> <span class="curr-user-display">User</span></div>
-                    <i class='bx bx-power-off' style="font-size: 24px; color:var(--danger); cursor:pointer" id="logout-trigger"></i>
+                    <i class='bx bx-power-off' style="font-size: 24px; color:var(--danger); cursor:pointer" onclick="handleLogout()"></i>
                 </div>
 
                 <div class="saldo-box">
                     <span class="saldo-label">SALDO POIN SAAT INI</span>
                     <div class="saldo-value">
                         <i class='bx bxs-coin-stack' style="font-size: 28px;"></i>
-                        <span id="mini-poin">0</span>
+                        <span class="curr-points-display">0</span>
                     </div>
                 </div>
 
                 <div class="question" id="q-text">-- + --</div>
-                
                 <div class="options-grid" id="q-options"></div>
                 
                 <button id="ad-btn" class="btn-main" disabled>
@@ -129,9 +131,35 @@
 
         <section id="poin" class="page">
             <div class="card">
-                <h3 style="opacity:0.5; font-size: 14px;">TOTAL PENGHASILAN</h3>
-                <h1 style="font-size: 4rem; color:#f39c12; margin: 10px 0;" id="user-poin">0</h1>
-                <p style="font-size: 12px; opacity:0.6;">Poin dapat ditukarkan dengan hadiah.</p>
+                <h3 style="opacity:0.5; font-size: 14px; margin-top:0">TOTAL PENGHASILAN</h3>
+                <h1 style="font-size: 4.5rem; color:#f39c12; margin: 15px 0; font-weight: 800" class="curr-points-display">0</h1>
+                <div style="background: var(--success); color: white; padding: 15px; border-radius: 20px; font-weight: 700;">
+                    Tingkatkan terus poinmu!
+                </div>
+            </div>
+        </section>
+
+        <section id="saya" class="page">
+            <div class="card">
+                <div class="profile-avatar">
+                    <i class='bx bxs-user'></i>
+                </div>
+                <h2 class="curr-user-display" style="margin: 0; font-weight: 800;">Username</h2>
+                <p style="font-size: 12px; opacity: 0.5; margin-top: 5px;">Player Level 1</p>
+
+                <div class="stat-grid">
+                    <div class="stat-item">
+                        <i class='bx bxs-wallet' style="font-size: 24px; color: #f39c12;"></i>
+                        <div>
+                            <div style="font-size: 10px; font-weight: 800; opacity: 0.5;">POIN SAYA</div>
+                            <div style="font-weight: 800; font-size: 16px;" class="curr-points-display">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-main" style="background: var(--danger); margin-top: 30px; box-shadow: none;" onclick="handleLogout()">
+                    <i class='bx bx-log-out-circle'></i> LOGOUT AKUN
+                </button>
             </div>
         </section>
     </div>
@@ -140,6 +168,7 @@
         <nav class="navbar">
             <div class="nav-item active" data-page="quiz"><i class='bx bxs-grid-alt'></i>Quiz</div>
             <div class="nav-item" data-page="poin"><i class='bx bxs-wallet'></i>Poin</div>
+            <div class="nav-item" data-page="saya"><i class='bx bxs-user-circle'></i>Saya</div>
         </nav>
     </div>
 
@@ -160,17 +189,20 @@
                 t.className = 'toast';
                 t.innerText = msg;
                 container.appendChild(t);
-                setTimeout(() => {
-                    t.style.opacity = '0';
-                    setTimeout(() => t.remove(), 300);
-                }, 1800);
+                setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 1800);
             };
 
             const updateUI = () => {
                 const p = parseInt(currentPoints) || 0;
-                document.getElementById('mini-poin').innerText = p.toLocaleString();
-                document.getElementById('user-poin').innerText = p.toLocaleString();
+                document.querySelectorAll('.curr-points-display').forEach(el => el.innerText = p.toLocaleString());
                 document.querySelectorAll('.curr-user-display').forEach(el => el.innerText = currentUser);
+            };
+
+            window.handleLogout = () => {
+                if(confirm("Yakin ingin keluar?")) {
+                    localStorage.removeItem('quiz_session');
+                    location.reload();
+                }
             };
 
             const handleAuth = () => {
@@ -222,7 +254,7 @@
                     btn.onclick = () => {
                         if(opt === currentAns) {
                             btn.classList.add('correct');
-                            showToast("Mantap! Klaim poinnya.");
+                            showToast("Benar! Klaim poinnya.");
                             document.getElementById('ad-btn').disabled = false;
                             grid.querySelectorAll('button').forEach(b => b.onclick = null);
                         } else {
@@ -267,11 +299,6 @@
                 this.innerText = isLoginMode ? "Daftar" : "Masuk";
                 document.getElementById('btn-auth-action').innerText = isLoginMode ? "Masuk Sekarang" : "Daftar Sekarang";
                 document.getElementById('auth-switch-text').innerText = isLoginMode ? "Belum punya akun?" : "Sudah punya akun?";
-            };
-
-            document.getElementById('logout-trigger').onclick = () => {
-                localStorage.removeItem('quiz_session');
-                location.reload();
             };
 
             document.querySelectorAll('.nav-item').forEach(item => {
