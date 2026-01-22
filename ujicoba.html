@@ -3,14 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monetag Reward App</title>
-    
+    <title>Quiz & Ads Mini App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
     <script src='//libtl.com/sdk.js' data-zone='9865183' data-sdk='show_9865183'></script>
-
     <style>
-        /* Menggunakan variabel warna resmi Telegram */
         body {
             background-color: var(--tg-theme-bg-color, #ffffff);
             color: var(--tg-theme-text-color, #000000);
@@ -18,67 +14,121 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            height: 100vh;
+            padding-top: 50px;
             margin: 0;
         }
-        .user-card {
+        .card {
             background: var(--tg-theme-secondary-bg-color, #f0f0f0);
             padding: 20px;
-            border-radius: 12px;
+            border-radius: 15px;
             text-align: center;
-            width: 80%;
-            max-width: 300px;
+            width: 85%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
         }
-        .btn-iklan {
-            margin-top: 20px;
-            padding: 12px 24px;
-            background-color: var(--tg-theme-button-color, #248bcf);
-            color: var(--tg-theme-button-text-color, #ffffff);
-            border: none;
+        .quiz-container { margin-bottom: 20px; }
+        .question { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+        input {
+            width: 60px;
+            padding: 10px;
+            font-size: 18px;
             border-radius: 8px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            margin-top: 10px;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
             font-weight: bold;
             cursor: pointer;
         }
+        .btn-check { background-color: #31b545; color: white; }
+        .btn-ads { background-color: var(--tg-theme-button-color, #248bcf); color: white; margin-top: 20px; }
+        
+        /* Gaya Toast Sederhana */
+        #toast {
+            visibility: hidden;
+            min-width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 10px;
+            padding: 16px;
+            position: fixed;
+            z-index: 1;
+            bottom: 30px;
+            font-size: 14px;
+        }
+        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
     </style>
 </head>
 <body>
 
-    <div class="user-card">
-        <h3 id="welcome-msg">Halo!</h3>
-        <p>Tonton video untuk mendukung kami.</p>
-        <button class="btn-iklan" onclick="putarVideo()">LIHAT IKLAN</button>
+    <div class="card">
+        <div class="quiz-container">
+            <div class="question" id="quiz-text">Memuat soal...</div>
+            <input type="number" id="user-answer" placeholder="?">
+            <button class="btn btn-check" onclick="cekJawaban()">Cek Jawaban</button>
+        </div>
+
+        <hr style="border: 0.5px solid #ccc; margin: 20px 0;">
+
+        <p>Butuh lebih banyak poin?</p>
+        <button class="btn btn-ads" onclick="putarVideo()">LIHAT IKLAN VIDEO</button>
     </div>
 
-    <script>
-        // Inisialisasi Telegram Web App
-        const tg = window.Telegram.WebApp;
-        tg.expand(); // Agar aplikasi terbuka penuh (layar penuh)
+    <div id="toast"></div>
 
-        // Menampilkan nama user jika tersedia
-        const user = tg.initDataUnsafe?.user;
-        if (user) {
-            document.getElementById('welcome-msg').innerText = `Halo, ${user.first_name}!`;
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        let angka1, angka2, hasilBenar;
+
+        // Fungsi membuat soal acak
+        function buatSoal() {
+            angka1 = Math.floor(Math.random() * 100) + 1;
+            angka2 = Math.floor(Math.random() * 100) + 1;
+            hasilBenar = angka1 + angka2;
+            document.getElementById('quiz-text').innerText = `${angka1} + ${angka2} =`;
+            document.getElementById('user-answer').value = "";
+        }
+
+        // Fungsi Toast (Pesan Singkat)
+        function showToast(pesan, warna) {
+            const toast = document.getElementById("toast");
+            toast.innerText = pesan;
+            toast.style.backgroundColor = warna;
+            toast.className = "show";
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+        }
+
+        function cekJawaban() {
+            const jawabanUser = parseInt(document.getElementById('user-answer').value);
+            if (jawabanUser === hasilBenar) {
+                showToast("✅ Benar! Kamu pintar.", "#31b545");
+                setTimeout(buatSoal, 2000); // Ganti soal setelah 2 detik
+            } else {
+                showToast("❌ Salah! Coba lagi ya.", "#e91e63");
+            }
         }
 
         function putarVideo() {
-            // Tampilkan loading di tombol utama Telegram
-            tg.MainButton.setText("Sedang Memuat Iklan...");
-            tg.MainButton.show();
-
-            // Panggil fungsi Monetag
             show_9865183().then(() => {
-                // Berhasil menonton
-                tg.MainButton.hide();
-                tg.showAlert("Selamat! Kamu mendapatkan reward.");
-                
-                // Kamu bisa mengirim data ke bot di sini
-                // tg.sendData("user_selesai_nonton"); 
+                tg.showAlert("Iklan selesai! Kamu mendapatkan reward tambahan.");
             }).catch((err) => {
-                tg.MainButton.hide();
-                tg.showAlert("Iklan gagal dimuat. Coba lagi nanti.");
+                tg.showAlert("Iklan belum siap atau gagal dimuat.");
             });
         }
+
+        // Jalankan soal pertama saat buka aplikasi
+        buatSoal();
     </script>
 </body>
 </html>
