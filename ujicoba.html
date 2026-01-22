@@ -3,178 +3,306 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Quiz Reward System</title>
+    <title>Modern Quiz App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src='//libtl.com/sdk.js' data-zone='9865183' data-sdk='show_9865183'></script>
     
     <style>
         :root {
-            --primary: #248bcf;
-            --success: #31b545;
-            --bg: var(--tg-theme-bg-color, #f5f7fa);
-            --card: var(--tg-theme-secondary-bg-color, #ffffff);
+            --primary: #0088cc;
+            --secondary: #6c5ce7;
+            --success: #00b894;
+            --danger: #d63031;
+            --bg: var(--tg-theme-bg-color, #f0f2f5);
+            --card-bg: var(--tg-theme-secondary-bg-color, rgba(255, 255, 255, 0.9));
             --text: var(--tg-theme-text-color, #2d3436);
         }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
             background-color: var(--bg);
             color: var(--text);
-            font-family: 'Segoe UI', sans-serif;
-            margin: 0; padding-bottom: 70px; /* Ruang untuk navbar */
+            font-family: 'Inter', -apple-system, sans-serif;
+            margin: 0;
+            overflow: hidden; /* Mencegah scroll yang tidak diinginkan */
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Navigasi Bawah */
-        .navbar {
-            position: fixed; bottom: 0; width: 100%;
-            background: var(--card);
-            display: flex; justify-content: space-around;
-            padding: 12px 0; border-top: 1px solid rgba(0,0,0,0.1);
-            z-index: 100;
+        /* Container Utama */
+        #app {
+            flex: 1;
+            position: relative;
+            padding: 20px;
+            overflow-y: auto;
         }
-        .nav-item {
-            font-size: 0.8rem; cursor: pointer; text-align: center; opacity: 0.5;
-        }
-        .nav-item.active { opacity: 1; color: var(--primary); font-weight: bold; }
 
-        /* Kontainer Menu */
-        .page { display: none; padding: 20px; text-align: center; animation: fadeIn 0.3s; }
+        /* Animasi Perpindahan Halaman */
+        .page {
+            display: none;
+            animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
         .page.active { display: block; }
 
-        @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-        /* UI Card & Buttons (Konsisten dengan sebelumnya) */
-        .card { background: var(--card); border-radius: 20px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .q-box { font-size: 2.5rem; font-weight: 800; margin: 20px 0; color: var(--primary); }
-        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .opt-btn { background: var(--bg); border: none; padding: 15px; border-radius: 12px; font-weight: 600; }
-        .opt-btn.correct { background: var(--success); color: white; }
-        .btn-action { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; }
-        
-        .point-display { font-size: 3rem; font-weight: bold; color: #f1c40f; margin: 20px 0; }
-        .admin-stat { text-align: left; background: #eee; padding: 10px; border-radius: 8px; margin-top: 10px; color: #333; }
+        /* Glassmorphism Card */
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 28px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.05);
+            border: 1px solid rgba(255,255,255,0.2);
+            text-align: center;
+        }
+
+        /* UI Kuis */
+        .q-badge {
+            background: var(--primary);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .question {
+            font-size: 42px;
+            font-weight: 800;
+            margin: 15px 0;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .opt-btn {
+            background: var(--card-bg);
+            border: 2px solid rgba(0,0,0,0.05);
+            padding: 18px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+            transition: 0.2s;
+            cursor: pointer;
+        }
+
+        .opt-btn:active { transform: scale(0.92); }
+        .opt-btn.correct { background: var(--success); color: white; border-color: var(--success); }
+        .opt-btn.wrong { background: var(--danger); color: white; border-color: var(--danger); }
+
+        /* Floating Navigation */
+        .navbar {
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 10px 25px 10px; /* Padding bawah lebih besar untuk iPhone */
+            border-top: 1px solid rgba(0,0,0,0.05);
+            border-radius: 24px 24px 0 0;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text);
+            opacity: 0.4;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-item i { font-size: 24px; margin-bottom: 4px; }
+        .nav-item.active { opacity: 1; color: var(--primary); transform: translateY(-5px); }
+
+        /* Button Utama */
+        .btn-main {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 20px;
+            width: 100%;
+            font-weight: 800;
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(0,136,204,0.3);
+            transition: 0.3s;
+        }
+
+        .btn-main:disabled { background: #b2bec3; box-shadow: none; opacity: 0.5; }
+
+        .point-tag {
+            font-size: 48px;
+            font-weight: 900;
+            color: #fdcb6e;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.05);
+        }
     </style>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
 <body>
 
-    <section id="page-quiz" class="page active">
-        <div class="card">
-            <h3 id="quiz-header">Quiz Matematika</h3>
-            <div class="q-box" id="question">-- + --</div>
-            <div class="options-grid" id="options-container"></div>
-            <button class="btn-action" style="background:none; color:var(--primary)" onclick="generateQuiz()">🔄 Lewati Soal</button>
-            <div style="margin-top:20px; border-top:1px solid #ddd; padding-top:20px;">
-                <button id="ad-button" class="btn-action" style="background:var(--primary); color:white" onclick="putarIklan()" disabled>🔒 Kunci Iklan</button>
+    <div id="app">
+        <section id="quiz" class="page active">
+            <div class="card">
+                <div class="q-badge">LEVEL 1</div>
+                <div class="question" id="q-text">0 + 0</div>
+                <div class="options-grid" id="q-options"></div>
+                <button onclick="initQuiz()" style="background:none; border:none; color:var(--primary); font-weight:600; cursor:pointer;">
+                    Ganti Soal <i class='bx bx-refresh'></i>
+                </button>
+                <div style="margin-top: 25px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 20px;">
+                    <button id="ad-btn" class="btn-main" onclick="handleAd()" disabled>
+                        <i class='bx bx-lock-alt'></i> Jawab Dulu
+                    </button>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <section id="page-poin" class="page">
-        <div class="card">
-            <h3>Total Poin Kamu</h3>
-            <div class="point-display" id="total-poin">0</div>
-            <p>Kumpulkan poin dengan menjawab benar dan menonton iklan!</p>
-        </div>
-    </section>
-
-    <section id="page-admin" class="page">
-        <div class="card">
-            <h3>Panel Kontrol</h3>
-            <div class="admin-stat">
-                <div>User: <span id="adm-name">Guest</span></div>
-                <div>Status Iklan: <span id="adm-ad-status">Ready</span></div>
+        <section id="poin" class="page">
+            <div class="card">
+                <i class='bx bxs-coin-stack' style="font-size: 50px; color: #f1c40f;"></i>
+                <h3>Saldo Poin</h3>
+                <div class="point-tag" id="user-poin">0</div>
+                <p style="opacity: 0.6;">Kumpulkan lebih banyak poin untuk ditukarkan hadiah!</p>
             </div>
-            <button class="btn-action" style="background:var(--error); color:white; margin-top:20px;" onclick="resetData()">⚠️ Reset Semua Data</button>
-        </div>
-    </section>
+        </section>
+
+        <section id="admin" class="page">
+            <div class="card" style="text-align: left;">
+                <h3 style="text-align: center;"><i class='bx bxs-user-badge'></i> Profil Admin</h3>
+                <div style="background: rgba(0,0,0,0.03); padding: 15px; border-radius: 15px;">
+                    <small>Nama User:</small>
+                    <div id="adm-name" style="font-weight: bold;">-</div>
+                    <hr style="border: 0.1px solid rgba(0,0,0,0.05); margin: 10px 0;">
+                    <small>ID Perangkat:</small>
+                    <div style="font-family: monospace; font-size: 10px;">ID-992837482</div>
+                </div>
+                <button onclick="resetData()" style="margin-top: 20px; color: var(--danger); background: none; border: 1px solid var(--danger); padding: 10px; width: 100%; border-radius: 12px; font-weight: bold;">
+                    Reset Data
+                </button>
+            </div>
+        </section>
+    </div>
 
     <nav class="navbar">
-        <div class="nav-item active" onclick="switchPage('quiz', this)">🎮<br>Quiz</div>
-        <div class="nav-item" onclick="switchPage('poin', this)">💰<br>Poin</div>
-        <div class="nav-item" onclick="switchPage('admin', this)">⚙️<br>Admin</div>
+        <div class="nav-item active" onclick="navTo('quiz', this)">
+            <i class='bx bxs-game'></i>
+            <span>Main</span>
+        </div>
+        <div class="nav-item" onclick="navTo('poin', this)">
+            <i class='bx bxs-wallet'></i>
+            <span>Dompet</span>
+        </div>
+        <div class="nav-item" onclick="navTo('admin', this)">
+            <i class='bx bxs-cog'></i>
+            <span>Setelan</span>
+        </div>
     </nav>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        let correctAnswer;
-        let poin = parseInt(localStorage.getItem('userPoin')) || 0;
-        const adBtn = document.getElementById('ad-button');
+        let ans;
+        let p = parseInt(localStorage.getItem('pts')) || 0;
+        const ab = document.getElementById('ad-btn');
 
-        // Update tampilan poin saat start
-        document.getElementById('total-poin').innerText = poin;
-        if(tg.initDataUnsafe?.user) document.getElementById('adm-name').innerText = tg.initDataUnsafe.user.first_name;
+        // Sync Nama User
+        if(tg.initDataUnsafe?.user) {
+            document.getElementById('adm-name').innerText = tg.initDataUnsafe.user.first_name;
+        }
 
-        function switchPage(pageId, el) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById('page-' + pageId).classList.add('active');
+        function navTo(id, el) {
+            document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
             el.classList.add('active');
+            tg.HapticFeedback.impactOccurred('light');
         }
 
-        function updatePoin(jumlah) {
-            poin += jumlah;
-            localStorage.setItem('userPoin', poin);
-            document.getElementById('total-poin').innerText = poin;
+        function refreshPoin() {
+            document.getElementById('user-poin').innerText = p;
+            localStorage.setItem('pts', p);
         }
 
-        function generateQuiz() {
-            adBtn.disabled = true;
-            adBtn.innerText = "🔒 Kunci Iklan (Jawab Dulu)";
-            const n1 = Math.floor(Math.random() * 100) + 1;
-            const n2 = Math.floor(Math.random() * 100) + 1;
-            correctAnswer = n1 + n2;
-            document.getElementById('question').innerText = `${n1} + ${n2}`;
+        function initQuiz() {
+            ab.disabled = true;
+            ab.innerHTML = "<i class='bx bx-lock-alt'></i> Jawab Dulu";
+            const a = Math.floor(Math.random() * 50) + 1;
+            const b = Math.floor(Math.random() * 50) + 1;
+            ans = a + b;
+            document.getElementById('q-text').innerText = `${a} + ${b}`;
 
-            let options = [correctAnswer];
-            while(options.length < 4) {
-                let wrong = correctAnswer + (Math.floor(Math.random() * 10) - 5);
-                if(wrong !== correctAnswer && wrong > 0 && !options.includes(wrong)) options.push(wrong);
+            let opts = [ans];
+            while(opts.length < 4) {
+                let w = ans + (Math.floor(Math.random() * 10) - 5);
+                if(w !== ans && w > 0 && !opts.includes(w)) opts.push(w);
             }
-            options.sort(() => Math.random() - 0.5);
+            opts.sort(() => Math.random() - 0.5);
 
-            const container = document.getElementById('options-container');
-            container.innerHTML = '';
-            options.forEach(opt => {
+            const cont = document.getElementById('q-options');
+            cont.innerHTML = '';
+            opts.forEach(o => {
                 const btn = document.createElement('button');
                 btn.className = 'opt-btn';
-                btn.innerText = opt;
+                btn.innerText = o;
                 btn.onclick = () => {
-                    if(opt === correctAnswer) {
+                    if(o === ans) {
                         btn.classList.add('correct');
-                        updatePoin(5); // Tambah 5 poin jika benar
-                        adBtn.disabled = false;
-                        adBtn.innerText = "📺 Tonton Iklan (+50 Poin)";
-                        document.querySelectorAll('.opt-btn').forEach(b => b.onclick = null);
+                        tg.HapticFeedback.notificationOccurred('success');
+                        ab.disabled = false;
+                        ab.innerHTML = "<i class='bx bx-play-circle'></i> Tonton Iklan (+50)";
+                        document.querySelectorAll('.opt-btn').forEach(x => x.onclick = null);
                     } else {
+                        btn.classList.add('wrong');
                         tg.HapticFeedback.notificationOccurred('error');
-                        alert("Salah! Coba lagi.");
+                        setTimeout(initQuiz, 800);
                     }
                 };
-                container.appendChild(btn);
+                cont.appendChild(btn);
             });
         }
 
-        function putarIklan() {
-            adBtn.disabled = true;
+        function handleAd() {
+            ab.disabled = true;
+            ab.innerText = "Memuat...";
             show_9865183().then(() => {
-                updatePoin(50); // Hadiah besar untuk nonton iklan
-                tg.showAlert("Mantap! +50 Poin berhasil ditambahkan.");
-                generateQuiz();
+                p += 50;
+                refreshPoin();
+                tg.showAlert("Berhasil! +50 Poin");
+                initQuiz();
             }).catch(() => {
-                tg.showAlert("Iklan gagal.");
-                generateQuiz();
+                tg.showAlert("Iklan gagal dimuat.");
+                initQuiz();
             });
         }
 
         function resetData() {
-            if(confirm("Hapus semua poin?")) {
-                localStorage.clear();
-                location.reload();
-            }
+            tg.showConfirm("Yakin hapus semua poin?", (ok) => {
+                if(ok) { localStorage.clear(); location.reload(); }
+            });
         }
 
-        generateQuiz();
+        refreshPoin();
+        initQuiz();
     </script>
 </body>
 </html>
