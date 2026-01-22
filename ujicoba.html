@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Quiz Unlock Ads</title>
+    <title>Quiz & Ads Mini App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src='//libtl.com/sdk.js' data-zone='9865183' data-sdk='show_9865183'></script>
     
@@ -50,7 +50,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
-            margin-bottom: 25px;
+            margin-bottom: 15px;
         }
 
         .option-btn {
@@ -67,6 +67,18 @@
 
         .option-btn.correct { background: var(--success-color); color: white; }
         .option-btn.wrong { background: var(--error-color); color: white; }
+
+        .btn-next {
+            background: transparent;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            width: 100%;
+            padding: 10px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-bottom: 25px;
+        }
 
         .ad-section {
             border-top: 1px solid rgba(0,0,0,0.1);
@@ -86,12 +98,10 @@
             transition: 0.3s;
         }
 
-        /* Gaya saat tombol Disable */
         .btn-ad:disabled {
             background: var(--disabled-color);
             opacity: 0.6;
             cursor: not-allowed;
-            transform: scale(0.98);
         }
 
         #toast {
@@ -115,10 +125,12 @@
     <div id="toast"></div>
 
     <div class="card">
-        <h2 style="font-size: 1rem; opacity: 0.7;">Jawab Benar untuk Iklan</h2>
+        <h2 style="font-size: 0.9rem; opacity: 0.7; margin-bottom: 5px;">QUIZ MATEMATIKA</h2>
         <div class="question-box" id="question">-- + --</div>
 
         <div class="options-grid" id="options-container"></div>
+        
+        <button class="btn-next" onclick="generateQuiz()">🔄 Soal Berikutnya</button>
 
         <div class="ad-section">
             <button id="ad-button" class="btn-ad" onclick="putarIklan()" disabled>
@@ -143,6 +155,10 @@
         }
 
         function generateQuiz() {
+            // Reset status tombol iklan saat ganti soal
+            adBtn.disabled = true;
+            adBtn.innerText = "🔒 Kunci Iklan (Jawab Dulu)";
+
             const n1 = Math.floor(Math.random() * 100) + 1;
             const n2 = Math.floor(Math.random() * 100) + 1;
             correctAnswer = n1 + n2;
@@ -171,31 +187,27 @@
         function checkAnswer(selected, btn) {
             if(selected === correctAnswer) {
                 btn.classList.add('correct');
-                showToast("Jawaban Benar! Iklan Terbuka 🔓", true);
-                
-                // AKTIFKAN TOMBOL IKLAN
+                showToast("Benar! Iklan Terbuka 🔓", true);
                 adBtn.disabled = false;
                 adBtn.innerText = "📺 Tonton Iklan Sekarang";
-                
-                // Disable semua pilihan agar tidak klik berkali-kali
                 document.querySelectorAll('.option-btn').forEach(b => b.onclick = null);
             } else {
                 btn.classList.add('wrong');
-                showToast("Salah! Coba lagi soal baru.", false);
-                setTimeout(generateQuiz, 1000);
+                showToast("Salah! Coba lagi.", false);
             }
         }
 
         function putarIklan() {
+            // LANGSUNG DISABLE SAAT DIKLIK
+            adBtn.disabled = true; 
+            adBtn.innerText = "⏳ Menyiapkan Iklan...";
+
             show_9865183().then(() => {
-                tg.showAlert("Terima kasih! Iklan selesai.");
-                
-                // RESET: Kunci kembali tombol iklan dan buat soal baru
-                adBtn.disabled = true;
-                adBtn.innerText = "🔒 Kunci Iklan (Jawab Dulu)";
-                generateQuiz();
+                tg.showAlert("Berhasil! Reward diberikan.");
+                generateQuiz(); // Reset ke soal baru setelah iklan selesai
             }).catch(() => {
-                tg.showAlert("Gagal memuat iklan.");
+                tg.showAlert("Iklan gagal dimuat. Selesaikan kuis lagi.");
+                generateQuiz(); // Reset agar user mencoba soal baru
             });
         }
 
