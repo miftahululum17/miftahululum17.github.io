@@ -3,162 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Quiz & Ads Mini App</title>
+    <title>Quiz Reward System</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src='//libtl.com/sdk.js' data-zone='9865183' data-sdk='show_9865183'></script>
     
     <style>
         :root {
-            --primary-color: #248bcf;
-            --success-color: #31b545;
-            --error-color: #ef4444;
-            --bg-color: var(--tg-theme-bg-color, #f5f7fa);
-            --card-bg: var(--tg-theme-secondary-bg-color, #ffffff);
-            --text-color: var(--tg-theme-text-color, #2d3436);
-            --disabled-color: #b2bec3;
+            --primary: #248bcf;
+            --success: #31b545;
+            --bg: var(--tg-theme-bg-color, #f5f7fa);
+            --card: var(--tg-theme-secondary-bg-color, #ffffff);
+            --text: var(--tg-theme-text-color, #2d3436);
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0; padding-bottom: 70px; /* Ruang untuk navbar */
         }
 
-        .card {
-            background: var(--card-bg);
-            border-radius: 24px;
-            padding: 24px;
-            width: 85%;
-            max-width: 350px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            text-align: center;
+        /* Navigasi Bawah */
+        .navbar {
+            position: fixed; bottom: 0; width: 100%;
+            background: var(--card);
+            display: flex; justify-content: space-around;
+            padding: 12px 0; border-top: 1px solid rgba(0,0,0,0.1);
+            z-index: 100;
         }
-
-        .question-box {
-            font-size: 2.2rem;
-            font-weight: 800;
-            margin: 20px 0;
-            color: var(--primary-color);
+        .nav-item {
+            font-size: 0.8rem; cursor: pointer; text-align: center; opacity: 0.5;
         }
+        .nav-item.active { opacity: 1; color: var(--primary); font-weight: bold; }
 
-        .options-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 15px;
-        }
+        /* Kontainer Menu */
+        .page { display: none; padding: 20px; text-align: center; animation: fadeIn 0.3s; }
+        .page.active { display: block; }
 
-        .option-btn {
-            background: var(--bg-color);
-            border: none;
-            padding: 15px;
-            border-radius: 16px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-color);
-            cursor: pointer;
-            transition: 0.2s;
-        }
+        @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
 
-        .option-btn.correct { background: var(--success-color); color: white; }
-        .option-btn.wrong { background: var(--error-color); color: white; }
-
-        .btn-next {
-            background: transparent;
-            color: var(--primary-color);
-            border: 1px solid var(--primary-color);
-            width: 100%;
-            padding: 10px;
-            border-radius: 12px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            margin-bottom: 25px;
-        }
-
-        .ad-section {
-            border-top: 1px solid rgba(0,0,0,0.1);
-            padding-top: 20px;
-        }
-
-        .btn-ad {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            width: 100%;
-            padding: 16px;
-            border-radius: 14px;
-            font-weight: bold;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .btn-ad:disabled {
-            background: var(--disabled-color);
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        #toast {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 12px 24px;
-            border-radius: 50px;
-            color: white;
-            font-weight: 600;
-            opacity: 0;
-            transition: 0.3s;
-            z-index: 1000;
-        }
-        #toast.show { opacity: 1; transform: translateX(-50%) translateY(10px); }
+        /* UI Card & Buttons (Konsisten dengan sebelumnya) */
+        .card { background: var(--card); border-radius: 20px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .q-box { font-size: 2.5rem; font-weight: 800; margin: 20px 0; color: var(--primary); }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .opt-btn { background: var(--bg); border: none; padding: 15px; border-radius: 12px; font-weight: 600; }
+        .opt-btn.correct { background: var(--success); color: white; }
+        .btn-action { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; }
+        
+        .point-display { font-size: 3rem; font-weight: bold; color: #f1c40f; margin: 20px 0; }
+        .admin-stat { text-align: left; background: #eee; padding: 10px; border-radius: 8px; margin-top: 10px; color: #333; }
     </style>
 </head>
 <body>
 
-    <div id="toast"></div>
-
-    <div class="card">
-        <h2 style="font-size: 0.9rem; opacity: 0.7; margin-bottom: 5px;">QUIZ MATEMATIKA</h2>
-        <div class="question-box" id="question">-- + --</div>
-
-        <div class="options-grid" id="options-container"></div>
-        
-        <button class="btn-next" onclick="generateQuiz()">🔄 Soal Berikutnya</button>
-
-        <div class="ad-section">
-            <button id="ad-button" class="btn-ad" onclick="putarIklan()" disabled>
-                🔒 Kunci Iklan (Jawab Dulu)
-            </button>
+    <section id="page-quiz" class="page active">
+        <div class="card">
+            <h3 id="quiz-header">Quiz Matematika</h3>
+            <div class="q-box" id="question">-- + --</div>
+            <div class="options-grid" id="options-container"></div>
+            <button class="btn-action" style="background:none; color:var(--primary)" onclick="generateQuiz()">🔄 Lewati Soal</button>
+            <div style="margin-top:20px; border-top:1px solid #ddd; padding-top:20px;">
+                <button id="ad-button" class="btn-action" style="background:var(--primary); color:white" onclick="putarIklan()" disabled>🔒 Kunci Iklan</button>
+            </div>
         </div>
-    </div>
+    </section>
+
+    <section id="page-poin" class="page">
+        <div class="card">
+            <h3>Total Poin Kamu</h3>
+            <div class="point-display" id="total-poin">0</div>
+            <p>Kumpulkan poin dengan menjawab benar dan menonton iklan!</p>
+        </div>
+    </section>
+
+    <section id="page-admin" class="page">
+        <div class="card">
+            <h3>Panel Kontrol</h3>
+            <div class="admin-stat">
+                <div>User: <span id="adm-name">Guest</span></div>
+                <div>Status Iklan: <span id="adm-ad-status">Ready</span></div>
+            </div>
+            <button class="btn-action" style="background:var(--error); color:white; margin-top:20px;" onclick="resetData()">⚠️ Reset Semua Data</button>
+        </div>
+    </section>
+
+    <nav class="navbar">
+        <div class="nav-item active" onclick="switchPage('quiz', this)">🎮<br>Quiz</div>
+        <div class="nav-item" onclick="switchPage('poin', this)">💰<br>Poin</div>
+        <div class="nav-item" onclick="switchPage('admin', this)">⚙️<br>Admin</div>
+    </nav>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
         let correctAnswer;
+        let poin = parseInt(localStorage.getItem('userPoin')) || 0;
         const adBtn = document.getElementById('ad-button');
 
-        function showToast(text, isSuccess) {
-            const toast = document.getElementById('toast');
-            toast.innerText = text;
-            toast.style.backgroundColor = isSuccess ? '#31b545' : '#ef4444';
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2000);
+        // Update tampilan poin saat start
+        document.getElementById('total-poin').innerText = poin;
+        if(tg.initDataUnsafe?.user) document.getElementById('adm-name').innerText = tg.initDataUnsafe.user.first_name;
+
+        function switchPage(pageId, el) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('page-' + pageId).classList.add('active');
+            el.classList.add('active');
+        }
+
+        function updatePoin(jumlah) {
+            poin += jumlah;
+            localStorage.setItem('userPoin', poin);
+            document.getElementById('total-poin').innerText = poin;
         }
 
         function generateQuiz() {
-            // Reset status tombol iklan saat ganti soal
             adBtn.disabled = true;
             adBtn.innerText = "🔒 Kunci Iklan (Jawab Dulu)";
-
             const n1 = Math.floor(Math.random() * 100) + 1;
             const n2 = Math.floor(Math.random() * 100) + 1;
             correctAnswer = n1 + n2;
@@ -166,10 +128,8 @@
 
             let options = [correctAnswer];
             while(options.length < 4) {
-                let wrong = correctAnswer + (Math.floor(Math.random() * 21) - 10);
-                if(wrong !== correctAnswer && wrong > 0 && !options.includes(wrong)) {
-                    options.push(wrong);
-                }
+                let wrong = correctAnswer + (Math.floor(Math.random() * 10) - 5);
+                if(wrong !== correctAnswer && wrong > 0 && !options.includes(wrong)) options.push(wrong);
             }
             options.sort(() => Math.random() - 0.5);
 
@@ -177,38 +137,41 @@
             container.innerHTML = '';
             options.forEach(opt => {
                 const btn = document.createElement('button');
-                btn.className = 'option-btn';
+                btn.className = 'opt-btn';
                 btn.innerText = opt;
-                btn.onclick = () => checkAnswer(opt, btn);
+                btn.onclick = () => {
+                    if(opt === correctAnswer) {
+                        btn.classList.add('correct');
+                        updatePoin(5); // Tambah 5 poin jika benar
+                        adBtn.disabled = false;
+                        adBtn.innerText = "📺 Tonton Iklan (+50 Poin)";
+                        document.querySelectorAll('.opt-btn').forEach(b => b.onclick = null);
+                    } else {
+                        tg.HapticFeedback.notificationOccurred('error');
+                        alert("Salah! Coba lagi.");
+                    }
+                };
                 container.appendChild(btn);
             });
         }
 
-        function checkAnswer(selected, btn) {
-            if(selected === correctAnswer) {
-                btn.classList.add('correct');
-                showToast("Benar! Iklan Terbuka 🔓", true);
-                adBtn.disabled = false;
-                adBtn.innerText = "📺 Tonton Iklan Sekarang";
-                document.querySelectorAll('.option-btn').forEach(b => b.onclick = null);
-            } else {
-                btn.classList.add('wrong');
-                showToast("Salah! Coba lagi.", false);
-            }
+        function putarIklan() {
+            adBtn.disabled = true;
+            show_9865183().then(() => {
+                updatePoin(50); // Hadiah besar untuk nonton iklan
+                tg.showAlert("Mantap! +50 Poin berhasil ditambahkan.");
+                generateQuiz();
+            }).catch(() => {
+                tg.showAlert("Iklan gagal.");
+                generateQuiz();
+            });
         }
 
-        function putarIklan() {
-            // LANGSUNG DISABLE SAAT DIKLIK
-            adBtn.disabled = true; 
-            adBtn.innerText = "⏳ Menyiapkan Iklan...";
-
-            show_9865183().then(() => {
-                tg.showAlert("Berhasil! Reward diberikan.");
-                generateQuiz(); // Reset ke soal baru setelah iklan selesai
-            }).catch(() => {
-                tg.showAlert("Iklan gagal dimuat. Selesaikan kuis lagi.");
-                generateQuiz(); // Reset agar user mencoba soal baru
-            });
+        function resetData() {
+            if(confirm("Hapus semua poin?")) {
+                localStorage.clear();
+                location.reload();
+            }
         }
 
         generateQuiz();
