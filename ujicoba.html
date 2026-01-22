@@ -2,341 +2,221 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Quiz Premium - Pro Update</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Reward Modern</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <script src='//libtl.com/sdk.js' data-zone='9865183' data-sdk='show_9865183'></script>
     
     <style>
-        :root {
-            --primary: #0088cc; --accent: #6c5ce7; --success: #00b894; --danger: #ff7675;
-            --disabled: #bdc3c7; --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            --card-glass: rgba(255, 255, 255, 0.75); --text: #2d3436;
+        .glass-morphism {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg-gradient); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
-
-        /* --- NOTIFIKASI MENGAMBANG --- */
-        #float-notif { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); z-index: 10001; padding: 20px 40px; border-radius: 20px; color: white; font-weight: 800; text-align: center; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; }
-        #float-notif.show { transform: translate(-50%, -50%) scale(1); }
-        .bg-correct { background: rgba(0, 184, 148, 0.95); }
-        .bg-wrong { background: rgba(255, 118, 117, 0.95); }
-
-        #app { flex: 1; display: none; flex-direction: column; align-items: center; padding: 15px; overflow-y: auto; }
-        .page { display: none; width: 100%; max-width: 400px; padding-bottom: 120px; }
-        .page.active { display: block; }
-        .card { background: var(--card-glass); backdrop-filter: blur(20px); border-radius: 25px; padding: 20px; border: 1px solid white; margin-bottom: 15px; }
-
-        .btn-main { background: linear-gradient(to right, var(--primary), var(--accent)); color: white; border: none; padding: 14px; border-radius: 15px; font-weight: 800; cursor: pointer; width: 100%; }
-        .btn-main:disabled { background: var(--disabled) !important; color: #7f8c8d; }
-        .opt-btn { background: white; border: 1px solid #ddd; padding: 15px; border-radius: 15px; font-weight: 800; }
-        input { width: 100%; padding: 12px; margin: 5px 0; border-radius: 12px; border: 1px solid #ddd; outline: none; }
-
-        /* --- NAV --- */
-        #nav-container { position: fixed; bottom: 15px; left: 0; right: 0; display: none; justify-content: center; z-index: 1000; }
-        .navbar { background: white; display: flex; width: 92%; max-width: 420px; padding: 10px; border-radius: 22px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
-        .nav-item { flex: 1; text-align: center; color: #b2bec3; font-size: 9px; font-weight: 800; cursor: pointer; }
-        .nav-item i { font-size: 20px; display: block; }
-        .nav-item.active { color: var(--accent); }
-        .nav-admin { display: none; }
-
-        /* --- HISTORY --- */
-        .hist-item { background: white; padding: 12px; border-radius: 15px; margin-bottom: 8px; font-size: 11px; border: 1px solid #eee; position: relative; }
-        .status-badge { padding: 2px 8px; border-radius: 6px; font-weight: 800; font-size: 9px; }
-        .st-pending { background: #ffeaa7; color: #d35400; }
-        .st-berhasil { background: #55efc4; color: #00b894; }
-        .st-ditolak { background: #ff7675; color: white; }
-        .btn-del { position: absolute; right: 10px; bottom: 10px; color: var(--danger); font-size: 18px; cursor: pointer; }
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
     </style>
 </head>
-<body>
+<body class="text-white font-sans pb-20">
 
-    <div id="float-notif"></div>
-    <div id="toast-container" style="position:fixed; top:20px; width:100%; z-index:10002; pointer-events:none; display:flex; flex-direction:column; align-items:center;"></div>
+    <div id="auth-section" class="container mx-auto px-4 py-10 max-w-md">
+        <div class="glass-morphism rounded-3xl p-8 shadow-2xl animate__animated animate__fadeInDown">
+            <h2 id="auth-title" class="text-3xl font-bold text-center mb-6">Masuk</h2>
+            
+            <div id="auth-form">
+                <input type="text" id="username" placeholder="Username" class="w-full p-4 mb-4 rounded-xl bg-white/20 border-none text-white placeholder-white/60 focus:ring-2 focus:ring-yellow-400 outline-none">
+                
+                <div id="login-buttons">
+                    <button onclick="handleLogin()" class="w-full bg-yellow-400 hover:bg-yellow-500 text-purple-900 font-bold py-4 rounded-xl transition duration-300 mb-4 shadow-lg">Login</button>
+                    <p class="text-center text-sm">Belum punya akun? <span onclick="toggleAuth(false)" class="underline cursor-pointer">Daftar User</span></p>
+                </div>
 
-    <div id="auth-page" style="position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:var(--bg-gradient); z-index:9999;">
-        <div class="card" style="width:90%; max-width:340px; text-align:center;">
-            <h2 id="auth-title">Quiz Earn</h2>
-            <input type="text" id="username" placeholder="Username">
-            <input type="password" id="password" placeholder="Password">
-            <button class="btn-main" id="btn-auth-action" style="margin-top:10px">Masuk</button>
-            <p style="font-size:11px; margin-top:15px; cursor:pointer" id="auth-link">Belum punya akun? Daftar</p>
+                <div id="register-buttons" class="hidden">
+                    <button onclick="handleRegister()" class="w-full bg-green-400 hover:bg-green-500 text-white font-bold py-4 rounded-xl transition duration-300 mb-4 shadow-lg">Daftar Sekarang</button>
+                    <p class="text-center text-sm">Sudah punya akun? <span onclick="toggleAuth(true)" class="underline cursor-pointer">Login</span></p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div id="app">
-        <section id="quiz" class="page active">
-            <div class="card" style="text-align:center">
-                <div style="display:flex; justify-content:space-between; font-weight:800; font-size:12px">
-                    <span><i class='bx bxs-coin-stack'></i> <span class="curr-points-display">0</span></span>
-                    <span class="curr-user-display">User</span>
+    <div id="main-app" class="hidden container mx-auto px-4 py-8 max-w-md animate__animated animate__fadeIn">
+        <div class="flex justify-between items-center mb-6 glass-morphism p-4 rounded-2xl">
+            <div>
+                <p class="text-xs opacity-70">Username</p>
+                <p id="display-user" class="font-bold text-lg text-yellow-300"></p>
+            </div>
+            <div class="text-right">
+                <p class="text-xs opacity-70">Total Poin</p>
+                <p id="display-points" class="font-bold text-2xl text-green-400">0</p>
+            </div>
+        </div>
+
+        <div class="glass-morphism rounded-3xl p-8 shadow-2xl text-center relative overflow-hidden">
+            <div id="notif" class="hidden absolute top-0 left-0 w-full p-2 text-sm font-bold animate__animated"></div>
+            
+            <h3 class="text-xl mb-4">Berapa hasil dari:</h3>
+            <div id="question" class="text-5xl font-black mb-8 text-yellow-300">0 + 0</div>
+
+            <div id="options" class="grid grid-cols-2 gap-4 mb-8">
                 </div>
-                <h1 style="font-size: 3.5rem; margin: 25px 0" id="q-text">0 + 0</h1>
-                <div id="q-options" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"></div>
-                <div style="margin-top: 25px; display:flex; flex-direction:column; gap:10px">
-                    <button id="ad-btn" class="btn-main" disabled>LIHAT IKLAN (+50)</button>
-                    <button id="next-btn" class="btn-main" style="background:#2d3436; display:none">SOAL SELANJUTNYA</button>
-                </div>
-            </div>
-        </section>
 
-        <section id="poin" class="page">
-            <div class="card">
-                <h3>Penarikan Poin</h3>
-                <input type="number" id="wd-amount" placeholder="Jumlah Poin">
-                <input type="text" id="wd-phone" placeholder="Nomor DANA">
-                <button class="btn-main" onclick="handleWithdraw()">Tarik Saldo</button>
-                <h4 style="margin: 20px 0 10px; font-size: 12px; opacity:0.6">RIWAYAT PENARIKAN</h4>
-                <div id="history-list"></div>
+            <div class="space-y-4">
+                <button onclick="generateQuiz()" class="w-full bg-blue-500 hover:bg-blue-600 py-3 rounded-xl font-semibold transition">Ganti Soal</button>
+                <button id="btn-ads" disabled onclick="showMonetagAd()" class="w-full bg-gray-500 text-white py-4 rounded-xl font-bold shadow-lg cursor-not-allowed transition duration-500">
+                    🎁 Lihat Iklan Reward (+5 Poin)
+                </button>
             </div>
-        </section>
+        </div>
 
-        <section id="admin" class="page">
-            <div class="card">
-                <h3>Kelola Penarikan (Pending)</h3>
-                <div id="admin-wd-list"></div>
-            </div>
-            <div class="card">
-                <h3>Semua Riwayat (Log)</h3>
-                <div id="admin-all-history"></div>
-            </div>
-        </section>
-
-        <section id="saya" class="page">
-            <div class="card" style="text-align:center">
-                <i class='bx bxs-user-circle' style="font-size:60px; color:var(--accent)"></i>
-                <h2 class="curr-user-display">User</h2>
-                <button class="btn-main" style="background:var(--danger)" onclick="logout()">Logout</button>
-            </div>
-        </section>
+        <button onclick="logout()" class="mt-8 w-full text-red-300 font-semibold underline">Logout</button>
     </div>
 
-    <div id="nav-container">
-        <nav class="navbar">
-            <div class="nav-item active" data-page="quiz"><i class='bx bxs-grid-alt'></i>Quiz</div>
-            <div class="nav-item" data-page="poin"><i class='bx bxs-wallet'></i>Poin</div>
-            <div class="nav-item" data-page="saya"><i class='bx bxs-user-circle'></i>Saya</div>
-            <div class="nav-item nav-admin" data-page="admin"><i class='bx bxs-shield-quarter'></i>Admin</div>
-        </nav>
-    </div>
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/10 backdrop-blur-md border-t border-white/20 p-4 flex justify-around items-center z-50">
+        <div class="text-center flex flex-col items-center opacity-50 cursor-pointer" onclick="showSection('quiz')">
+            <span class="text-xl">🎮</span>
+            <span class="text-[10px]">Quiz</span>
+        </div>
+        <div class="text-center flex flex-col items-center opacity-50 cursor-pointer" onclick="alert('Menu Poin Aktif')">
+            <span class="text-xl">💰</span>
+            <span class="text-[10px]">Poin</span>
+        </div>
+        <div class="text-center flex flex-col items-center opacity-50 cursor-pointer" onclick="alert('Halaman Admin (Segera)')">
+            <span class="text-xl">🛡️</span>
+            <span class="text-[10px]">Admin</span>
+        </div>
+    </nav>
 
     <script>
-        let currentPoints = 0, currentUser = null, currentAns = 0;
+        // Database Sederhana (Local Storage)
+        let users = JSON.parse(localStorage.getItem('quiz_users')) || {};
+        let currentUser = null;
+        let currentCorrectAnswer = null;
 
-        const showToast = (msg) => {
-            const t = document.createElement('div');
-            t.style.cssText = "background:#2d3436; color:white; padding:10px 20px; border-radius:10px; margin-bottom:5px; font-size:11px;";
-            t.innerText = msg;
-            document.getElementById('toast-container').appendChild(t);
-            setTimeout(() => t.remove(), 2000);
-        };
-
-        const floatingNotif = (type, msg) => {
-            const el = document.getElementById('float-notif');
-            el.innerText = msg;
-            el.className = type === 'success' ? 'show bg-correct' : 'show bg-wrong';
-            setTimeout(() => el.className = '', 1500);
-        };
-
-        const updateUI = () => {
-            document.querySelectorAll('.curr-points-display').forEach(el => el.innerText = currentPoints);
-            document.querySelectorAll('.curr-user-display').forEach(el => el.innerText = currentUser);
-            if(currentUser === 'admin') {
-                document.querySelector('.nav-admin').style.display = 'block';
-                renderAdmin();
-            }
-            renderUserHistory();
-        };
-
-        // --- USER HISTORY & DELETE ---
-        window.deleteHistory = (wdId) => {
-            if(!confirm("Hapus riwayat ini?")) return;
-            let db = JSON.parse(localStorage.getItem('quiz_users') || '{}');
-            const index = db[currentUser].history.findIndex(h => h.id === wdId);
+        // --- AUTH FUNCTIONS ---
+        function toggleAuth(isLogin) {
+            const title = document.getElementById('auth-title');
+            const loginBtns = document.getElementById('login-buttons');
+            const regBtns = document.getElementById('register-buttons');
             
-            if(index !== -1) {
-                if(db[currentUser].history[index].status === 'Pending') {
-                    return showToast("Gagal! Status Pending tidak bisa dihapus.");
-                }
-                db[currentUser].history.splice(index, 1);
-                localStorage.setItem('quiz_users', JSON.stringify(db));
-                updateUI();
-                showToast("Riwayat dihapus.");
-            }
-        };
+            title.innerText = isLogin ? "Masuk" : "Daftar User";
+            loginBtns.classList.toggle('hidden', !isLogin);
+            regBtns.classList.toggle('hidden', isLogin);
+        }
 
-        const renderUserHistory = () => {
-            const container = document.getElementById('history-list');
-            let db = JSON.parse(localStorage.getItem('quiz_users') || '{}');
-            const hist = db[currentUser]?.history || [];
-            container.innerHTML = hist.map(h => `
-                <div class="hist-item">
-                    <div style="display:flex; justify-content:space-between">
-                        <b>DANA: ${h.phone}</b>
-                        <span class="status-badge st-${h.status.toLowerCase()}">${h.status}</span>
-                    </div>
-                    <div style="margin-top:5px; opacity:0.7">-${h.amount} Poin • ${h.date}</div>
-                    ${h.status !== 'Pending' ? `<i class='bx bx-trash btn-del' onclick="deleteHistory(${h.id})"></i>` : ''}
-                </div>
-            `).join('') || '<p style="font-size:11px; opacity:0.5">Tidak ada riwayat.</p>';
-        };
-
-        // --- ADMIN SYSTEM ---
-        const renderAdmin = () => {
-            let db = JSON.parse(localStorage.getItem('quiz_users') || '{}');
-            const wdCont = document.getElementById('admin-wd-list');
-            const allCont = document.getElementById('admin-all-history');
+        function handleRegister() {
+            const user = document.getElementById('username').value.trim();
+            if (!user) return alert("Isi username!");
             
-            let pendingList = [], allList = [];
-            Object.keys(db).forEach(u => {
-                if(db[u].history) {
-                    db[u].history.forEach(h => {
-                        if(h.status === 'Pending') pendingList.push(h);
-                        else allList.push(h);
-                    });
-                }
-            });
-
-            wdCont.innerHTML = pendingList.map(w => `
-                <div class="hist-item">
-                    <b>${w.user} (${w.phone})</b><br>${w.amount} Poin
-                    <div style="display:flex; gap:5px; margin-top:10px">
-                        <button onclick="adminAction('${w.user}', ${w.id}, 'Berhasil')" style="background:var(--success); color:white; border:none; padding:5px 10px; border-radius:5px">Setujui</button>
-                        <button onclick="adminAction('${w.user}', ${w.id}, 'Ditolak')" style="background:var(--danger); color:white; border:none; padding:5px 10px; border-radius:5px">Tolak</button>
-                    </div>
-                </div>
-            `).join('') || '<p style="font-size:11px; opacity:0.5">Antrian kosong.</p>';
-
-            allCont.innerHTML = allList.map(w => `
-                <div class="hist-item">
-                    <b>${w.user}</b> - <span class="status-badge st-${w.status.toLowerCase()}">${w.status}</span>
-                    <div style="font-size:10px">${w.amount} Poin • ${w.phone}</div>
-                    <i class='bx bx-trash btn-del' onclick="adminDeleteAny('${w.user}', ${w.id})"></i>
-                </div>
-            `).join('') || '<p style="font-size:11px; opacity:0.5">Log kosong.</p>';
-        };
-
-        window.adminAction = (target, id, status) => {
-            let db = JSON.parse(localStorage.getItem('quiz_users') || '{}');
-            const idx = db[target].history.findIndex(x => x.id === id);
-            if(idx !== -1) {
-                db[target].history[idx].status = status;
-                if(status === 'Ditolak') db[target].points += db[target].history[idx].amount;
-                localStorage.setItem('quiz_users', JSON.stringify(db));
-                updateUI();
-                showToast("Update Berhasil!");
-            }
-        };
-
-        window.adminDeleteAny = (target, id) => {
-            if(!confirm("Hapus log ini dari database?")) return;
-            let db = JSON.parse(localStorage.getItem('quiz_users') || '{}');
-            db[target].history = db[target].history.filter(h => h.id !== id);
-            localStorage.setItem('quiz_users', JSON.stringify(db));
-            updateUI();
-            showToast("Log dihapus Admin.");
-        };
-
-        // --- QUIZ CORE ---
-        const generateQuiz = () => {
-            document.getElementById('ad-btn').disabled = true;
-            document.getElementById('next-btn').style.display = 'none';
-            const a = Math.floor(Math.random()*50), b = Math.floor(Math.random()*50);
-            currentAns = a + b;
-            document.getElementById('q-text').innerText = `${a} + ${b}`;
-            const grid = document.getElementById('q-options'); grid.innerHTML = '';
-            [currentAns, currentAns+5, currentAns-2, currentAns+10].sort(()=>Math.random()-0.5).forEach(o => {
-                const b = document.createElement('button'); b.className = 'opt-btn'; b.innerText = o;
-                b.onclick = () => {
-                    if(o === currentAns) {
-                        floatingNotif('success', 'BENAR!');
-                        document.getElementById('ad-btn').disabled = false;
-                        grid.querySelectorAll('button').forEach(btn => btn.onclick = null);
-                    } else {
-                        floatingNotif('error', 'SALAH!');
-                        setTimeout(generateQuiz, 1000);
-                    }
-                };
-                grid.appendChild(b);
-            });
-        };
-
-        document.getElementById('ad-btn').onclick = () => {
-            currentPoints += 50;
-            let db = JSON.parse(localStorage.getItem('quiz_users') || '{}');
-            db[currentUser].points = currentPoints;
-            localStorage.setItem('quiz_users', JSON.stringify(db));
-            updateUI();
-            showToast("+50 Poin!");
-            document.getElementById('ad-btn').disabled = true;
-            document.getElementById('next-btn').style.display = 'block';
-        };
-
-        document.getElementById('next-btn').onclick = generateQuiz;
-
-        window.handleWithdraw = () => {
-            const amt = parseInt(document.getElementById('wd-amount').value);
-            const phone = document.getElementById('wd-phone').value;
-            if(!amt || amt < 1000 || amt > currentPoints) return showToast("Poin kurang!");
-            currentPoints -= amt;
-            let db = JSON.parse(localStorage.getItem('quiz_users') || '{}');
-            db[currentUser].points = currentPoints;
-            db[currentUser].history = db[currentUser].history || [];
-            db[currentUser].history.unshift({id: Date.now(), user: currentUser, amount: amt, phone: phone, status: 'Pending', date: new Date().toLocaleDateString()});
-            localStorage.setItem('quiz_users', JSON.stringify(db));
-            updateUI();
-            showToast("Berhasil!");
-        };
-
-        // --- AUTH & NAV ---
-        document.getElementById('btn-auth-action').onclick = () => {
-            const u = document.getElementById('username').value.trim().toLowerCase();
-            const p = document.getElementById('password').value;
-            const isL = document.getElementById('auth-title').innerText === "Quiz Earn";
-            let db = JSON.parse(localStorage.getItem('quiz_users') || '{}');
-            if(isL) {
-                if(db[u] && db[u].password === p) { currentUser = u; currentPoints = db[u].points; startApp(); }
-                else showToast("Gagal!");
+            if (users[user]) {
+                alert("❌ Username '" + user + "' sudah digunakan. Pilih yang lain!");
             } else {
-                if(db[u]) return showToast("Ada!");
-                db[u] = { password: p, points: 0, history: [] };
-                localStorage.setItem('quiz_users', JSON.stringify(db));
-                showToast("Sukses!"); document.getElementById('auth-link').click();
+                users[user] = { points: 0 };
+                saveData();
+                alert("✅ Pendaftaran Berhasil! Silakan Login.");
+                toggleAuth(true);
             }
-        };
+        }
 
-        const startApp = () => {
-            localStorage.setItem('quiz_session', JSON.stringify({user: currentUser, points: currentPoints}));
-            document.getElementById('auth-page').style.display = 'none';
-            document.getElementById('app').style.display = 'flex';
-            document.getElementById('nav-container').style.display = 'flex';
-            updateUI(); generateQuiz();
-        };
+        function handleLogin() {
+            const user = document.getElementById('username').value.trim();
+            if (users[user]) {
+                currentUser = user;
+                document.getElementById('auth-section').classList.add('hidden');
+                document.getElementById('main-app').classList.remove('hidden');
+                document.getElementById('display-user').innerText = currentUser;
+                document.getElementById('display-points').innerText = users[currentUser].points;
+                generateQuiz();
+            } else {
+                alert("❌ Akun tidak ditemukan!");
+            }
+        }
 
-        window.logout = () => { localStorage.removeItem('quiz_session'); location.reload(); };
+        function logout() {
+            currentUser = null;
+            location.reload();
+        }
 
-        document.getElementById('auth-link').onclick = function() {
-            const isL = document.getElementById('auth-title').innerText === "Quiz Earn";
-            document.getElementById('auth-title').innerText = isL ? "Daftar" : "Quiz Earn";
-            this.innerText = isL ? "Login" : "Daftar";
-        };
+        // --- QUIZ LOGIC ---
+        function generateQuiz() {
+            const btnAds = document.getElementById('btn-ads');
+            btnAds.disabled = true;
+            btnAds.className = "w-full bg-gray-500 text-white py-4 rounded-xl font-bold cursor-not-allowed";
+            
+            const num1 = Math.floor(Math.random() * 100) + 1;
+            const num2 = Math.floor(Math.random() * 100) + 1;
+            currentCorrectAnswer = num1 + num2;
 
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.onclick = function() {
-                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-                this.classList.add('active');
-                document.getElementById(this.dataset.page).classList.add('active');
-            };
-        });
+            document.getElementById('question').innerText = `${num1} + ${num2}`;
+            
+            // Buat pilihan jawaban (1 benar, 3 salah)
+            let options = [currentCorrectAnswer];
+            while(options.length < 4) {
+                let wrong = currentCorrectAnswer + (Math.floor(Math.random() * 20) - 10);
+                if (!options.includes(wrong) && wrong > 0) options.push(wrong);
+            }
+            
+            // Acak posisi
+            options.sort(() => Math.random() - 0.5);
 
-        const sess = localStorage.getItem('quiz_session');
-        if(sess) {
-            const s = JSON.parse(sess);
-            let db = JSON.parse(localStorage.getItem('quiz_users') || '{}');
-            if(db[s.user]) { currentUser = s.user; currentPoints = db[s.user].points; startApp(); }
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.innerText = opt;
+                btn.className = "bg-white/20 hover:bg-yellow-400 hover:text-purple-900 p-4 rounded-xl font-bold transition duration-300 animate__animated animate__zoomIn";
+                btn.onclick = () => checkAnswer(opt);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selected) {
+            const notif = document.getElementById('notif');
+            notif.classList.remove('hidden', 'animate__fadeOutUp', 'animate__fadeInDown', 'bg-green-500', 'bg-red-500');
+            
+            if (selected === currentCorrectAnswer) {
+                notif.innerText = "🎉 Benar! Klik Iklan untuk Poin.";
+                notif.classList.add('bg-green-500', 'animate__fadeInDown');
+                
+                // Aktifkan Tombol Iklan
+                const btnAds = document.getElementById('btn-ads');
+                btnAds.disabled = false;
+                btnAds.className = "w-full bg-gradient-to-r from-yellow-400 to-orange-500 text-purple-900 py-4 rounded-xl font-bold shadow-lg animate__animated animate__pulse animate__infinite cursor-pointer";
+            } else {
+                notif.innerText = "❌ Salah! Coba lagi.";
+                notif.classList.add('bg-red-500', 'animate__fadeInDown');
+            }
+
+            setTimeout(() => {
+                notif.classList.add('animate__fadeOutUp');
+            }, 2000);
+        }
+
+        // --- MONETAG INTEGRATION ---
+        function showMonetagAd() {
+            // Memanggil SDK Monetag
+            show_9865183().then(() => {
+                // Eksekusi setelah iklan selesai ditonton
+                users[currentUser].points += 5;
+                saveData();
+                document.getElementById('display-points').innerText = users[currentUser].points;
+                
+                // Disable kembali tombol setelah klik
+                const btnAds = document.getElementById('btn-ads');
+                btnAds.disabled = true;
+                btnAds.className = "w-full bg-gray-500 text-white py-4 rounded-xl font-bold cursor-not-allowed";
+                
+                alert('Selamat! Anda mendapatkan 5 poin.');
+                generateQuiz(); // Reset soal setelah dapat poin
+            }).catch((e) => {
+                alert("Gagal memuat iklan. Pastikan Adblock mati.");
+            });
+        }
+
+        function saveData() {
+            localStorage.setItem('quiz_users', JSON.stringify(users));
         }
     </script>
 </body>
