@@ -15,6 +15,7 @@
             --accent: #6c5ce7;
             --success: #00b894;
             --danger: #ff7675;
+            --disabled: #bdc3c7; /* Warna abu-abu untuk disable */
             --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             --card-glass: rgba(255, 255, 255, 0.7);
             --text: #2d3436;
@@ -29,28 +30,13 @@
         }
 
         /* --- TOAST SYSTEM --- */
-        #toast-container { 
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%); 
-            z-index: 10000; width: 90%; max-width: 300px; pointer-events: none;
-        }
-        .toast {
-            background: white; color: var(--text); padding: 12px 20px; border-radius: 18px;
-            font-weight: 700; font-size: 13px; margin-bottom: 10px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-left: 6px solid var(--primary);
-            display: flex; align-items: center; gap: 10px;
-            animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
+        #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; width: 90%; max-width: 300px; pointer-events: none; }
+        .toast { background: white; color: var(--text); padding: 12px 20px; border-radius: 18px; font-weight: 700; font-size: 13px; margin-bottom: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-left: 6px solid var(--primary); display: flex; align-items: center; gap: 10px; animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         @keyframes toastIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- MODAL LOGOUT (Ganti Confirm) --- */
-        #modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
-            z-index: 9000; display: none; align-items: center; justify-content: center; padding: 20px;
-        }
-        .modal-card {
-            background: white; border-radius: 28px; padding: 25px; width: 100%; max-width: 300px;
-            text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-        }
+        /* --- MODAL LOGOUT --- */
+        #modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 9000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .modal-card { background: white; border-radius: 28px; padding: 25px; width: 100%; max-width: 300px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
 
         /* --- UI COMPONENTS --- */
         #auth-page { position: fixed; inset: 0; background: var(--bg-gradient); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 25px; }
@@ -65,11 +51,21 @@
         .card { background: var(--card-glass); backdrop-filter: blur(20px); border-radius: 35px; padding: 25px; border: 1px solid rgba(255,255,255,0.5); box-shadow: 0 15px 35px rgba(0,0,0,0.05); text-align: center; width: 100%; }
         .user-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .question { font-size: 3rem; font-weight: 800; margin: 15px 0; background: linear-gradient(to bottom, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        /* Options & Buttons */
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 15px 0; }
-        .opt-btn { background: white; border: none; padding: 16px; border-radius: 20px; font-size: 1.1rem; font-weight: 800; cursor: pointer; }
+        .opt-btn { background: white; border: none; padding: 16px; border-radius: 20px; font-size: 1.1rem; font-weight: 800; cursor: pointer; transition: 0.2s; color: var(--text); }
         .opt-btn.correct { background: var(--success); color: white; }
         .opt-btn.wrong { background: var(--danger); color: white; }
-        .btn-main { background: linear-gradient(to right, var(--primary), var(--accent)); color: white; border: none; padding: 16px; border-radius: 20px; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; }
+        
+        .btn-main { background: linear-gradient(to right, var(--primary), var(--accent)); color: white; border: none; padding: 16px; border-radius: 20px; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: 0.3s; }
+        
+        /* State Disable Warna Abu-abu */
+        .btn-main:disabled { background: var(--disabled); color: #7f8c8d; cursor: not-allowed; box-shadow: none; transform: none; opacity: 0.8; }
+
+        /* Tombol Ganti Soal */
+        .btn-skip { background: none; border: none; color: var(--primary); font-size: 13px; font-weight: 700; cursor: pointer; margin-top: 10px; display: inline-flex; align-items: center; gap: 4px; opacity: 0.7; transition: 0.2s; }
+        .btn-skip:hover { opacity: 1; }
 
         /* NAVBAR */
         .nav-container { padding-bottom: 30px; display: flex; justify-content: center; }
@@ -124,7 +120,12 @@
                 </div>
                 <div class="question" id="q-text">-- + --</div>
                 <div class="options-grid" id="q-options"></div>
-                <button id="ad-btn" class="btn-main" onclick="handleAd()" disabled><i class='bx bxs-zap'></i> Bonus Iklan</button>
+                
+                <button class="btn-skip" onclick="initQuiz()"><i class='bx bx-refresh'></i> Ganti Soal</button>
+                
+                <div style="margin-top: 20px;">
+                    <button id="ad-btn" class="btn-main" onclick="handleAd()" disabled><i class='bx bxs-zap'></i> Bonus Iklan +50</button>
+                </div>
             </div>
         </section>
 
@@ -160,31 +161,22 @@
         let currentUser = null;
         let ans, p = 0;
 
-        // --- IMPROVED TOAST SYSTEM ---
         function showToast(msg, type = 'info') {
             const container = document.getElementById('toast-container');
             const t = document.createElement('div');
             t.className = 'toast';
-            
             let icon = 'bx-info-circle';
             if(type === 'success') { t.style.borderLeftColor = 'var(--success)'; icon = 'bx-check-circle'; tg.HapticFeedback.notificationOccurred('success'); }
             if(type === 'error') { t.style.borderLeftColor = 'var(--danger)'; icon = 'bx-error-circle'; tg.HapticFeedback.notificationOccurred('error'); }
-            
             t.innerHTML = `<i class='bx ${icon}'></i> <span>${msg}</span>`;
             container.appendChild(t);
-            
-            setTimeout(() => {
-                t.style.animation = 'toastIn 0.4s reverse forwards';
-                setTimeout(() => t.remove(), 400);
-            }, 2500);
+            setTimeout(() => { t.style.animation = 'toastIn 0.4s reverse forwards'; setTimeout(() => t.remove(), 400); }, 2500);
         }
 
-        // --- LOGOUT MODAL LOGIC ---
         function openLogoutModal() { document.getElementById('modal-overlay').style.display = 'flex'; tg.HapticFeedback.impactOccurred('medium'); }
         function closeLogoutModal() { document.getElementById('modal-overlay').style.display = 'none'; }
         function confirmLogout() { localStorage.removeItem('session'); location.reload(); }
 
-        // --- AUTH LOGIC ---
         function toggleAuthMode() {
             isLoginMode = !isLoginMode;
             document.getElementById('auth-title').innerText = isLoginMode ? "Masuk Akun" : "Daftar Akun";
@@ -196,7 +188,6 @@
             const pw = document.getElementById('password').value;
             if(!u || !pw) return showToast("Lengkapi semua kolom!", "error");
             let users = JSON.parse(localStorage.getItem('users_db')) || {};
-
             if(isLoginMode) {
                 if(users[u] && users[u].password === pw) { loginSuccess(u, users[u].points); }
                 else { showToast("User atau Password salah!", "error"); }
