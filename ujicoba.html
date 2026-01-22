@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Quiz Premium - Withdraw System</title>
+    <title>Quiz Premium - Admin Panel</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
@@ -16,53 +16,47 @@
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body {
-            background: var(--bg-gradient); color: var(--text);
-            font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; height: 100vh;
-            display: flex; flex-direction: column; overflow: hidden;
-        }
+        body { background: var(--bg-gradient); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
         /* TOAST & MODAL */
         #toast-container { position: fixed; top: 15px; left: 50%; transform: translateX(-50%); z-index: 10000; pointer-events: none; width: 90%; max-width: 300px; }
         .toast { background: rgba(45, 52, 54, 0.95); color: white; padding: 12px 18px; border-radius: 20px; font-weight: 600; font-size: 11px; margin-bottom: 8px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); animation: toastIn 0.3s ease-out forwards; text-align: center; }
         @keyframes toastIn { from { opacity: 0; transform: translateY(-15px); } to { opacity: 1; transform: translateY(0); } }
 
-        #logout-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 10001; display: none; align-items: center; justify-content: center; padding: 20px; }
-        .confirm-card { background: white; padding: 25px; border-radius: 28px; width: 100%; max-width: 300px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
-
         /* APP STRUCTURE */
         #app { flex: 1; display: none; flex-direction: column; align-items: center; padding: 20px; overflow-y: auto; }
-        .page { display: none; width: 100%; max-width: 380px; padding-bottom: 100px; }
+        .page { display: none; width: 100%; max-width: 380px; padding-bottom: 120px; }
         .page.active { display: block; animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .card { background: var(--card-glass); backdrop-filter: blur(25px); border-radius: 30px; padding: 22px; border: 1px solid white; text-align: center; margin-bottom: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.05); }
         
-        /* WITHDRAW FORM */
-        .wd-form { text-align: left; background: rgba(255,255,255,0.5); padding: 18px; border-radius: 22px; margin-top: 15px; }
-        .wd-form label { font-size: 10px; font-weight: 800; opacity: 0.5; margin-left: 5px; }
-        .wd-form input { width: 100%; padding: 12px 15px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.05); margin: 5px 0 15px; outline: none; font-family: inherit; font-weight: 600; }
+        /* ADMIN & LIST STYLE */
+        .admin-item { background: white; padding: 15px; border-radius: 20px; margin-bottom: 12px; text-align: left; border: 1px solid rgba(0,0,0,0.03); }
+        .status-tag { font-size: 10px; padding: 4px 10px; border-radius: 10px; font-weight: 800; }
+        .status-pending { background: #ffeaa7; color: #d35400; }
+        .status-berhasil { background: #55efc4; color: #00b894; }
+        .status-ditolak { background: #ff7675; color: white; }
 
-        /* HISTORY LIST */
-        .history-list { text-align: left; margin-top: 10px; }
-        .history-item { background: white; padding: 12px 15px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border: 1px solid rgba(0,0,0,0.03); }
-        .status-tag { font-size: 9px; padding: 4px 8px; border-radius: 8px; font-weight: 800; background: #ffeaa7; color: #d63031; }
+        .btn-action { padding: 8px 12px; border-radius: 10px; border: none; font-weight: 800; font-size: 11px; cursor: pointer; margin-top: 10px; }
 
-        /* COMMON BUTTONS */
-        .btn-main { background: linear-gradient(to right, var(--primary), var(--accent)); color: white; border: none; padding: 16px; border-radius: 18px; font-weight: 800; width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-main:disabled { opacity: 0.5; cursor: not-allowed; }
-        
         /* NAV */
         #nav-container { position: fixed; bottom: 20px; left: 0; right: 0; display: none; justify-content: center; z-index: 1000; }
-        .navbar { background: white; display: flex; width: 90%; max-width: 380px; padding: 10px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .nav-item { flex: 1; text-align: center; color: #b2bec3; font-size: 10px; font-weight: 800; cursor: pointer; }
+        .navbar { background: white; display: flex; width: 95%; max-width: 400px; padding: 10px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .nav-item { flex: 1; text-align: center; color: #b2bec3; font-size: 9px; font-weight: 800; cursor: pointer; }
         .nav-item i { font-size: 22px; display: block; }
         .nav-item.active { color: var(--accent); }
+        .nav-admin { display: none; } /* Tersembunyi default */
 
-        /* QUIZ */
-        .question { font-size: 3.5rem; font-weight: 800; margin: 15px 0; color: var(--text); letter-spacing: -2px; }
+        /* INPUTS & BUTTONS */
+        .btn-main { background: linear-gradient(to right, var(--primary), var(--accent)); color: white; border: none; padding: 16px; border-radius: 18px; font-weight: 800; width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-main:disabled { opacity: 0.5; }
+        input { width: 100%; padding: 15px; margin-top: 10px; border-radius: 15px; border: 1px solid #ddd; outline: none; font-family: inherit; }
+
+        /* QUIZ UI */
+        .question { font-size: 3.5rem; font-weight: 800; margin: 15px 0; color: var(--text); }
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
-        .opt-btn { background: white; border: none; padding: 16px; border-radius: 18px; font-weight: 800; font-size: 18px; box-shadow: 0 4px 0 rgba(0,0,0,0.05); }
+        .opt-btn { background: white; border: none; padding: 16px; border-radius: 18px; font-weight: 800; font-size: 18px; }
         .opt-btn.correct { background: var(--success); color: white; }
         .opt-btn.wrong { background: var(--danger); color: white; }
     </style>
@@ -71,22 +65,11 @@
 
     <div id="toast-container"></div>
 
-    <div id="logout-modal">
-        <div class="confirm-card">
-            <i class='bx bx-log-out-circle' style="font-size: 48px; color: var(--danger);"></i>
-            <h3>Keluar Akun?</h3>
-            <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button class="btn-main" style="background:#f1f2f6; color: #2d3436;" onclick="document.getElementById('logout-modal').style.display='none'">Batal</button>
-                <button class="btn-main" style="background:var(--danger);" onclick="confirmLogout()">Keluar</button>
-            </div>
-        </div>
-    </div>
-
     <div id="auth-page">
-        <div class="card" style="max-width:340px">
+        <div class="card" style="max-width:340px; width:90%">
             <h2 id="auth-title">Masuk Akun</h2>
-            <input type="text" id="username" placeholder="Username" style="width:100%; padding:15px; margin-top:10px; border-radius:15px; border:1px solid #ddd; outline:none">
-            <input type="password" id="password" placeholder="Password" style="width:100%; padding:15px; margin-top:10px; border-radius:15px; border:1px solid #ddd; outline:none">
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
             <button class="btn-main" style="margin-top:20px" id="btn-auth-action">Masuk Sekarang</button>
             <p style="font-size: 12px; margin-top: 15px;">
                 <span id="auth-switch-text">Belum punya akun?</span> <span id="auth-link" style="color:var(--accent); font-weight:800; cursor:pointer">Daftar</span>
@@ -98,12 +81,12 @@
         <section id="quiz" class="page active">
             <div class="card">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                    <span style="font-weight: 800; color: var(--primary);"><i class='bx bxs-user'></i> <span class="curr-user-display">User</span></span>
-                    <i class='bx bx-power-off' style="color:var(--danger); font-size: 20px;" onclick="document.getElementById('logout-modal').style.display='flex'"></i>
+                    <span style="font-weight: 800; color: var(--primary);"><i class='bx bxs-user-badge'></i> <span class="curr-user-display">User</span></span>
+                    <i class='bx bx-power-off' style="color:var(--danger); cursor:pointer" onclick="location.reload()"></i>
                 </div>
                 <div style="background:rgba(255,184,0,0.1); padding:15px; border-radius:20px; margin-bottom:20px">
                     <small style="font-weight: 800; opacity: 0.5;">POIN ANDA</small>
-                    <div style="font-size: 24px; font-weight: 800; color: #f39c12;"><i class='bx bxs-coin-stack'></i> <span class="curr-points-display">0</span></div>
+                    <div style="font-size: 24px; font-weight: 800; color: #f39c12;"><span class="curr-points-display">0</span></div>
                 </div>
                 <div class="question" id="q-text">0 + 0</div>
                 <div class="options-grid" id="q-options"></div>
@@ -113,34 +96,36 @@
 
         <section id="poin" class="page">
             <div class="card">
-                <h3 style="margin:0">Penarikan Saldo</h3>
-                <div style="font-size: 30px; font-weight: 800; color: #f39c12; margin: 10px 0;"><span class="curr-points-display">0</span> <small style="font-size:12px; opacity:0.5">Poin</small></div>
-                
-                <div class="wd-form">
-                    <label>JUMLAH POIN</label>
-                    <input type="number" id="wd-amount" placeholder="Contoh: 5000">
-                    <label>NOMOR DANA</label>
+                <h3>Penarikan Saldo</h3>
+                <div style="font-size: 28px; font-weight: 800; color: #f39c12; margin-bottom: 20px;"><span class="curr-points-display">0</span> <small style="font-size:12px">Poin</small></div>
+                <div style="text-align: left; background: rgba(0,0,0,0.03); padding: 15px; border-radius: 20px;">
+                    <label style="font-size: 10px; font-weight: 800; opacity: 0.5;">JUMLAH POIN</label>
+                    <input type="number" id="wd-amount" placeholder="Min. 1000">
+                    <label style="font-size: 10px; font-weight: 800; opacity: 0.5;">NOMOR DANA</label>
                     <input type="text" id="wd-phone" placeholder="08xxxxxxxxxx">
-                    <button class="btn-main" onclick="handleWithdraw()"><i class='bx bx-send'></i> Ajukan Penarikan</button>
+                    <button class="btn-main" style="margin-top:15px" onclick="handleWithdraw()">Kirim Penarikan</button>
                 </div>
+                <div id="history-container" style="margin-top: 20px;"></div>
+            </div>
+        </section>
 
-                <div class="history-list">
-                    <h4 style="font-size: 12px; margin: 20px 0 10px;">RIWAYAT PENUKARAN</h4>
-                    <div id="history-container">
-                        </div>
-                </div>
+        <section id="admin" class="page">
+            <div class="card">
+                <h3 style="margin-bottom: 5px;">Panel Admin</h3>
+                <p style="font-size: 11px; opacity: 0.5; margin-bottom: 20px;">Kelola semua penarikan member</p>
+                <div id="admin-list-container">
+                    </div>
             </div>
         </section>
 
         <section id="saya" class="page">
             <div class="card">
-                <div style="width:70px; height:70px; background:white; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 10px; font-size:30px; color:var(--accent)"><i class='bx bxs-user'></i></div>
+                <div style="width:70px; height:70px; background:white; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 10px; font-size:35px; color:var(--accent); border: 2px solid var(--accent)"><i class='bx bxs-user'></i></div>
                 <h2 class="curr-user-display">User</h2>
-                <div style="text-align:left; background:rgba(255,255,255,0.5); padding:15px; border-radius:15px">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:5px"><small>ID Akun</small> <small>#<span id="user-id-rand">8821</span></small></div>
-                    <div style="display:flex; justify-content:space-between"><b>Total Poin</b> <b class="curr-points-display">0</b></div>
+                <div style="text-align:left; background:rgba(0,0,0,0.03); padding:15px; border-radius:15px">
+                    <div style="display:flex; justify-content:space-between"><b>Poin Saat Ini</b> <b class="curr-points-display">0</b></div>
                 </div>
-                <button class="btn-main" style="background:var(--danger); margin-top:20px" onclick="document.getElementById('logout-modal').style.display='flex'">Logout</button>
+                <button class="btn-main" style="background:var(--danger); margin-top:20px" onclick="localStorage.removeItem('quiz_session'); location.reload();">Logout Akun</button>
             </div>
         </section>
     </div>
@@ -149,6 +134,7 @@
         <nav class="navbar">
             <div class="nav-item active" data-page="quiz"><i class='bx bxs-grid-alt'></i>Quiz</div>
             <div class="nav-item" data-page="poin"><i class='bx bxs-wallet'></i>Poin</div>
+            <div class="nav-item nav-admin" data-page="admin"><i class='bx bxs-shield-quarter'></i>Admin</div>
             <div class="nav-item" data-page="saya"><i class='bx bxs-user-circle'></i>Saya</div>
         </nav>
     </div>
@@ -172,70 +158,106 @@
                 const p = parseInt(currentPoints) || 0;
                 document.querySelectorAll('.curr-points-display').forEach(el => el.innerText = p.toLocaleString());
                 document.querySelectorAll('.curr-user-display').forEach(el => el.innerText = currentUser);
+                
+                // Cek Admin Menu
+                if(currentUser === 'admin') {
+                    document.querySelector('.nav-admin').style.display = 'block';
+                    renderAdminPanel();
+                }
                 renderHistory();
             };
 
-            // --- WITHDRAW LOGIC ---
+            // --- USER WITHDRAW ---
             window.handleWithdraw = () => {
                 const amt = parseInt(document.getElementById('wd-amount').value);
                 const phone = document.getElementById('wd-phone').value.trim();
-
-                if(!amt || amt < 1000) return showToast("Minimal penarikan 1.000 poin!");
-                if(phone.length < 10) return showToast("Nomor DANA tidak valid!");
-                if(amt > currentPoints) return showToast("Poin tidak mencukupi!");
-
-                // Potong Poin
+                if(!amt || amt < 1000) return showToast("Min 1.000 poin!");
+                if(amt > currentPoints) return showToast("Poin kurang!");
+                
                 currentPoints -= amt;
-                
-                // Simpan ke Riwayat
                 let db = JSON.parse(localStorage.getItem('quiz_users') || '{}');
+                const newWD = { id: Date.now(), user: currentUser, amount: amt, phone: phone, status: 'Pending', date: new Date().toLocaleDateString() };
+                
                 if(!db[currentUser].history) db[currentUser].history = [];
-                
-                db[currentUser].history.unshift({
-                    date: new Date().toLocaleDateString('id-ID'),
-                    amount: amt,
-                    phone: phone,
-                    status: 'Pending'
-                });
-                
+                db[currentUser].history.unshift(newWD);
                 db[currentUser].points = currentPoints;
+                
                 localStorage.setItem('quiz_users', JSON.stringify(db));
                 localStorage.setItem('quiz_session', JSON.stringify({user: currentUser, points: currentPoints}));
-
-                // Reset Form & Update
-                document.getElementById('wd-amount').value = '';
-                document.getElementById('wd-phone').value = '';
                 updateUI();
-                showToast("Pengajuan berhasil dikirim!");
+                showToast("Pengajuan dikirim!");
             };
 
             const renderHistory = () => {
                 const container = document.getElementById('history-container');
                 let db = JSON.parse(localStorage.getItem('quiz_users') || '{}');
                 const history = db[currentUser]?.history || [];
+                container.innerHTML = history.length ? history.map(h => `
+                    <div style="background:white; padding:12px; border-radius:15px; display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px; border: 1px solid #eee">
+                        <div><b>DANA</b><br><small>${h.date}</small></div>
+                        <div style="text-align:right"><b>-${h.amount}</b><br><span class="status-tag status-${h.status.toLowerCase()}">${h.status}</span></div>
+                    </div>
+                `).join('') : '<p style="font-size:11px; opacity:0.5">Belum ada riwayat.</p>';
+            };
+
+            // --- ADMIN LOGIC ---
+            const renderAdminPanel = () => {
+                const container = document.getElementById('admin-list-container');
+                let db = JSON.parse(localStorage.getItem('quiz_users') || '{}');
+                let allWD = [];
                 
-                if(history.length === 0) {
-                    container.innerHTML = '<p style="font-size:11px; opacity:0.5; text-align:center">Belum ada riwayat penukaran.</p>';
+                // Gabungkan semua WD dari semua user
+                Object.keys(db).forEach(user => {
+                    if(db[user].history) {
+                        db[user].history.forEach(item => {
+                            if(item.status === 'Pending') allWD.push(item);
+                        });
+                    }
+                });
+
+                if(allWD.length === 0) {
+                    container.innerHTML = '<p style="font-size:11px; opacity:0.5">Tidak ada antrian penarikan.</p>';
                     return;
                 }
 
-                container.innerHTML = history.map(item => `
-                    <div class="history-item">
-                        <div>
-                            <div style="font-size: 12px; font-weight: 800;">DANA - ${item.phone}</div>
-                            <div style="font-size: 10px; opacity: 0.5;">${item.date}</div>
+                container.innerHTML = allWD.map(wd => `
+                    <div class="admin-item">
+                        <div style="display:flex; justify-content:space-between">
+                            <b>${wd.user}</b> <span class="status-tag status-pending">${wd.status}</span>
                         </div>
-                        <div style="text-align: right;">
-                            <div style="font-weight: 800; font-size: 12px; color: var(--danger);">-${item.amount.toLocaleString()}</div>
-                            <span class="status-tag">${item.status}</span>
+                        <div style="margin-top:5px; font-size:12px">
+                            DANA: ${wd.phone} <br>
+                            Jumlah: <span style="color:var(--danger); font-weight:800">${wd.amount} Poin</span>
+                        </div>
+                        <div style="display:flex; gap:10px">
+                            <button class="btn-action" style="background:var(--success); color:white" onclick="updateWDStatus('${wd.user}', ${wd.id}, 'Berhasil')">Setujui</button>
+                            <button class="btn-action" style="background:var(--danger); color:white" onclick="updateWDStatus('${wd.user}', ${wd.id}, 'Ditolak')">Tolak</button>
                         </div>
                     </div>
                 `).join('');
             };
 
-            // --- AUTH & CORE ---
+            window.updateWDStatus = (targetUser, wdId, newStatus) => {
+                let db = JSON.parse(localStorage.getItem('quiz_users') || '{}');
+                if(db[targetUser] && db[targetUser].history) {
+                    const index = db[targetUser].history.findIndex(h => h.id === wdId);
+                    if(index !== -1) {
+                        db[targetUser].history[index].status = newStatus;
+                        // Jika ditolak, kembalikan poin
+                        if(newStatus === 'Ditolak') {
+                            db[targetUser].points += db[targetUser].history[index].amount;
+                        }
+                        localStorage.setItem('quiz_users', JSON.stringify(db));
+                        showToast(`Status: ${newStatus}`);
+                        renderAdminPanel();
+                        if(currentUser === targetUser) updateUI();
+                    }
+                }
+            };
+
+            // --- CORE LOGIC ---
             document.getElementById('btn-auth-action').onclick = () => {
-                const u = document.getElementById('username').value.trim();
+                const u = document.getElementById('username').value.trim().toLowerCase();
                 const p = document.getElementById('password').value;
                 const isLogin = document.getElementById('auth-title').innerText === "Masuk Akun";
                 let db = JSON.parse(localStorage.getItem('quiz_users') || '{}');
@@ -244,12 +266,12 @@
                     if(db[u] && db[u].password === p) {
                         currentUser = u; currentPoints = db[u].points || 0;
                         startApp();
-                    } else showToast("Gagal masuk!");
+                    } else showToast("Login gagal!");
                 } else {
-                    if(db[u]) return showToast("User ada!");
+                    if(db[u]) return showToast("Username ada!");
                     db[u] = { password: p, points: 0, history: [] };
                     localStorage.setItem('quiz_users', JSON.stringify(db));
-                    showToast("Terdaftar!");
+                    showToast("Silakan login!");
                     document.getElementById('auth-link').click();
                 }
             };
@@ -259,50 +281,38 @@
                 document.getElementById('auth-page').style.display = 'none';
                 document.getElementById('app').style.display = 'flex';
                 document.getElementById('nav-container').style.display = 'flex';
-                document.getElementById('user-id-rand').innerText = Math.floor(1000 + Math.random() * 9000);
                 updateUI(); generateQuiz();
             };
-
-            window.confirmLogout = () => { localStorage.removeItem('quiz_session'); location.reload(); };
 
             const generateQuiz = () => {
                 document.getElementById('ad-btn').disabled = true;
                 const a = Math.floor(Math.random()*50), b = Math.floor(Math.random()*50);
                 currentAns = a + b; document.getElementById('q-text').innerText = `${a} + ${b}`;
                 const grid = document.getElementById('q-options'); grid.innerHTML = '';
-                let opts = [currentAns, currentAns+2, currentAns-1, currentAns+5].sort(()=>Math.random()-0.5);
-                opts.forEach(o => {
-                    const b = document.createElement('button'); b.className='opt-btn'; b.innerText=o;
-                    b.onclick = () => {
+                [currentAns, currentAns+3, currentAns-2, currentAns+7].sort(()=>Math.random()-0.5).forEach(o => {
+                    const btn = document.createElement('button'); btn.className='opt-btn'; btn.innerText=o;
+                    btn.onclick = () => {
                         if(o === currentAns) {
-                            b.classList.add('correct'); document.getElementById('ad-btn').disabled = false;
-                            grid.querySelectorAll('button').forEach(btn => btn.onclick = null);
-                        } else { b.classList.add('wrong'); setTimeout(generateQuiz, 1000); }
+                            btn.classList.add('correct'); document.getElementById('ad-btn').disabled = false;
+                            grid.querySelectorAll('button').forEach(b => b.onclick = null);
+                        } else { btn.classList.add('wrong'); setTimeout(generateQuiz, 1000); }
                     };
-                    grid.appendChild(b);
+                    grid.appendChild(btn);
                 });
             };
 
-            document.getElementById('ad-btn').onclick = function() {
-                this.disabled = true;
-                if(typeof show_9865183 === 'function') {
-                    show_9865183().then(() => {
-                        currentPoints += 50;
-                        let db = JSON.parse(localStorage.getItem('quiz_users') || '{}');
-                        db[currentUser].points = currentPoints;
-                        localStorage.setItem('quiz_users', JSON.stringify(db));
-                        updateUI(); showToast("+50 Poin!"); generateQuiz();
-                    });
-                } else { 
-                    currentPoints += 50; updateUI(); generateQuiz(); 
-                }
+            document.getElementById('ad-btn').onclick = () => {
+                currentPoints += 50;
+                let db = JSON.parse(localStorage.getItem('quiz_users') || '{}');
+                db[currentUser].points = currentPoints;
+                localStorage.setItem('quiz_users', JSON.stringify(db));
+                updateUI(); showToast("+50 Poin!"); generateQuiz();
             };
 
             document.getElementById('auth-link').onclick = function() {
                 const isL = document.getElementById('auth-title').innerText === "Masuk Akun";
                 document.getElementById('auth-title').innerText = isL ? "Daftar Akun" : "Masuk Akun";
                 this.innerText = isL ? "Masuk" : "Daftar";
-                document.getElementById('auth-switch-text').innerText = isL ? "Sudah punya akun?" : "Belum punya akun?";
             };
 
             document.querySelectorAll('.nav-item').forEach(item => {
