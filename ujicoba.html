@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Quiz Premium Optimized</title>
+    <title>Quiz Premium - Floating Logout</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
@@ -22,68 +22,78 @@
             display: flex; flex-direction: column; overflow: hidden;
         }
 
-        /* TOAST MINIMALIS */
-        #toast-container { position: fixed; top: 15px; left: 50%; transform: translateX(-50%); z-index: 10000; pointer-events: none; }
-        .toast { 
-            background: rgba(45, 52, 54, 0.95); color: white; padding: 10px 20px; 
-            border-radius: 25px; font-weight: 600; font-size: 12px; margin-bottom: 8px; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2); animation: toastIn 0.3s ease-out forwards;
+        /* --- NOTIFIKASI MENGAMBANG (LOGOUT) --- */
+        #logout-modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(4px); z-index: 10001;
+            display: none; align-items: center; justify-content: center; padding: 20px;
         }
-        @keyframes toastIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .confirm-card {
+            background: white; padding: 25px; border-radius: 28px;
+            width: 100%; max-width: 300px; text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes modalIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        /* AUTH PAGE */
+        .confirm-btns { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-flex { flex: 1; padding: 12px; border-radius: 15px; border: none; font-weight: 800; cursor: pointer; font-size: 14px; }
+        .btn-no { background: #f1f2f6; color: var(--text); }
+        .btn-yes { background: var(--danger); color: white; }
+
+        /* --- TOAST --- */
+        #toast-container { position: fixed; top: 15px; left: 50%; transform: translateX(-50%); z-index: 10000; pointer-events: none; width: 90%; max-width: 300px; }
+        .toast { 
+            background: rgba(45, 52, 54, 0.95); color: white; padding: 12px 18px; 
+            border-radius: 20px; font-weight: 600; font-size: 12px; margin-bottom: 8px; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2); animation: toastIn 0.3s ease-out forwards;
+            text-align: center;
+        }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(-15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- UI COMPONENTS --- */
         #auth-page { position: fixed; inset: 0; background: var(--bg-gradient); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .auth-card { background: var(--card-glass); backdrop-filter: blur(15px); padding: 40px 30px; border-radius: 35px; width: 100%; max-width: 350px; border: 1px solid white; text-align: center; }
         .input-group input { width: 100%; padding: 16px; border-radius: 18px; border: 1px solid rgba(0,0,0,0.1); background: white; margin-top: 12px; outline: none; }
 
-        /* APP CONTENT */
         #app { flex: 1; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
         .page { display: none; width: 100%; max-width: 360px; }
-        .page.active { display: block; animation: fadeIn 0.4s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .page.active { display: block; }
 
-        .card { background: var(--card-glass); backdrop-filter: blur(25px); border-radius: 35px; padding: 25px; border: 1px solid white; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.05); }
-        
-        .persistent-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .user-tag { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 15px; color: var(--primary); }
-        
-        .saldo-box { 
-            background: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4)); 
-            padding: 15px; border-radius: 22px; margin-bottom: 25px; 
-            border: 1px solid rgba(255,255,255,0.5); display: flex; 
-            flex-direction: column; align-items: center; gap: 5px;
-        }
-        .saldo-label { font-weight: 800; opacity: 0.4; font-size: 11px; letter-spacing: 1px; }
-        .saldo-value { font-weight: 800; color: #f39c12; font-size: 24px; display: flex; align-items: center; gap: 8px; }
-
-        .question { font-size: 3.8rem; font-weight: 800; margin: 15px 0; color: var(--text); letter-spacing: -2px; }
-        
+        .card { background: var(--card-glass); backdrop-filter: blur(25px); border-radius: 35px; padding: 25px; border: 1px solid white; text-align: center; }
+        .saldo-box { background: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4)); padding: 15px; border-radius: 22px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.5); }
+        .question { font-size: 3.8rem; font-weight: 800; margin: 15px 0; letter-spacing: -2px; }
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
-        .opt-btn { background: white; border: none; padding: 18px; border-radius: 20px; font-weight: 800; cursor: pointer; font-size: 18px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+        .opt-btn { background: white; border: none; padding: 18px; border-radius: 20px; font-weight: 800; font-size: 18px; }
         .opt-btn.correct { background: var(--success); color: white; }
         .opt-btn.wrong { background: var(--danger); color: white; }
 
-        .btn-main { background: linear-gradient(to right, var(--primary), var(--accent)); color: white; border: none; padding: 18px; border-radius: 22px; font-weight: 800; width: 100%; cursor: pointer; font-size: 16px; margin-bottom: 12px; box-shadow: 0 10px 20px rgba(108, 92, 231, 0.2); }
-        .btn-main:disabled { background: var(--disabled); opacity: 0.6; box-shadow: none; }
+        .btn-main { background: linear-gradient(to right, var(--primary), var(--accent)); color: white; border: none; padding: 18px; border-radius: 22px; font-weight: 800; width: 100%; cursor: pointer; margin-bottom: 12px; }
+        .btn-main:disabled { background: var(--disabled); opacity: 0.6; }
+        .btn-skip { background: none; border: none; color: var(--primary); font-weight: 800; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; margin: 0 auto; }
 
-        .btn-skip { background: none; border: none; color: var(--primary); font-weight: 800; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; margin: 5px auto; opacity: 0.6; }
-
-        /* NAVBAR (3 MENU) */
         #nav-container { padding-bottom: 30px; display: none; justify-content: center; }
         .navbar { background: white; display: flex; width: 95%; max-width: 380px; padding: 12px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
-        .nav-item { flex: 1; text-align: center; color: #b2bec3; font-size: 11px; font-weight: 800; cursor: pointer; transition: 0.3s; }
+        .nav-item { flex: 1; text-align: center; color: #b2bec3; font-size: 11px; font-weight: 800; cursor: pointer; }
         .nav-item i { font-size: 24px; display: block; margin-bottom: 2px; }
-        .nav-item.active { color: var(--accent); transform: translateY(-3px); }
-
-        /* STYLE KHUSUS HALAMAN SAYA */
-        .profile-avatar { width: 80px; height: 80px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); color: var(--accent); font-size: 40px; }
-        .stat-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 20px; }
-        .stat-item { background: rgba(255,255,255,0.5); padding: 15px; border-radius: 20px; text-align: left; display: flex; align-items: center; gap: 15px; }
+        .nav-item.active { color: var(--accent); }
     </style>
 </head>
 <body>
 
     <div id="toast-container"></div>
+
+    <div id="logout-modal">
+        <div class="confirm-card">
+            <i class='bx bx-log-out-circle' style="font-size: 48px; color: var(--danger);"></i>
+            <h3 style="margin: 10px 0 5px;">Keluar Akun?</h3>
+            <p style="font-size: 13px; opacity: 0.6; margin: 0;">Anda perlu masuk kembali untuk bermain nanti.</p>
+            <div class="confirm-btns">
+                <button class="btn-flex btn-no" onclick="closeLogoutModal()">Batal</button>
+                <button class="btn-flex btn-yes" onclick="confirmLogout()">Ya, Keluar</button>
+            </div>
+        </div>
+    </div>
 
     <div id="auth-page">
         <div class="auth-card">
@@ -103,29 +113,22 @@
     <div id="app">
         <section id="quiz" class="page active">
             <div class="card">
-                <div class="persistent-header">
-                    <div class="user-tag"><i class='bx bxs-user-circle' style="font-size: 24px;"></i> <span class="curr-user-display">User</span></div>
-                    <i class='bx bx-power-off' style="font-size: 24px; color:var(--danger); cursor:pointer" onclick="handleLogout()"></i>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 15px; color: var(--primary);">
+                        <i class='bx bxs-user-circle' style="font-size: 24px;"></i> <span class="curr-user-display">User</span>
+                    </div>
+                    <i class='bx bx-power-off' style="font-size: 24px; color:var(--danger); cursor:pointer" onclick="openLogoutModal()"></i>
                 </div>
-
                 <div class="saldo-box">
-                    <span class="saldo-label">SALDO POIN SAAT INI</span>
-                    <div class="saldo-value">
-                        <i class='bx bxs-coin-stack' style="font-size: 28px;"></i>
-                        <span class="curr-points-display">0</span>
+                    <small style="font-weight: 800; opacity: 0.4; font-size: 11px;">SALDO POIN</small>
+                    <div style="font-weight: 800; color: #f39c12; font-size: 24px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <i class='bx bxs-coin-stack' style="font-size: 28px;"></i> <span class="curr-points-display">0</span>
                     </div>
                 </div>
-
                 <div class="question" id="q-text">-- + --</div>
                 <div class="options-grid" id="q-options"></div>
-                
-                <button id="ad-btn" class="btn-main" disabled>
-                    <i class='bx bxs-zap' ></i> KLAIM +50 POIN
-                </button>
-                
-                <button class="btn-skip" id="btn-next-soal">
-                    <i class='bx bx-refresh' style="font-size: 20px;"></i> Soal Berikutnya
-                </button>
+                <button id="ad-btn" class="btn-main" disabled><i class='bx bxs-zap'></i> KLAIM +50 POIN</button>
+                <button class="btn-skip" id="btn-next-soal"><i class='bx bx-refresh' style="font-size: 20px;"></i> Soal Berikutnya</button>
             </div>
         </section>
 
@@ -133,33 +136,18 @@
             <div class="card">
                 <h3 style="opacity:0.5; font-size: 14px; margin-top:0">TOTAL PENGHASILAN</h3>
                 <h1 style="font-size: 4.5rem; color:#f39c12; margin: 15px 0; font-weight: 800" class="curr-points-display">0</h1>
-                <div style="background: var(--success); color: white; padding: 15px; border-radius: 20px; font-weight: 700;">
-                    Tingkatkan terus poinmu!
-                </div>
             </div>
         </section>
 
         <section id="saya" class="page">
             <div class="card">
-                <div class="profile-avatar">
-                    <i class='bx bxs-user'></i>
-                </div>
+                <div style="width: 80px; height: 80px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; color: var(--accent); font-size: 40px; box-shadow: 0 10px 20px rgba(0,0,0,0.05);"><i class='bx bxs-user'></i></div>
                 <h2 class="curr-user-display" style="margin: 0; font-weight: 800;">Username</h2>
-                <p style="font-size: 12px; opacity: 0.5; margin-top: 5px;">Player Level 1</p>
-
-                <div class="stat-grid">
-                    <div class="stat-item">
-                        <i class='bx bxs-wallet' style="font-size: 24px; color: #f39c12;"></i>
-                        <div>
-                            <div style="font-size: 10px; font-weight: 800; opacity: 0.5;">POIN SAYA</div>
-                            <div style="font-weight: 800; font-size: 16px;" class="curr-points-display">0</div>
-                        </div>
-                    </div>
+                <div style="background: rgba(255,255,255,0.5); padding: 15px; border-radius: 20px; margin-top:20px; text-align: left; display: flex; align-items: center; gap: 15px;">
+                    <i class='bx bxs-wallet' style="font-size: 24px; color: #f39c12;"></i>
+                    <div><small style="font-weight: 800; opacity: 0.5; font-size: 10px;">POIN SAYA</small><br><span class="curr-points-display" style="font-weight: 800;">0</span></div>
                 </div>
-
-                <button class="btn-main" style="background: var(--danger); margin-top: 30px; box-shadow: none;" onclick="handleLogout()">
-                    <i class='bx bx-log-out-circle'></i> LOGOUT AKUN
-                </button>
+                <button class="btn-main" style="background: var(--danger); margin-top: 30px; box-shadow: none;" onclick="openLogoutModal()"><i class='bx bx-log-out-circle'></i> LOGOUT</button>
             </div>
         </section>
     </div>
@@ -185,9 +173,7 @@
 
             const showToast = (msg) => {
                 const container = document.getElementById('toast-container');
-                const t = document.createElement('div');
-                t.className = 'toast';
-                t.innerText = msg;
+                const t = document.createElement('div'); t.className = 'toast'; t.innerText = msg;
                 container.appendChild(t);
                 setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 1800);
             };
@@ -198,21 +184,27 @@
                 document.querySelectorAll('.curr-user-display').forEach(el => el.innerText = currentUser);
             };
 
-            window.handleLogout = () => {
-                if(confirm("Yakin ingin keluar?")) {
-                    localStorage.removeItem('quiz_session');
-                    location.reload();
-                }
+            // --- FLOATING LOGOUT LOGIC ---
+            window.openLogoutModal = () => {
+                document.getElementById('logout-modal').style.display = 'flex';
+                tg?.HapticFeedback.notificationOccurred('warning');
+            };
+            window.closeLogoutModal = () => {
+                document.getElementById('logout-modal').style.display = 'none';
+            };
+            window.confirmLogout = () => {
+                localStorage.removeItem('quiz_session');
+                location.reload();
             };
 
             const handleAuth = () => {
                 const u = document.getElementById('username').value.trim();
                 const p = document.getElementById('password').value;
-                if(!u || !p) return showToast("Data tidak lengkap!");
+                if(!u || !p) return showToast("Harap isi data!");
                 let db = JSON.parse(localStorage.getItem('quiz_users') || '{}');
                 if(isLoginMode) {
                     if(db[u] && db[u].password === p) startApp(u, db[u].points || 0);
-                    else showToast("Gagal masuk!");
+                    else showToast("User/Pass salah!");
                 } else {
                     if(db[u]) return showToast("User sudah ada!");
                     db[u] = { password: p, points: 0 };
@@ -223,43 +215,34 @@
             };
 
             const startApp = (user, points) => {
-                currentUser = user;
-                currentPoints = points;
+                currentUser = user; currentPoints = points;
                 localStorage.setItem('quiz_session', JSON.stringify({user, points}));
                 document.getElementById('auth-page').style.display = 'none';
                 document.getElementById('app').style.display = 'flex';
                 document.getElementById('nav-container').style.display = 'flex';
-                updateUI();
-                generateQuiz();
+                updateUI(); generateQuiz();
             };
 
             const generateQuiz = () => {
                 document.getElementById('ad-btn').disabled = true;
-                const a = Math.floor(Math.random() * 50) + 1;
-                const b = Math.floor(Math.random() * 50) + 1;
-                currentAns = a + b;
-                document.getElementById('q-text').innerText = `${a} + ${b}`;
+                const a = Math.floor(Math.random() * 50) + 1, b = Math.floor(Math.random() * 50) + 1;
+                currentAns = a + b; document.getElementById('q-text').innerText = `${a} + ${b}`;
                 let options = [currentAns];
                 while(options.length < 4) {
                     let w = currentAns + (Math.floor(Math.random() * 12) - 6);
                     if(w > 0 && !options.includes(w)) options.push(w);
                 }
                 options.sort(() => Math.random() - 0.5);
-                const grid = document.getElementById('q-options');
-                grid.innerHTML = '';
+                const grid = document.getElementById('q-options'); grid.innerHTML = '';
                 options.forEach(opt => {
-                    const btn = document.createElement('button');
-                    btn.className = 'opt-btn';
-                    btn.innerText = opt;
+                    const btn = document.createElement('button'); btn.className = 'opt-btn'; btn.innerText = opt;
                     btn.onclick = () => {
                         if(opt === currentAns) {
-                            btn.classList.add('correct');
-                            showToast("Benar! Klaim poinnya.");
+                            btn.classList.add('correct'); showToast("Benar! Ambil poin.");
                             document.getElementById('ad-btn').disabled = false;
                             grid.querySelectorAll('button').forEach(b => b.onclick = null);
                         } else {
-                            btn.classList.add('wrong');
-                            showToast("Yah, salah!");
+                            btn.classList.add('wrong'); showToast("Yah, salah!");
                             setTimeout(generateQuiz, 1000);
                         }
                     };
@@ -270,10 +253,7 @@
             document.getElementById('ad-btn').onclick = function() {
                 this.disabled = true;
                 if(typeof show_9865183 === 'function') {
-                    show_9865183().then(() => rewardUser(50)).catch(() => { 
-                        showToast("Iklan gagal"); 
-                        this.disabled = false; 
-                    });
+                    show_9865183().then(() => rewardUser(50)).catch(() => { showToast("Iklan gagal"); this.disabled = false; });
                 } else { rewardUser(50); }
             };
 
@@ -282,17 +262,11 @@
                 let db = JSON.parse(localStorage.getItem('quiz_users') || '{}');
                 if(db[currentUser]) db[currentUser].points = currentPoints;
                 localStorage.setItem('quiz_users', JSON.stringify(db));
-                updateUI();
-                showToast(`Klaim +${amt} Berhasil!`);
-                setTimeout(generateQuiz, 800);
+                updateUI(); showToast(`+${amt} Poin!`); setTimeout(generateQuiz, 800);
             };
 
             document.getElementById('btn-auth-action').onclick = handleAuth;
-            document.getElementById('btn-next-soal').onclick = () => {
-                tg?.HapticFeedback.impactOccurred('medium');
-                generateQuiz();
-            };
-            
+            document.getElementById('btn-next-soal').onclick = () => { tg?.HapticFeedback.impactOccurred('medium'); generateQuiz(); };
             document.getElementById('auth-link').onclick = function() {
                 isLoginMode = !isLoginMode;
                 document.getElementById('auth-title').innerText = isLoginMode ? "Masuk Akun" : "Daftar Akun";
@@ -307,14 +281,12 @@
                     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
                     this.classList.add('active');
                     document.getElementById(this.dataset.page).classList.add('active');
+                    tg?.HapticFeedback.selectionChanged();
                 };
             });
 
             const session = localStorage.getItem('quiz_session');
-            if(session) {
-                const s = JSON.parse(session);
-                startApp(s.user, s.points);
-            }
+            if(session) { const s = JSON.parse(session); startApp(s.user, s.points); }
         });
     </script>
 </body>
