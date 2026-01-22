@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monetag Reward App</title>
+    
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <script src='//libtl.com/sdk.js' data-zone='9865183' data-sdk='show_9865183'></script>
+
+    <style>
+        /* Menggunakan variabel warna resmi Telegram */
+        body {
+            background-color: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .user-card {
+            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            width: 80%;
+            max-width: 300px;
+        }
+        .btn-iklan {
+            margin-top: 20px;
+            padding: 12px 24px;
+            background-color: var(--tg-theme-button-color, #248bcf);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="user-card">
+        <h3 id="welcome-msg">Halo!</h3>
+        <p>Tonton video untuk mendukung kami.</p>
+        <button class="btn-iklan" onclick="putarVideo()">LIHAT IKLAN</button>
+    </div>
+
+    <script>
+        // Inisialisasi Telegram Web App
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Agar aplikasi terbuka penuh (layar penuh)
+
+        // Menampilkan nama user jika tersedia
+        const user = tg.initDataUnsafe?.user;
+        if (user) {
+            document.getElementById('welcome-msg').innerText = `Halo, ${user.first_name}!`;
+        }
+
+        function putarVideo() {
+            // Tampilkan loading di tombol utama Telegram
+            tg.MainButton.setText("Sedang Memuat Iklan...");
+            tg.MainButton.show();
+
+            // Panggil fungsi Monetag
+            show_9865183().then(() => {
+                // Berhasil menonton
+                tg.MainButton.hide();
+                tg.showAlert("Selamat! Kamu mendapatkan reward.");
+                
+                // Kamu bisa mengirim data ke bot di sini
+                // tg.sendData("user_selesai_nonton"); 
+            }).catch((err) => {
+                tg.MainButton.hide();
+                tg.showAlert("Iklan gagal dimuat. Coba lagi nanti.");
+            });
+        }
+    </script>
+</body>
+</html>
