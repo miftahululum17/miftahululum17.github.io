@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Quiz Premium - Full Admin Control</title>
+    <title>Quiz Premium Pro</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
@@ -18,26 +18,23 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg-gradient); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 
-        /* --- UI COMPONENTS --- */
-        #auth-page { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; background: var(--bg-gradient); }
-        .auth-card { background: var(--card-glass); backdrop-filter: blur(15px); padding: 30px; border-radius: 30px; width: 100%; max-width: 350px; border: 1px solid white; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        
+        /* --- NOTIFIKASI MENGAMBANG --- */
+        #float-notif { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); z-index: 10001; padding: 20px 40px; border-radius: 20px; color: white; font-weight: 800; text-align: center; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; }
+        #float-notif.show { transform: translate(-50%, -50%) scale(1); }
+        .bg-correct { background: rgba(0, 184, 148, 0.95); box-shadow: 0 10px 30px rgba(0, 184, 148, 0.4); }
+        .bg-wrong { background: rgba(255, 118, 117, 0.95); box-shadow: 0 10px 30px rgba(255, 118, 117, 0.4); }
+
+        /* --- APP STRUCTURE --- */
         #app { flex: 1; display: none; flex-direction: column; align-items: center; padding: 15px; overflow-y: auto; }
         .page { display: none; width: 100%; max-width: 400px; padding-bottom: 120px; }
         .page.active { display: block; }
         .card { background: var(--card-glass); backdrop-filter: blur(20px); border-radius: 25px; padding: 20px; border: 1px solid white; margin-bottom: 15px; }
 
-        /* --- ADMIN STYLE --- */
-        .user-item { background: white; padding: 15px; border-radius: 18px; margin-bottom: 10px; border: 1px solid #eee; position: relative; }
-        .user-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .btn-group { display: flex; flex-wrap: wrap; gap: 5px; }
-        .btn-sm { padding: 6px 10px; border-radius: 8px; border: none; font-size: 10px; font-weight: 800; cursor: pointer; color: white; transition: 0.2s; }
-        .btn-sm:active { transform: scale(0.95); }
-        .bg-edit { background: var(--accent); }
-        .bg-add { background: var(--success); }
-        .bg-block { background: var(--danger); }
-        .is-blocked { opacity: 0.5; background: #ffeaea; border: 1px solid var(--danger); }
-        .badge-admin { background: #000; color: #fff; font-size: 8px; padding: 2px 6px; border-radius: 5px; margin-left: 5px; }
+        /* --- BUTTONS & INPUTS --- */
+        .btn-main { background: linear-gradient(to right, var(--primary), var(--accent)); color: white; border: none; padding: 14px; border-radius: 15px; font-weight: 800; cursor: pointer; width: 100%; transition: 0.3s; }
+        .btn-main:disabled { background: var(--disabled) !important; color: #7f8c8d; cursor: not-allowed; transform: none; box-shadow: none; }
+        .opt-btn { background: white; border: 1px solid #ddd; padding: 15px; border-radius: 15px; font-weight: 800; transition: 0.2s; }
+        input, select { width: 100%; padding: 12px; margin: 5px 0; border-radius: 12px; border: 1px solid #ddd; outline: none; }
 
         /* --- NAV --- */
         #nav-container { position: fixed; bottom: 15px; left: 0; right: 0; display: none; justify-content: center; z-index: 1000; }
@@ -47,77 +44,74 @@
         .nav-item.active { color: var(--accent); }
         .nav-admin { display: none; }
 
-        /* --- TOAST --- */
-        #toast-container { position: fixed; top: 15px; left: 50%; transform: translateX(-50%); z-index: 10000; width: 85%; max-width: 300px; }
-        .toast { background: #2d3436; color: white; padding: 10px 15px; border-radius: 15px; font-size: 11px; margin-bottom: 5px; text-align: center; animation: tIn 0.3s forwards; }
-        @keyframes tIn { from { transform: translateY(-20px); opacity:0; } to { transform: translateY(0); opacity:1; } }
-
-        input { width: 100%; padding: 12px; margin: 5px 0; border-radius: 12px; border: 1px solid #ddd; outline: none; font-family: inherit; }
-        .btn-main { background: linear-gradient(to right, var(--primary), var(--accent)); color: white; border: none; padding: 14px; border-radius: 15px; font-weight: 800; cursor: pointer; width: 100%; }
+        /* --- HISTORY --- */
+        .hist-item { background: white; padding: 12px; border-radius: 15px; margin-bottom: 8px; font-size: 11px; border: 1px solid #eee; }
+        .status-badge { padding: 2px 8px; border-radius: 6px; font-weight: 800; font-size: 9px; }
+        .st-pending { background: #ffeaa7; color: #d35400; }
+        .st-berhasil { background: #55efc4; color: #00b894; }
+        .st-ditolak { background: #ff7675; color: white; }
     </style>
 </head>
 <body>
 
-    <div id="toast-container"></div>
+    <div id="float-notif">JAWABAN BENAR!</div>
+    <div id="toast-container" style="position:fixed; top:20px; width:100%; z-index:10002; pointer-events:none; display:flex; flex-direction:column; align-items:center;"></div>
 
-    <div id="auth-page">
-        <div class="auth-card">
-            <h2 id="auth-title">Welcome</h2>
+    <div id="auth-page" style="position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:var(--bg-gradient); z-index:9999;">
+        <div class="card" style="width:90%; max-width:340px; text-align:center;">
+            <h2 id="auth-title">Quiz Earn</h2>
             <input type="text" id="username" placeholder="Username">
             <input type="password" id="password" placeholder="Password">
-            <button class="btn-main" id="btn-auth-action" style="margin-top:10px">Login</button>
-            <p style="font-size: 11px; margin-top: 15px; opacity: 0.7;">
-                <span id="auth-switch-text">Baru di sini?</span> <span id="auth-link" style="color:var(--accent); font-weight:800; cursor:pointer">Daftar</span>
-            </p>
+            <button class="btn-main" id="btn-auth-action" style="margin-top:10px">Masuk</button>
+            <p style="font-size:11px; margin-top:15px; cursor:pointer" id="auth-link">Belum punya akun? Daftar</p>
         </div>
     </div>
 
     <div id="app">
         <section id="quiz" class="page active">
-            <div class="card">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <b><i class='bx bxs-user'></i> <span class="curr-user-display">--</span></b>
-                    <i class='bx bx-log-out-circle' style="color:var(--danger); cursor:pointer; font-size: 20px;" onclick="logout()"></i>
+            <div class="card" style="text-align:center">
+                <div style="display:flex; justify-content:space-between; font-weight:800; font-size:12px">
+                    <span><i class='bx bxs-coin-stack'></i> <span class="curr-points-display">0</span></span>
+                    <span class="curr-user-display">User</span>
                 </div>
-                <div style="margin: 20px 0; background: rgba(255,255,255,0.4); border-radius: 15px; padding: 10px;">
-                    <small style="font-weight: 800; opacity: 0.5;">POIN ANDA</small>
-                    <h2 style="margin:0; color:#f39c12"><span class="curr-points-display">0</span></h2>
+                <h1 style="font-size: 3.5rem; margin: 25px 0" id="q-text">0 + 0</h1>
+                <div id="q-options" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"></div>
+                
+                <div style="margin-top: 25px; display:flex; flex-direction:column; gap:10px">
+                    <button id="ad-btn" class="btn-main" disabled><i class='bx bxs-video-plus'></i> LIHAT IKLAN (+50)</button>
+                    <button id="next-btn" class="btn-main" style="background:#2d3436; display:none">SOAL SELANJUTNYA</button>
                 </div>
-                <h1 style="font-size: 3.5rem; margin: 15px 0" id="q-text">0 + 0</h1>
-                <div id="q-options" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px"></div>
-                <button id="ad-btn" class="btn-main" disabled>KLAIM POIN (+50)</button>
             </div>
         </section>
 
         <section id="poin" class="page">
             <div class="card">
-                <h3 style="margin-top:0">Penarikan DANA</h3>
+                <h3>Penarikan Saldo</h3>
                 <input type="number" id="wd-amount" placeholder="Jumlah Poin">
                 <input type="text" id="wd-phone" placeholder="Nomor DANA">
-                <button class="btn-main" onclick="handleWithdraw()">Tukar Saldo</button>
-                <div id="history-container" style="margin-top:15px"></div>
+                <button class="btn-main" onclick="handleWithdraw()">Kirim Pengajuan</button>
+                
+                <h4 style="margin: 20px 0 10px; font-size: 12px; opacity:0.6">RIWAYAT PENARIKAN</h4>
+                <div id="history-list"></div>
             </div>
         </section>
 
         <section id="saya" class="page">
             <div class="card" style="text-align:center">
-                <div style="width: 80px; height: 80px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; color: var(--accent); font-size: 40px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
-                    <i class='bx bxs-user'></i>
-                </div>
-                <h2 class="curr-user-display" style="margin:0">User</h2>
-                <p style="font-size: 12px; opacity: 0.6;">Member Premium Quiz</p>
-                <div style="background: rgba(255,255,255,0.5); padding: 15px; border-radius: 15px; margin-top: 15px; text-align: left;">
-                    <div style="display: flex; justify-content: space-between;"><span>Saldo Poin</span> <b class="curr-points-display">0</b></div>
-                </div>
-                <button class="btn-main" style="background:var(--danger); margin-top:20px" onclick="logout()">Logout</button>
+                <i class='bx bxs-user-circle' style="font-size:60px; color:var(--accent)"></i>
+                <h2 class="curr-user-display">User</h2>
+                <button class="btn-main" style="background:var(--danger)" onclick="logout()">Keluar Akun</button>
             </div>
         </section>
 
         <section id="admin" class="page">
             <div class="card">
-                <h3 style="margin-top:0"><i class='bx bxs-shield-alt'></i> Panel Kendali Admin</h3>
-                <p style="font-size: 11px; opacity: 0.6;">Kelola seluruh pengguna dan akun admin.</p>
+                <h3>Manajemen User</h3>
                 <div id="admin-user-list"></div>
+            </div>
+            <div class="card">
+                <h3>Permintaan WD</h3>
+                <div id="admin-wd-list"></div>
             </div>
         </section>
     </div>
@@ -127,225 +121,231 @@
             <div class="nav-item active" data-page="quiz"><i class='bx bxs-grid-alt'></i>Quiz</div>
             <div class="nav-item" data-page="poin"><i class='bx bxs-wallet'></i>Poin</div>
             <div class="nav-item" data-page="saya"><i class='bx bxs-user-circle'></i>Saya</div>
-            <div class="nav-item nav-admin" data-page="admin"><i class='bx bxs-cog'></i>Admin</div>
+            <div class="nav-item nav-admin" data-page="admin"><i class='bx bxs-shield-quarter'></i>Admin</div>
         </nav>
     </div>
 
+    <script src='//libtl.com/sdk.js' data-zone='9865183' data-sdk='show_9865183'></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            let currentPoints = 0, currentUser = null;
+        let currentPoints = 0, currentUser = null, currentAns = 0;
 
-            const showToast = (msg) => {
-                const c = document.getElementById('toast-container');
-                const t = document.createElement('div'); t.className = 'toast'; t.innerText = msg;
-                c.appendChild(t); setTimeout(() => { t.remove(); }, 2500);
-            };
+        // --- UTILS ---
+        const showToast = (msg) => {
+            const t = document.createElement('div');
+            t.style.cssText = "background:#2d3436; color:white; padding:10px 20px; border-radius:10px; margin-bottom:5px; font-size:11px;";
+            t.innerText = msg;
+            document.getElementById('toast-container').appendChild(t);
+            setTimeout(() => t.remove(), 2000);
+        };
 
-            const updateUI = () => {
-                document.querySelectorAll('.curr-points-display').forEach(el => el.innerText = currentPoints);
-                document.querySelectorAll('.curr-user-display').forEach(el => el.innerText = currentUser);
-                if(currentUser === 'admin') {
-                    document.querySelector('.nav-admin').style.display = 'block';
-                    renderAdminUsers();
-                } else {
-                    document.querySelector('.nav-admin').style.display = 'none';
-                }
-            };
+        const floatingNotif = (type, msg) => {
+            const el = document.getElementById('float-notif');
+            el.innerText = msg;
+            el.className = type === 'success' ? 'show bg-correct' : 'show bg-wrong';
+            setTimeout(() => el.className = '', 1500);
+        };
 
-            // --- ADMIN FUNCTIONS ---
-            window.renderAdminUsers = () => {
-                const container = document.getElementById('admin-user-list');
-                let db = JSON.parse(localStorage.getItem('quiz_users') || '{}');
-                
-                // Urutkan: Admin selalu di atas
-                const sortedKeys = Object.keys(db).sort((a, b) => {
-                    if (a === 'admin') return -1;
-                    if (b === 'admin') return 1;
-                    return a.localeCompare(b);
-                });
+        const updateUI = () => {
+            document.querySelectorAll('.curr-points-display').forEach(el => el.innerText = currentPoints);
+            document.querySelectorAll('.curr-user-display').forEach(el => el.innerText = currentUser);
+            if(currentUser === 'admin') {
+                document.querySelector('.nav-admin').style.display = 'block';
+                renderAdmin();
+            }
+            renderUserHistory();
+        };
 
-                container.innerHTML = sortedKeys.map(u => {
-                    const user = db[u];
-                    const isAdmin = (u === 'admin');
-                    return `
-                        <div class="user-item ${user.blocked ? 'is-blocked' : ''}">
-                            <div class="user-info">
-                                <div>
-                                    <b>${u}</b> 
-                                    ${isAdmin ? '<span class="badge-admin">ADMIN UTAMA</span>' : ''}
-                                </div>
-                                <span style="font-weight: 800; color: #f39c12;">${user.points} Poin</span>
-                            </div>
-                            <div class="btn-group">
-                                <button class="btn-sm bg-edit" onclick="adminEditUser('${u}')">Edit Akun</button>
-                                <button class="btn-sm bg-add" onclick="adminAddPoints('${u}')">${isAdmin ? 'Set Poin' : '+ Poin'}</button>
-                                ${!isAdmin ? `<button class="btn-sm bg-block" onclick="adminToggleBlock('${u}')">${user.blocked ? 'Unblock' : 'Block'}</button>` : ''}
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            };
-
-            window.adminEditUser = (oldUser) => {
-                const isAdmin = (oldUser === 'admin');
-                let newName = oldUser;
-                
-                if(!isAdmin) {
-                    newName = prompt("Username Baru (Biarkan sama jika tidak ingin ganti):", oldUser);
-                } else {
-                    alert("Username admin utama tidak bisa diubah demi keamanan sistem.");
-                }
-
-                const newPass = prompt("Password Baru (Jangan dikosongkan!):");
-                if(!newName || !newPass) return;
-
-                let db = JSON.parse(localStorage.getItem('quiz_users') || '{}');
-                const userData = db[oldUser];
-                
-                if(!isAdmin && newName !== oldUser) {
-                    delete db[oldUser];
-                }
-                
-                userData.password = newPass;
-                db[newName] = userData;
-                
-                localStorage.setItem('quiz_users', JSON.stringify(db));
-                showToast("Data akun berhasil diupdate!");
-                renderAdminUsers();
-            };
-
-            window.adminAddPoints = (u) => {
-                const amt = parseInt(prompt("Masukkan jumlah poin (Gunakan minus '-' untuk mengurangi):", "100"));
-                if(isNaN(amt)) return;
-                let db = JSON.parse(localStorage.getItem('quiz_users') || '{}');
-                db[u].points += amt;
-                localStorage.setItem('quiz_users', JSON.stringify(db));
-                showToast("Poin diperbarui!");
-                renderAdminUsers();
-                if(u === currentUser) { currentPoints = db[u].points; updateUI(); }
-            };
-
-            window.adminToggleBlock = (u) => {
-                if(u === 'admin') return;
-                let db = JSON.parse(localStorage.getItem('quiz_users') || '{}');
-                db[u].blocked = !db[u].blocked;
-                localStorage.setItem('quiz_users', JSON.stringify(db));
-                showToast(db[u].blocked ? "User diblokir!" : "Akses user dipulihkan!");
-                renderAdminUsers();
-            };
-
-            window.logout = () => {
-                localStorage.removeItem('quiz_session');
-                location.reload();
-            };
-
-            // --- AUTH LOGIC ---
-            document.getElementById('btn-auth-action').onclick = () => {
-                const u = document.getElementById('username').value.trim().toLowerCase();
-                const p = document.getElementById('password').value;
-                const isLogin = document.getElementById('auth-title').innerText === "Welcome";
-                let db = JSON.parse(localStorage.getItem('quiz_users') || '{}');
-
-                if(isLogin) {
-                    if(db[u] && db[u].password === p) {
-                        if(db[u].blocked) return showToast("AKUN ANDA DIBLOKIR!");
-                        currentUser = u; currentPoints = db[u].points;
-                        startApp();
-                    } else showToast("Username atau Password salah!");
-                } else {
-                    if(db[u]) return showToast("Username sudah terdaftar!");
-                    db[u] = { password: p, points: 0, history: [], blocked: false };
-                    localStorage.setItem('quiz_users', JSON.stringify(db));
-                    showToast("Pendaftaran sukses! Silakan login.");
-                    document.getElementById('auth-link').click();
-                }
-            };
-
-            const startApp = () => {
-                localStorage.setItem('quiz_session', JSON.stringify({user: currentUser, points: currentPoints}));
-                document.getElementById('auth-page').style.display = 'none';
-                document.getElementById('app').style.display = 'flex';
-                document.getElementById('nav-container').style.display = 'flex';
-                updateUI(); generateQuiz();
-            };
-
-            // --- QUIZ LOGIC ---
-            const generateQuiz = () => {
-                document.getElementById('ad-btn').disabled = true;
-                const a = Math.floor(Math.random()*50), b = Math.floor(Math.random()*50), ans = a+b;
-                document.getElementById('q-text').innerText = `${a} + ${b}`;
-                const grid = document.getElementById('q-options'); grid.innerHTML = '';
-                [ans, ans+Math.floor(Math.random()*5)+1, ans-Math.floor(Math.random()*5)-1, ans+10].sort(()=>Math.random()-0.5).forEach(o => {
-                    const btn = document.createElement('button'); btn.innerText = o;
-                    btn.style.padding = '15px'; btn.style.borderRadius = '15px'; btn.style.border = '1px solid #ddd'; btn.style.fontWeight = '800'; btn.style.background = 'white';
-                    btn.onclick = () => {
-                        if(o === ans) { 
-                            btn.style.background = '#00b894'; btn.style.color = 'white'; 
-                            document.getElementById('ad-btn').disabled = false;
-                            grid.querySelectorAll('button').forEach(b => b.onclick = null);
-                        } else { 
-                            btn.style.background = '#ff7675'; btn.style.color = 'white';
-                            setTimeout(generateQuiz, 800); 
-                        }
-                    };
-                    grid.appendChild(btn);
-                });
-            };
-
-            document.getElementById('ad-btn').onclick = () => {
-                currentPoints += 50;
-                let db = JSON.parse(localStorage.getItem('quiz_users') || '{}');
-                db[currentUser].points = currentPoints;
-                localStorage.setItem('quiz_users', JSON.stringify(db));
-                updateUI(); showToast("+50 Poin Berhasil Masuk!"); generateQuiz();
-            };
-
-            window.handleWithdraw = () => {
-                const amt = parseInt(document.getElementById('wd-amount').value);
-                const phone = document.getElementById('wd-phone').value;
-                if(!amt || amt < 1000) return showToast("Minimal penarikan 1000 poin!");
-                if(!phone) return showToast("Masukkan nomor DANA!");
-                if(amt > currentPoints) return showToast("Poin Anda tidak cukup!");
-                
-                currentPoints -= amt;
-                let db = JSON.parse(localStorage.getItem('quiz_users') || '{}');
-                db[currentUser].points = currentPoints;
-                db[currentUser].history = db[currentUser].history || [];
-                db[currentUser].history.unshift({amt, phone, status: 'Pending', date: new Date().toLocaleDateString()});
-                
-                localStorage.setItem('quiz_users', JSON.stringify(db));
-                updateUI(); showToast("Permintaan WD sedang diproses!");
-                document.getElementById('wd-amount').value = '';
-                document.getElementById('wd-phone').value = '';
-            };
-
-            // --- NAV LOGIC ---
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.onclick = function() {
-                    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-                    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-                    this.classList.add('active');
-                    document.getElementById(this.dataset.page).classList.add('active');
+        // --- QUIZ SYSTEM ---
+        const generateQuiz = () => {
+            document.getElementById('ad-btn').disabled = true;
+            document.getElementById('next-btn').style.display = 'none';
+            const a = Math.floor(Math.random()*50), b = Math.floor(Math.random()*50);
+            currentAns = a + b;
+            document.getElementById('q-text').innerText = `${a} + ${b}`;
+            const grid = document.getElementById('q-options'); grid.innerHTML = '';
+            
+            [currentAns, currentAns+2, currentAns-3, currentAns+5].sort(()=>Math.random()-0.5).forEach(o => {
+                const b = document.createElement('button');
+                b.className = 'opt-btn'; b.innerText = o;
+                b.onclick = () => {
+                    if(o === currentAns) {
+                        floatingNotif('success', 'BENAR! + SILAKAN KLAIM');
+                        document.getElementById('ad-btn').disabled = false;
+                        grid.querySelectorAll('button').forEach(btn => btn.onclick = null);
+                    } else {
+                        floatingNotif('error', 'SALAH! COBA LAGI');
+                        setTimeout(generateQuiz, 1000);
+                    }
                 };
+                grid.appendChild(b);
+            });
+        };
+
+        document.getElementById('ad-btn').onclick = function() {
+            if(typeof show_9865183 === 'function') {
+                show_9865183().then(() => {
+                    processClaim();
+                }).catch(() => processClaim()); // Fallback jika iklan gagal load
+            } else {
+                processClaim();
+            }
+        };
+
+        const processClaim = () => {
+            currentPoints += 50;
+            saveData();
+            updateUI();
+            showToast("+50 Poin Berhasil Diklaim!");
+            document.getElementById('ad-btn').disabled = true;
+            document.getElementById('next-btn').style.display = 'block';
+        };
+
+        document.getElementById('next-btn').onclick = generateQuiz;
+
+        // --- WITHDRAW SYSTEM ---
+        window.handleWithdraw = () => {
+            const amt = parseInt(document.getElementById('wd-amount').value);
+            const phone = document.getElementById('wd-phone').value;
+            if(!amt || amt < 1000 || amt > currentPoints) return showToast("Poin tidak cukup/Data salah");
+
+            currentPoints -= amt;
+            let db = JSON.parse(localStorage.getItem('quiz_users') || '{}');
+            const wdEntry = {
+                id: Date.now(),
+                user: currentUser,
+                amount: amt,
+                phone: phone,
+                status: 'Pending',
+                date: new Date().toLocaleDateString(),
+                note: ''
+            };
+            db[currentUser].points = currentPoints;
+            db[currentUser].history = db[currentUser].history || [];
+            db[currentUser].history.unshift(wdEntry);
+            
+            localStorage.setItem('quiz_users', JSON.stringify(db));
+            updateUI();
+            showToast("Pengajuan dikirim!");
+        };
+
+        const renderUserHistory = () => {
+            const container = document.getElementById('history-list');
+            let db = JSON.parse(localStorage.getItem('quiz_users') || '{}');
+            const hist = db[currentUser]?.history || [];
+            container.innerHTML = hist.map(h => `
+                <div class="hist-item">
+                    <div style="display:flex; justify-content:space-between">
+                        <b>DANA: ${h.phone}</b>
+                        <span class="status-badge st-${h.status.toLowerCase()}">${h.status}</span>
+                    </div>
+                    <div style="margin-top:5px; opacity:0.7">
+                        ${h.amount} Poin • ${h.date}
+                        ${h.note ? `<br><i style="color:var(--accent)">Catatan: ${h.note}</i>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        };
+
+        // --- ADMIN SYSTEM ---
+        const renderAdmin = () => {
+            let db = JSON.parse(localStorage.getItem('quiz_users') || '{}');
+            
+            // Render WD List
+            const wdCont = document.getElementById('admin-wd-list');
+            let allWd = [];
+            Object.keys(db).forEach(u => {
+                if(db[u].history) db[u].history.forEach(h => { if(h.status === 'Pending') allWd.push(h); });
             });
 
-            document.getElementById('auth-link').onclick = function() {
-                const isL = document.getElementById('auth-title').innerText === "Welcome";
-                document.getElementById('auth-title').innerText = isL ? "Daftar" : "Welcome";
-                this.innerText = isL ? "Login" : "Daftar";
-            };
+            wdCont.innerHTML = allWd.map(w => `
+                <div class="hist-item">
+                    <b>${w.user} (${w.phone})</b><br>
+                    Jumlah: ${w.amount} Poin
+                    <div style="display:flex; gap:5px; margin-top:10px">
+                        <button class="btn-sm" style="background:var(--success); color:white; border:none; padding:5px 10px; border-radius:5px" onclick="adminAction('${w.user}', ${w.id}, 'Berhasil')">Setujui</button>
+                        <button class="btn-sm" style="background:var(--danger); color:white; border:none; padding:5px 10px; border-radius:5px" onclick="adminAction('${w.user}', ${w.id}, 'Ditolak')">Tolak</button>
+                    </div>
+                </div>
+            `).join('') || '<p style="font-size:11px; opacity:0.5">Tidak ada antrian.</p>';
+        };
 
-            const sess = localStorage.getItem('quiz_session');
-            if(sess) { 
-                const s = JSON.parse(sess); 
-                let db = JSON.parse(localStorage.getItem('quiz_users') || '{}');
-                if(db[s.user]) {
-                    currentUser = s.user; 
-                    currentPoints = db[s.user].points; 
-                    startApp(); 
+        window.adminAction = (targetUser, wdId, status) => {
+            const note = prompt("Berikan catatan admin (Opsional):", "");
+            let db = JSON.parse(localStorage.getItem('quiz_users') || '{}');
+            const idx = db[targetUser].history.findIndex(x => x.id === wdId);
+            
+            if(idx !== -1) {
+                db[targetUser].history[idx].status = status;
+                db[targetUser].history[idx].note = note || '-';
+                
+                // Kembalikan poin jika ditolak
+                if(status === 'Ditolak') {
+                    db[targetUser].points += db[targetUser].history[idx].amount;
+                    showToast("Poin telah dikembalikan ke user");
                 }
+
+                localStorage.setItem('quiz_users', JSON.stringify(db));
+                if(targetUser === currentUser) currentPoints = db[currentUser].points;
+                updateUI();
+                showToast(`Status diperbarui ke: ${status}`);
             }
+        };
+
+        // --- CORE ---
+        const saveData = () => {
+            let db = JSON.parse(localStorage.getItem('quiz_users') || '{}');
+            db[currentUser].points = currentPoints;
+            localStorage.setItem('quiz_users', JSON.stringify(db));
+            localStorage.setItem('quiz_session', JSON.stringify({user: currentUser, points: currentPoints}));
+        };
+
+        document.getElementById('btn-auth-action').onclick = () => {
+            const u = document.getElementById('username').value.trim().toLowerCase();
+            const p = document.getElementById('password').value;
+            const isL = document.getElementById('auth-title').innerText === "Quiz Earn";
+            let db = JSON.parse(localStorage.getItem('quiz_users') || '{}');
+
+            if(isL) {
+                if(db[u] && db[u].password === p) { currentUser = u; currentPoints = db[u].points; startApp(); }
+                else showToast("Gagal Login!");
+            } else {
+                if(db[u]) return showToast("User sudah ada!");
+                db[u] = { password: p, points: 0, history: [] };
+                localStorage.setItem('quiz_users', JSON.stringify(db));
+                showToast("Daftar Berhasil!"); document.getElementById('auth-link').click();
+            }
+        };
+
+        const startApp = () => {
+            document.getElementById('auth-page').style.display = 'none';
+            document.getElementById('app').style.display = 'flex';
+            document.getElementById('nav-container').style.display = 'flex';
+            updateUI(); generateQuiz();
+        };
+
+        window.logout = () => { localStorage.removeItem('quiz_session'); location.reload(); };
+
+        document.getElementById('auth-link').onclick = function() {
+            const isL = document.getElementById('auth-title').innerText === "Quiz Earn";
+            document.getElementById('auth-title').innerText = isL ? "Daftar Akun" : "Quiz Earn";
+            this.innerText = isL ? "Sudah punya akun? Masuk" : "Belum punya akun? Daftar";
+        };
+
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.onclick = function() {
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                this.classList.add('active');
+                document.getElementById(this.dataset.page).classList.add('active');
+            };
         });
+
+        const sess = localStorage.getItem('quiz_session');
+        if(sess) {
+            const s = JSON.parse(sess);
+            let db = JSON.parse(localStorage.getItem('quiz_users') || '{}');
+            if(db[s.user]) { currentUser = s.user; currentPoints = db[s.user].points; startApp(); }
+        }
     </script>
 </body>
 </html>
