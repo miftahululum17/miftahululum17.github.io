@@ -1,360 +1,39 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Premium Quiz App</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src='//libtl.com/sdk.js' data-zone='9865183' data-sdk='show_9865183'></script>
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+// --- FUNGSI LOGOUT YANG DIPERBAIKI ---
+function handleLogout() {
+    // Menggunakan konfirmasi bawaan browser yang lebih stabil untuk Mini App
+    const yakin = confirm("Apakah Anda yakin ingin keluar?");
     
-    <style>
-        :root {
-            --primary: #0088cc;
-            --accent: #6c5ce7;
-            --success: #00b894;
-            --danger: #ff7675;
-            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            --card-glass: rgba(255, 255, 255, 0.7);
-            --text: #2d3436;
-        }
-
-        /* Reset & Base */
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body {
-            background: var(--bg-gradient);
-            color: var(--text);
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        /* --- AUTH PAGE ESTETIK --- */
-        #auth-page {
-            position: fixed; inset: 0; background: var(--bg-gradient);
-            z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 25px;
-        }
-        .auth-card {
-            background: var(--card-glass);
-            backdrop-filter: blur(15px);
-            padding: 40px 30px;
-            border-radius: 32px;
-            width: 100%;
-            max-width: 350px;
-            border: 1px solid rgba(255,255,255,0.4);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-        .input-group input {
-            width: 100%; padding: 14px 18px; border-radius: 16px;
-            border: 1px solid rgba(0,0,0,0.05); background: rgba(255,255,255,0.5);
-            margin-top: 8px; outline: none; transition: 0.3s;
-        }
-        .input-group input:focus { border-color: var(--primary); background: white; }
-
-        /* --- MAIN APP LAYOUT --- */
-        #app { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .page { display: none; width: 100%; max-width: 400px; }
-        .page.active { display: block; animation: fadeUp 0.5s cubic-bezier(0.23, 1, 0.32, 1); }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Glass Card */
-        .card {
-            background: var(--card-glass);
-            backdrop-filter: blur(20px);
-            border-radius: 35px;
-            padding: 25px;
-            border: 1px solid rgba(255,255,255,0.5);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
-            text-align: center;
-        }
-
-        .user-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-        .user-info { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; }
-        .logout-mini { color: var(--danger); font-size: 22px; cursor: pointer; opacity: 0.7; transition: 0.2s; }
-        .logout-mini:hover { opacity: 1; }
-
-        .question {
-            font-size: 3.5rem; font-weight: 800; margin: 20px 0;
-            background: linear-gradient(to bottom, var(--primary), var(--accent));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
-
-        /* Buttons Style */
-        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
-        .opt-btn {
-            background: white; border: none; padding: 18px; border-radius: 20px;
-            font-size: 1.2rem; font-weight: 800; color: var(--text);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.02); transition: 0.3s; cursor: pointer;
-        }
-        .opt-btn:active { transform: scale(0.95); }
-        .opt-btn.correct { background: var(--success); color: white; box-shadow: 0 10px 20px rgba(0,184,148,0.3); }
-        .opt-btn.wrong { background: var(--danger); color: white; }
-
-        .btn-main {
-            background: linear-gradient(to right, var(--primary), var(--accent));
-            color: white; border: none; padding: 16px; border-radius: 20px;
-            font-weight: 700; width: 100%; display: flex; align-items: center;
-            justify-content: center; gap: 10px; box-shadow: 0 10px 20px rgba(108,92,231,0.2);
-        }
-        .btn-main:disabled { background: #d1d8e0; box-shadow: none; opacity: 0.7; }
-
-        /* --- FLOATING NAVBAR --- */
-        .nav-container { padding-bottom: 30px; display: flex; justify-content: center; }
-        .navbar {
-            background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
-            display: flex; gap: 10px; padding: 10px 20px; border-radius: 50px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid white;
-        }
-        .nav-item {
-            display: flex; flex-direction: column; align-items: center; width: 60px;
-            color: #b2bec3; cursor: pointer; transition: 0.3s;
-        }
-        .nav-item i { font-size: 24px; }
-        .nav-item span { font-size: 10px; font-weight: 800; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .nav-item.active { color: var(--accent); transform: translateY(-3px); }
-
-        /* Toast */
-        #toast-container { position: fixed; top: 30px; left: 50%; transform: translateX(-50%); z-index: 9999; }
-        .toast {
-            background: white; color: var(--text); padding: 12px 25px; border-radius: 20px;
-            font-weight: 700; font-size: 14px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            border-left: 5px solid var(--primary); animation: slideDown 0.4s ease forwards;
-        }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } }
-    </style>
-</head>
-<body>
-
-    <div id="toast-container"></div>
-
-    <div id="auth-page">
-        <div class="auth-card">
-            <div style="background: var(--primary); width: 60px; height: 60px; border-radius: 20px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(0,136,204,0.3);">
-                <i class='bx bxs-lock-alt' style="color: white; font-size: 30px;"></i>
-            </div>
-            <h2 id="auth-title" style="margin: 0; font-weight: 800;">Masuk Akun</h2>
-            <p id="auth-desc" style="font-size: 14px; opacity: 0.5; margin-bottom: 25px;">Masukkan detail anda</p>
-            
-            <div class="input-group" style="margin-bottom: 15px; text-align: left;">
-                <input type="text" id="username" placeholder="Username">
-            </div>
-            <div class="input-group" style="margin-bottom: 25px; text-align: left;">
-                <input type="password" id="password" placeholder="Password">
-            </div>
-
-            <button class="btn-main" onclick="handleAuth()" id="btn-auth-action">Mulai Bermain</button>
-            
-            <p style="font-size: 13px; margin-top: 20px; font-weight: 600;">
-                <span id="auth-switch-text" style="opacity: 0.5;">Belum punya akun?</span> 
-                <a href="#" onclick="toggleAuthMode()" id="auth-link" style="color: var(--accent); text-decoration: none;">Daftar</a>
-            </p>
-        </div>
-    </div>
-
-    <div id="app">
-        <section id="quiz" class="page active">
-            <div class="card">
-                <div class="user-header">
-                    <div class="user-info">
-                        <div style="width: 35px; height: 35px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
-                            <i class='bx bxs-user' style="color: var(--primary);"></i>
-                        </div>
-                        <span class="curr-user-display">User</span>
-                    </div>
-                    <i class='bx bx-power-off logout-mini' onclick="handleLogout()"></i>
-                </div>
-
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: rgba(255,255,255,0.4); padding: 10px 15px; border-radius: 20px;">
-                    <span style="font-size: 12px; font-weight: 800; opacity: 0.4;">SALDO POIN</span>
-                    <div style="font-weight: 800; color: #f39c12;"><i class='bx bxs-coin-stack'></i> <span id="mini-poin">0</span></div>
-                </div>
-
-                <div class="question" id="q-text">-- + --</div>
-                <div class="options-grid" id="q-options"></div>
-                
-                <div style="margin-top: 20px;">
-                    <button id="ad-btn" class="btn-main" onclick="handleAd()" disabled>
-                        <i class='bx bxs-zap'></i> Ambil Bonus +50
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <section id="poin" class="page">
-            <div class="card">
-                <h3 style="opacity: 0.5; margin-bottom: 5px;">Total Saldo</h3>
-                <div style="font-size: 4rem; font-weight: 800; color: #f39c12; margin-bottom: 20px;" id="user-poin">0</div>
-                <div style="background: white; padding: 20px; border-radius: 25px; display: flex; align-items: center; gap: 15px; text-align: left;">
-                    <i class='bx bxs-info-circle' style="font-size: 24px; color: var(--primary);"></i>
-                    <span style="font-size: 13px; font-weight: 600; opacity: 0.7;">Kumpulkan poin untuk menukarkannya dengan hadiah menarik.</span>
-                </div>
-            </div>
-        </section>
-
-        <section id="saya" class="page">
-            <div class="card">
-                <div style="position: relative; width: 100px; height: 100px; margin: 0 auto 20px;">
-                    <div style="width: 100%; height: 100%; background: white; border-radius: 35px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 2px solid white;">
-                        <i class='bx bxs-user-detail' style="font-size: 50px; color: var(--accent);"></i>
-                    </div>
-                </div>
-                <h2 class="curr-user-display" style="margin: 0; font-weight: 800;">User</h2>
-                <p style="opacity: 0.5; font-size: 14px; margin-top: 5px;">Member Premium</p>
-
-                <div style="margin-top: 30px; display: grid; gap: 10px;">
-                    <button class="btn-main" style="background: white; color: var(--text);" onclick="showToast('Fitur segera datang!', 'success')">
-                        <i class='bx bxs-edit'></i> Edit Profil
-                    </button>
-                    <button class="btn-main" style="background: rgba(255, 118, 117, 0.1); color: var(--danger); box-shadow: none;" onclick="handleLogout()">
-                        <i class='bx bx-log-out-circle'></i> Keluar Akun
-                    </button>
-                </div>
-            </div>
-        </section>
-    </div>
-
-    <div class="nav-container">
-        <nav class="navbar">
-            <div class="nav-item active" onclick="navTo('quiz', this)"><i class='bx bxs-dashboard'></i><span>Quiz</span></div>
-            <div class="nav-item" onclick="navTo('poin', this)"><i class='bx bxs-wallet-alt'></i><span>Poin</span></div>
-            <div class="nav-item" onclick="navTo('saya', this)"><i class='bx bxs-smile'></i><span>Saya</span></div>
-        </nav>
-    </div>
-
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-
-        let isLoginMode = true;
-        let currentUser = JSON.parse(localStorage.getItem('session')) || null;
-        let ans, p = 0;
-
-        function toggleAuthMode() {
-            isLoginMode = !isLoginMode;
-            document.getElementById('auth-title').innerText = isLoginMode ? "Masuk Akun" : "Daftar Akun";
-            document.getElementById('btn-auth-action').innerText = isLoginMode ? "Mulai Bermain" : "Daftar Sekarang";
-            document.getElementById('auth-link').innerText = isLoginMode ? "Daftar" : "Login";
-        }
-
-        function handleAuth() {
-            const u = document.getElementById('username').value.trim();
-            const pw = document.getElementById('password').value;
-            if(!u || !pw) return showToast("Data belum lengkap", "error");
+    if (yakin) {
+        // 1. Simpan poin terakhir ke database sebelum hapus sesi
+        if (currentUser) {
             let users = JSON.parse(localStorage.getItem('users_db')) || {};
-
-            if(isLoginMode) {
-                if(users[u] && users[u].password === pw) {
-                    loginSuccess(u, users[u].points);
-                } else {
-                    showToast("Data tidak cocok", "error");
-                }
-            } else {
-                if(users[u]) return showToast("User sudah ada", "error");
-                users[u] = { password: pw, points: 0 };
-                localStorage.setItem('users_db', JSON.stringify(users));
-                showToast("Daftar berhasil!", "success");
-                toggleAuthMode();
-            }
-        }
-
-        function loginSuccess(username, points) {
-            currentUser = username;
-            p = points;
-            localStorage.setItem('session', JSON.stringify({username, points}));
-            document.getElementById('auth-page').style.display = 'none';
-            document.querySelectorAll('.curr-user-display').forEach(el => el.innerText = username);
-            refreshPoin();
-            initQuiz();
-            showToast("Berhasil masuk!", "success");
-        }
-
-        function handleLogout() {
-            tg.showConfirm("Ingin keluar dari aplikasi?", (res) => {
-                if(res) {
-                    localStorage.removeItem('session');
-                    location.reload();
-                }
-            });
-        }
-
-        function showToast(msg, type) {
-            const container = document.getElementById('toast-container');
-            const t = document.createElement('div');
-            t.className = 'toast';
-            if(type === 'error') t.style.borderLeftColor = 'var(--danger)';
-            t.innerText = msg;
-            container.appendChild(t);
-            setTimeout(() => t.remove(), 2500);
-        }
-
-        function navTo(id, el) {
-            document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            el.classList.add('active');
-            tg.HapticFeedback.impactOccurred('medium');
-        }
-
-        function refreshPoin() {
-            document.getElementById('mini-poin').innerText = p.toLocaleString();
-            document.getElementById('user-poin').innerText = p.toLocaleString();
-            if(currentUser) {
-                let users = JSON.parse(localStorage.getItem('users_db'));
+            if (users[currentUser]) {
                 users[currentUser].points = p;
                 localStorage.setItem('users_db', JSON.stringify(users));
             }
         }
 
-        function initQuiz() {
-            document.getElementById('ad-btn').disabled = true;
-            const a = Math.floor(Math.random() * 50) + 1, b = Math.floor(Math.random() * 50) + 1;
-            ans = a + b;
-            document.getElementById('q-text').innerText = `${a} + ${b}`;
-            let opts = [ans];
-            while(opts.length < 4) {
-                let w = ans + (Math.floor(Math.random() * 10) - 5);
-                if(w !== ans && w > 0 && !opts.includes(w)) opts.push(w);
-            }
-            opts.sort(() => Math.random() - 0.5);
-            const cont = document.getElementById('q-options');
-            cont.innerHTML = '';
-            opts.forEach(o => {
-                const btn = document.createElement('button');
-                btn.className = 'opt-btn'; btn.innerText = o;
-                btn.onclick = () => {
-                    if(o === ans) {
-                        btn.classList.add('correct'); showToast("Jawaban Benar!", "success");
-                        p += 5; refreshPoin(); document.getElementById('ad-btn').disabled = false;
-                        document.querySelectorAll('.opt-btn').forEach(x => x.onclick = null);
-                        tg.HapticFeedback.notificationOccurred('success');
-                    } else {
-                        btn.classList.add('wrong'); showToast("Jawaban Salah", "error");
-                        tg.HapticFeedback.notificationOccurred('error');
-                        setTimeout(initQuiz, 1000);
-                    }
-                };
-                cont.appendChild(btn);
-            });
-        }
+        // 2. Hapus data sesi login
+        localStorage.removeItem('session');
+        
+        // 3. Reset variabel global
+        currentUser = null;
+        p = 0;
 
-        function handleAd() {
-            document.getElementById('ad-btn').disabled = true;
-            show_9865183().then(() => {
-                p += 50; refreshPoin(); showToast("Bonus +50 Berhasil!", "success"); initQuiz();
-            }).catch(() => { initQuiz(); });
-        }
+        // 4. Paksa refresh halaman untuk kembali ke tampilan Auth (Login)
+        window.location.reload();
+    }
+}
 
-        if(currentUser) {
-            loginSuccess(currentUser.username, currentUser.points);
-        }
-    </script>
-</body>
-</html>
+// --- PERBAIKAN INISIALISASI SESI (DI BAGIAN PALING BAWAH SCRIPT) ---
+window.onload = function() {
+    const sessionData = localStorage.getItem('session');
+    if (sessionData) {
+        const session = JSON.parse(sessionData);
+        // Pastikan memanggil fungsi loginSuccess dengan data yang benar
+        loginSuccess(session.username, session.points);
+    } else {
+        // Jika tidak ada sesi, pastikan halaman auth tampil
+        document.getElementById('auth-page').style.display = 'flex';
+    }
+};
