@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Reward - Professional Admin Panel v2</title>
+    <title>Quiz Reward Pro - Auto Sync & Broadcast</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <script src='//libtl.com/sdk.js' data-zone='9865183' data-sdk='show_9865183'></script>
     <style>
         .glass { background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        body { background: #0a0f1e; min-height: 100vh; color: white; font-family: sans-serif; }
+        body { background: #070b14; min-height: 100vh; color: white; font-family: sans-serif; overflow-x: hidden; }
         .toast-box { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; padding: 12px 25px; border-radius: 50px; font-weight: bold; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .hide-section { display: none !important; }
         .status-pending { background: rgba(234, 179, 8, 0.2); color: #eab308; }
@@ -23,29 +23,38 @@
 
     <div id="toast" class="hidden toast-box animate__animated"></div>
 
+    <div id="broadcast-modal" class="hidden fixed inset-0 z-[1000] flex items-center justify-center p-6">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-md"></div>
+        <div class="glass w-full max-w-sm p-8 rounded-[2.5rem] text-center relative animate__animated animate__bounceIn">
+            <span class="text-5xl block mb-4">📢</span>
+            <h2 class="text-xl font-black mb-2 text-blue-400">PENGUMUMAN</h2>
+            <p id="broadcast-text" class="text-sm opacity-80 mb-6 font-medium">---</p>
+            <button onclick="closeBroadcast()" class="w-full bg-blue-600 py-3 rounded-2xl font-bold">Oke, Mengerti</button>
+        </div>
+    </div>
+
     <div id="setup-page" class="hide-section flex items-center justify-center min-h-screen px-4">
-        <div class="glass w-full max-w-sm p-8 rounded-[2rem] text-center border-t-4 border-red-600">
-            <h2 class="text-2xl font-black mb-4 text-red-500">SET ADMIN BARU</h2>
-            <p class="text-xs opacity-60 mb-6">Buat akun Admin utama aplikasi Anda.</p>
-            <input type="text" id="setup-user" placeholder="Admin Username" class="w-full p-4 rounded-2xl bg-white/5 mb-3 outline-none border border-white/10">
-            <input type="password" id="setup-pass" placeholder="Admin Password" class="w-full p-4 rounded-2xl bg-white/5 mb-6 outline-none border border-white/10">
-            <button onclick="saveSetupAdmin()" class="w-full bg-red-600 py-4 rounded-2xl font-bold">SIMPAN ADMIN</button>
+        <div class="glass w-full max-w-sm p-8 rounded-[2rem] text-center border-t-4 border-blue-600">
+            <h2 class="text-2xl font-black mb-4">SETUP ADMIN</h2>
+            <input type="text" id="setup-user" placeholder="Username Admin" class="w-full p-4 rounded-2xl bg-white/5 mb-3 border border-white/10 outline-none">
+            <input type="password" id="setup-pass" placeholder="Password Admin" class="w-full p-4 rounded-2xl bg-white/5 mb-6 border border-white/10 outline-none">
+            <button onclick="saveSetupAdmin()" class="w-full bg-blue-600 py-4 rounded-2xl font-bold">MULAI APLIKASI</button>
         </div>
     </div>
 
     <div id="auth-page" class="flex items-center justify-center min-h-screen px-4">
-        <div class="glass w-full max-w-sm p-8 rounded-[2rem] shadow-2xl animate__animated animate__zoomIn">
-            <h2 id="auth-title" class="text-3xl font-black text-center mb-8 tracking-tighter uppercase">Masuk</h2>
+        <div class="glass w-full max-w-sm p-8 rounded-[2rem] shadow-2xl animate__animated animate__fadeIn">
+            <h2 id="auth-title" class="text-3xl font-black text-center mb-8 uppercase tracking-widest">Login</h2>
             <div class="space-y-4">
-                <input type="text" id="user-input" placeholder="Username" class="w-full p-4 rounded-2xl bg-white/5 border border-white/10 outline-none focus:border-blue-500">
-                <input type="password" id="pass-input" placeholder="Password" class="w-full p-4 rounded-2xl bg-white/5 border border-white/10 outline-none focus:border-blue-500">
+                <input type="text" id="user-input" placeholder="Username" class="w-full p-4 rounded-2xl bg-white/5 border border-white/10 outline-none">
+                <input type="password" id="pass-input" placeholder="Password" class="w-full p-4 rounded-2xl bg-white/5 border border-white/10 outline-none">
                 <div id="login-area">
-                    <button onclick="doLogin()" class="w-full bg-blue-600 py-4 rounded-2xl font-bold shadow-lg">Login</button>
-                    <p class="text-center mt-4 text-sm opacity-60">Belum punya akun? <button onclick="switchAuth(false)" class="text-blue-400 font-bold">Daftar</button></p>
+                    <button onclick="doLogin()" class="w-full bg-blue-600 py-4 rounded-2xl font-bold">MASUK</button>
+                    <p class="text-center mt-4 text-xs opacity-50">Belum punya akun? <button onclick="switchAuth(false)" class="text-blue-400 font-bold">Daftar</button></p>
                 </div>
                 <div id="reg-area" class="hidden">
-                    <button onclick="doRegister()" class="w-full bg-purple-600 py-4 rounded-2xl font-bold">Daftar Akun</button>
-                    <p class="text-center mt-4 text-sm opacity-60">Sudah punya akun? <button onclick="switchAuth(true)" class="text-purple-400 font-bold">Login</button></p>
+                    <button onclick="doRegister()" class="w-full bg-purple-600 py-4 rounded-2xl font-bold">DAFTAR</button>
+                    <p class="text-center mt-4 text-xs opacity-50">Sudah punya akun? <button onclick="switchAuth(true)" class="text-purple-400 font-bold">Login</button></p>
                 </div>
             </div>
         </div>
@@ -53,50 +62,43 @@
 
     <main id="main-app" class="hide-section pb-24">
         <div class="p-6 flex justify-between items-center glass m-4 rounded-3xl border-b-2 border-blue-500/30">
-            <div>
-                <p class="text-[10px] text-blue-400 font-bold uppercase tracking-widest">Username</p>
-                <h3 id="display-name" class="font-bold text-lg">---</h3>
-            </div>
-            <div class="text-right">
-                <p class="text-[10px] text-yellow-400 font-bold uppercase tracking-widest">Total Poin</p>
-                <h3 id="display-points" class="text-2xl font-black text-yellow-400">0</h3>
-            </div>
+            <div><p class="text-[10px] text-blue-400 font-bold">MEMBER</p><h3 id="display-name" class="font-bold">---</h3></div>
+            <div class="text-right"><p class="text-[10px] text-yellow-400 font-bold">SALDO POIN</p><h3 id="display-points" class="text-2xl font-black text-yellow-400">0</h3></div>
         </div>
 
         <div id="quiz-view" class="px-6 mt-6">
-            <div class="glass p-10 rounded-[3rem] text-center border border-white/5 shadow-2xl">
-                <h1 id="question" class="text-6xl font-black mb-10 tracking-tighter">0 + 0</h1>
-                <div id="options-grid" class="grid grid-cols-2 gap-4 mb-8"></div>
-                <button id="ad-btn" disabled onclick="playAd()" class="w-full bg-gray-800 text-gray-500 py-4 rounded-2xl font-bold">🎁 KLAIM HADIAH (ADS)</button>
+            <div class="glass p-10 rounded-[3rem] text-center shadow-2xl">
+                <h1 id="question" class="text-6xl font-black mb-10">0 + 0</h1>
+                <div id="options-grid" class="grid grid-cols-2 gap-4"></div>
+                <button id="ad-btn" disabled onclick="playAd()" class="w-full mt-8 bg-gray-800 text-gray-500 py-4 rounded-2xl font-bold">🎁 KLAIM REWARD (ADS)</button>
             </div>
         </div>
 
-        <div id="points-view" class="hide-section px-6 mt-6">
+        <div id="points-view" class="hide-section px-6 mt-6 animate__animated animate__fadeIn">
             <div class="glass p-6 rounded-3xl mb-6">
-                <h3 class="font-bold mb-4">Tarik Saldo DANA</h3>
-                <input type="number" id="wd-amount" placeholder="Jumlah Poin" class="w-full p-4 rounded-2xl bg-white/5 mb-3 border border-white/10 outline-none">
-                <input type="text" id="wd-dana" placeholder="Nomor DANA" class="w-full p-4 rounded-2xl bg-white/5 mb-3 border border-white/10 outline-none">
-                <input type="text" id="wd-name" placeholder="Nama Akun" class="w-full p-4 rounded-2xl bg-white/5 mb-4 border border-white/10 outline-none">
-                <button onclick="submitWD()" class="w-full bg-green-600 py-4 rounded-2xl font-bold">Ajukan Sekarang</button>
+                <h3 class="font-bold mb-4">Tarik ke DANA</h3>
+                <input type="number" id="wd-amount" placeholder="Jumlah Poin" class="w-full p-4 rounded-xl bg-white/5 mb-3 outline-none border border-white/10">
+                <input type="text" id="wd-dana" placeholder="No DANA" class="w-full p-4 rounded-xl bg-white/5 mb-3 outline-none border border-white/10">
+                <input type="text" id="wd-name" placeholder="Nama Akun" class="w-full p-4 rounded-xl bg-white/5 mb-4 outline-none border border-white/10">
+                <button onclick="submitWD()" class="w-full bg-green-600 py-4 rounded-xl font-bold">Kirim Penarikan</button>
             </div>
-            <h3 class="font-bold mb-4 px-2">Riwayat Anda</h3>
+            <h3 class="font-bold mb-4 px-2">Riwayat Transaksi</h3>
             <div id="user-history" class="space-y-3"></div>
         </div>
     </main>
 
     <div id="admin-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/95 backdrop-blur-md" onclick="closeAdmin()"></div>
-        <div class="glass w-full max-w-2xl max-h-[90vh] rounded-[2.5rem] p-8 relative overflow-hidden flex flex-col animate__animated animate__fadeInUp">
+        <div class="glass w-full max-w-2xl max-h-[90vh] rounded-[2.5rem] p-8 relative flex flex-col">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-black text-red-500 uppercase italic">Admin Panel</h2>
-                <button onclick="closeAdmin()" class="text-3xl text-gray-500 hover:text-white">&times;</button>
+                <h2 class="text-xl font-black text-red-500 uppercase tracking-tighter italic">Control Center</h2>
+                <button onclick="closeAdmin()" class="text-2xl opacity-50">&times;</button>
             </div>
-            
             <div class="flex space-x-2 mb-6">
-                <button onclick="switchAdminTab('users')" id="tab-u" class="flex-1 bg-red-600 py-3 rounded-2xl font-bold text-xs">DAFTAR USER</button>
-                <button onclick="switchAdminTab('wd')" id="tab-w" class="flex-1 bg-white/10 py-3 rounded-2xl font-bold text-xs opacity-50">PENARIKAN</button>
+                <button onclick="switchAdminTab('users')" id="tab-u" class="flex-1 bg-red-600 py-3 rounded-xl font-bold text-[10px]">USERS</button>
+                <button onclick="switchAdminTab('wd')" id="tab-w" class="flex-1 bg-white/10 py-3 rounded-xl font-bold text-[10px] opacity-50">WITHDRAW</button>
+                <button onclick="adminBroadcast()" class="flex-1 bg-blue-600 py-3 rounded-xl font-bold text-[10px]">BROADCAST</button>
             </div>
-
             <div id="admin-content" class="overflow-y-auto flex-1 pr-2 custom-scrollbar"></div>
         </div>
     </div>
@@ -104,31 +106,44 @@
     <nav id="bottom-nav" class="hidden fixed bottom-0 left-0 right-0 glass border-t border-white/5 p-4 flex justify-around items-center rounded-t-[2.5rem] z-50">
         <div onclick="showSection('quiz')" id="nav-quiz" class="flex flex-col items-center cursor-pointer text-blue-500"><span class="text-2xl">🎮</span><span class="text-[10px] font-bold">QUIZ</span></div>
         <div onclick="showSection('points')" id="nav-points" class="flex flex-col items-center cursor-pointer opacity-30"><span class="text-2xl">💰</span><span class="text-[10px] font-bold">POIN</span></div>
-        <div id="admin-btn" class="hidden flex flex-col items-center cursor-pointer text-red-500"><span class="text-2xl animate-pulse">🛡️</span><span class="text-[10px] font-bold text-red-500">ADMIN</span></div>
-        <div onclick="location.reload()" class="flex flex-col items-center cursor-pointer opacity-30"><span class="text-2xl">🚪</span><span class="text-[10px] font-bold">KELUAR</span></div>
+        <div id="admin-btn" class="hidden flex flex-col items-center cursor-pointer text-red-500"><span class="text-2xl">⚙️</span><span class="text-[10px] font-bold">ADMIN</span></div>
+        <div onclick="location.reload()" class="flex flex-col items-center cursor-pointer opacity-30"><span class="text-2xl">🚪</span><span class="text-[10px] font-bold">OUT</span></div>
     </nav>
 
     <script>
-        let db = JSON.parse(localStorage.getItem('quiz_ultimate_v2_db')) || {};
+        let db = JSON.parse(localStorage.getItem('quiz_sync_v3_db')) || { global_broadcast: { msg: "", time: 0 } };
         let activeUser = null;
         let rightAnswer = 0;
         let adminTab = 'users';
+        let currentSection = 'quiz';
+        let lastBroadcastTime = 0;
 
-        // STARTUP
+        // --- SYSTEM CORE ---
         window.onload = () => {
             const hasAdmin = Object.values(db).some(u => u.role === 'admin');
             if(!hasAdmin) {
                 document.getElementById('auth-page').classList.add('hide-section');
                 document.getElementById('setup-page').classList.remove('hide-section');
             }
+            // AUTO SYNC SETTINGS (Setiap 2 Detik)
+            setInterval(syncData, 2000);
         };
 
-        function saveSetupAdmin() {
-            const u = document.getElementById('setup-user').value.trim();
-            const p = document.getElementById('setup-pass').value.trim();
-            if(!u || !p) return notify("Input tidak boleh kosong!", true);
-            db[u] = { pass: p, points: 0, role: 'admin', history: [], blocked: false };
-            saveDB(); location.reload();
+        function syncData() {
+            // Tarik data terbaru dari LocalStorage
+            db = JSON.parse(localStorage.getItem('quiz_sync_v3_db')) || db;
+            
+            if(activeUser) {
+                // Update Points & History Otomatis
+                updatePointsDisplay();
+                if(currentSection === 'points') renderUserHistory();
+                
+                // Cek Broadcast Baru
+                if(db.global_broadcast && db.global_broadcast.time > lastBroadcastTime) {
+                    showBroadcast(db.global_broadcast.msg);
+                    lastBroadcastTime = db.global_broadcast.time;
+                }
+            }
         }
 
         function notify(text, isError = false) {
@@ -136,22 +151,18 @@
             t.innerText = text;
             t.className = `toast-box animate__animated animate__fadeInDown ${isError ? 'bg-red-600' : 'bg-blue-600'}`;
             t.classList.remove('hidden');
-            setTimeout(() => { t.classList.add('hidden'); }, 3000);
+            setTimeout(() => t.classList.add('hidden'), 3000);
         }
 
-        // AUTH & UI
-        function switchAuth(isLogin) {
-            document.getElementById('auth-title').innerText = isLogin ? "Masuk" : "Daftar Akun";
-            document.getElementById('login-area').classList.toggle('hidden', !isLogin);
-            document.getElementById('reg-area').classList.toggle('hidden', isLogin);
-        }
+        function saveDB() { localStorage.setItem('quiz_sync_v3_db', JSON.stringify(db)); }
 
-        function doRegister() {
-            const u = document.getElementById('user-input').value.trim();
-            const p = document.getElementById('pass-input').value.trim();
-            if(db[u]) return notify("Username sudah digunakan!", true);
-            db[u] = { pass: p, points: 0, role: 'user', history: [], blocked: false };
-            saveDB(); notify("Berhasil terdaftar!"); switchAuth(true);
+        // --- AUTH ---
+        function saveSetupAdmin() {
+            const u = document.getElementById('setup-user').value.trim();
+            const p = document.getElementById('setup-pass').value.trim();
+            if(!u || !p) return notify("Input kosong!", true);
+            db[u] = { pass: p, points: 0, role: 'admin', history: [], blocked: false };
+            saveDB(); location.reload();
         }
 
         function doLogin() {
@@ -159,7 +170,7 @@
             const p = document.getElementById('pass-input').value.trim();
             const user = db[u];
             if(user && user.pass === p) {
-                if(user.blocked) return notify("Akun Anda diblokir!", true);
+                if(user.blocked) return notify("Blocked!", true);
                 activeUser = u;
                 document.getElementById('auth-page').classList.add('hide-section');
                 document.getElementById('main-app').classList.remove('hide-section');
@@ -169,44 +180,55 @@
                     document.getElementById('admin-btn').onclick = openAdmin;
                 }
                 document.getElementById('display-name').innerText = u;
-                updatePointsDisplay(); showSection('quiz');
-            } else { notify("Username atau Password salah!", true); }
+                syncData(); showSection('quiz');
+            } else { notify("Login Gagal!", true); }
         }
 
+        function switchAuth(isL) {
+            document.getElementById('auth-title').innerText = isL ? "Login" : "Daftar";
+            document.getElementById('login-area').classList.toggle('hidden', !isL);
+            document.getElementById('reg-area').classList.toggle('hidden', isL);
+        }
+
+        function doRegister() {
+            const u = document.getElementById('user-input').value.trim();
+            const p = document.getElementById('pass-input').value.trim();
+            if(db[u]) return notify("Username ada!", true);
+            db[u] = { pass: p, points: 0, role: 'user', history: [], blocked: false };
+            saveDB(); notify("Terdaftar!"); switchAuth(true);
+        }
+
+        // --- GAME ---
         function showSection(name) {
+            currentSection = name;
             document.getElementById('quiz-view').classList.toggle('hide-section', name !== 'quiz');
             document.getElementById('points-view').classList.toggle('hide-section', name !== 'points');
             document.getElementById('nav-quiz').style.opacity = name === 'quiz' ? '1' : '0.3';
             document.getElementById('nav-points').style.opacity = name === 'points' ? '1' : '0.3';
             if(name === 'quiz') initQuiz();
-            if(name === 'points') renderUserHistory();
         }
 
-        // GAME LOGIC
         function initQuiz() {
             const adBtn = document.getElementById('ad-btn');
-            adBtn.disabled = true; adBtn.className = "w-full bg-gray-800 text-gray-500 py-4 rounded-2xl font-bold";
-            const a = Math.floor(Math.random() * 100) + 1, b = Math.floor(Math.random() * 100) + 1;
+            adBtn.disabled = true; adBtn.className = "w-full mt-8 bg-gray-800 text-gray-500 py-4 rounded-2xl font-bold";
+            const a = Math.floor(Math.random() * 99), b = Math.floor(Math.random() * 99);
             rightAnswer = a + b;
             document.getElementById('question').innerText = `${a} + ${b}`;
-            let choices = [rightAnswer];
-            while(choices.length < 4) {
-                let ran = rightAnswer + (Math.floor(Math.random() * 15) - 7);
-                if(!choices.includes(ran) && ran > 0) choices.push(ran);
-            }
-            choices.sort(() => Math.random() - 0.5);
             const grid = document.getElementById('options-grid');
             grid.innerHTML = '';
-            choices.forEach(v => {
+            let choices = [rightAnswer];
+            while(choices.length < 4) {
+                let r = rightAnswer + (Math.floor(Math.random() * 10) - 5);
+                if(!choices.includes(r) && r >= 0) choices.push(r);
+            }
+            choices.sort(() => Math.random() - 0.5).forEach(v => {
                 const btn = document.createElement('button');
-                btn.innerText = v;
-                btn.className = "glass p-6 rounded-2xl font-black text-2xl hover:bg-blue-600 transition duration-300";
+                btn.innerText = v; btn.className = "glass p-6 rounded-2xl font-black text-2xl hover:bg-blue-600 transition";
                 btn.onclick = () => {
                     if(v === rightAnswer) {
-                        notify("BENAR! Klaim sekarang.");
-                        adBtn.disabled = false;
-                        adBtn.className = "w-full bg-yellow-500 text-black py-4 rounded-2xl font-black shadow-lg animate__animated animate__tada cursor-pointer";
-                    } else { notify("Jawaban Salah!", true); }
+                        notify("Benar!"); adBtn.disabled = false;
+                        adBtn.className = "w-full mt-8 bg-yellow-500 text-black py-4 rounded-2xl font-black animate__animated animate__heartBeat cursor-pointer";
+                    } else notify("Salah!", true);
                 };
                 grid.appendChild(btn);
             });
@@ -215,52 +237,42 @@
         function playAd() {
             show_9865183().then(() => {
                 db[activeUser].points += 5; saveDB(); updatePointsDisplay();
-                notify("Poin Berhasil Ditambah!"); initQuiz();
-            }).catch(() => notify("Gagal memuat iklan", true));
+                notify("+5 Poin!"); initQuiz();
+            }).catch(() => notify("Ads Error", true));
         }
 
-        // WITHDRAW LOGIC
+        // --- WITHDRAW ---
         function submitWD() {
             const amount = parseInt(document.getElementById('wd-amount').value);
             const num = document.getElementById('wd-dana').value.trim();
             const name = document.getElementById('wd-name').value.trim();
-            if(!amount || !num || !name) return notify("Lengkapi data penarikan!", true);
-            if(db[activeUser].points < amount) return notify("Saldo poin tidak cukup!", true);
-            
+            if(db[activeUser].points < amount || !amount) return notify("Poin kurang!", true);
             db[activeUser].points -= amount;
-            const entry = { id: Date.now(), user: activeUser, amount, num, name, status: 'Pending', note: '' };
-            db[activeUser].history.unshift(entry);
-            saveDB(); updatePointsDisplay(); renderUserHistory();
-            notify("Pengajuan terkirim!");
+            db[activeUser].history.unshift({ id: Date.now(), user: activeUser, amount, num, name, status: 'Pending', note: '' });
+            saveDB(); renderUserHistory(); notify("Diajukan!");
         }
 
         function renderUserHistory() {
             const cont = document.getElementById('user-history');
             cont.innerHTML = '';
-            db[activeUser].history.forEach(item => {
+            db[activeUser].history.forEach(i => {
                 cont.innerHTML += `
-                    <div class="glass p-4 rounded-2xl border-l-4 ${item.status === 'Pending' ? 'border-yellow-500' : (item.status === 'Diterima' ? 'border-green-500' : 'border-red-500')}">
-                        <div class="flex justify-between items-start mb-2">
-                            <span class="font-bold text-lg">${item.amount} Poin</span>
-                            <span class="text-[10px] px-2 py-1 rounded-lg status-${item.status.toLowerCase()}">${item.status}</span>
-                        </div>
-                        <p class="text-[10px] opacity-60">${item.num} a/n ${item.name}</p>
-                        ${item.note ? `<div class="bg-blue-900/20 p-2 mt-2 rounded-lg text-[10px] text-blue-300">Catatan Admin: ${item.note}</div>` : ''}
-                        <button onclick="delHistory(${item.id})" class="mt-2 text-[10px] text-red-500 font-bold">HAPUS RIWAYAT</button>
-                    </div>`;
+                <div class="glass p-4 rounded-2xl border-l-4 ${i.status==='Pending'?'border-yellow-500':(i.status==='Diterima'?'border-green-500':'border-red-500')}">
+                    <div class="flex justify-between items-start">
+                        <span class="font-bold">${i.amount} Poin</span>
+                        <span class="text-[8px] px-2 py-1 rounded status-${i.status.toLowerCase()}">${i.status}</span>
+                    </div>
+                    <p class="text-[9px] opacity-40">${i.num} | ${i.name}</p>
+                    ${i.note ? `<p class="text-[9px] text-blue-300 mt-2 bg-white/5 p-2 rounded">Note: ${i.note}</p>` : ''}
+                </div>`;
             });
         }
 
-        function delHistory(id) {
-            db[activeUser].history = db[activeUser].history.filter(i => i.id !== id);
-            saveDB(); renderUserHistory(); notify("Berhasil dihapus", true);
-        }
-
-        // ADMIN FUNCTIONS
+        // --- ADMIN ---
         function switchAdminTab(t) {
             adminTab = t;
-            document.getElementById('tab-u').className = t === 'users' ? 'flex-1 bg-red-600 py-3 rounded-2xl font-bold text-xs' : 'flex-1 bg-white/10 py-3 rounded-2xl font-bold text-xs opacity-50';
-            document.getElementById('tab-w').className = t === 'wd' ? 'flex-1 bg-red-600 py-3 rounded-2xl font-bold text-xs' : 'flex-1 bg-white/10 py-3 rounded-2xl font-bold text-xs opacity-50';
+            document.getElementById('tab-u').className = t === 'users' ? 'flex-1 bg-red-600 py-3 rounded-xl font-bold text-[10px]' : 'flex-1 bg-white/10 py-3 rounded-xl font-bold text-[10px] opacity-50';
+            document.getElementById('tab-w').className = t === 'wd' ? 'flex-1 bg-red-600 py-3 rounded-xl font-bold text-[10px]' : 'flex-1 bg-white/10 py-3 rounded-xl font-bold text-[10px] opacity-50';
             renderAdminContent();
         }
 
@@ -269,80 +281,78 @@
             cont.innerHTML = '';
             if(adminTab === 'users') {
                 Object.keys(db).forEach(u => {
+                    if(u === 'global_broadcast') return;
                     const user = db[u];
                     cont.innerHTML += `
-                        <div class="glass p-4 rounded-2xl mb-3 ${user.blocked ? 'opacity-40 grayscale' : ''}">
-                            <div class="flex justify-between mb-3 items-center">
-                                <span class="font-bold text-blue-400 uppercase text-xs">${u}</span>
-                                <span class="bg-yellow-500/10 text-yellow-500 px-3 py-1 rounded-full text-xs font-black">${user.points} PTS</span>
-                            </div>
-                            <div class="flex space-x-2">
-                                <button onclick="adminAction('pass', '${u}')" class="flex-1 bg-blue-600/20 text-blue-400 py-2 rounded-lg text-[9px] font-bold">PASSWORD</button>
-                                <button onclick="adminAction('poin', '${u}')" class="flex-1 bg-yellow-600/20 text-yellow-400 py-2 rounded-lg text-[9px] font-bold">POIN</button>
-                                <button onclick="adminAction('block', '${u}')" class="flex-1 bg-red-600/20 text-red-400 py-2 rounded-lg text-[9px] font-bold">${user.blocked?'UNBLOCK':'BLOCK'}</button>
-                            </div>
-                        </div>`;
+                    <div class="glass p-4 rounded-2xl mb-2 flex justify-between items-center ${user.blocked?'opacity-30':''}">
+                        <div><p class="font-bold text-xs">${u}</p><p class="text-[10px] text-yellow-500">${user.points} Pts</p></div>
+                        <div class="flex space-x-1">
+                            <button onclick="admPass('${u}')" class="bg-blue-600 p-2 rounded text-[8px]">PASS</button>
+                            <button onclick="admPoin('${u}')" class="bg-yellow-600 p-2 rounded text-[8px]">POIN</button>
+                            <button onclick="admBlock('${u}')" class="bg-red-600 p-2 rounded text-[8px]">${user.blocked?'UN':'BLCK'}</button>
+                        </div>
+                    </div>`;
                 });
             } else {
                 Object.keys(db).forEach(u => {
+                    if(u === 'global_broadcast') return;
                     db[u].history.forEach(h => {
                         cont.innerHTML += `
-                            <div class="glass p-4 rounded-2xl mb-3 border-l-4 ${h.status === 'Pending' ? 'border-yellow-500' : (h.status === 'Diterima' ? 'border-green-500' : 'border-red-500')}">
-                                <p class="text-[10px] text-gray-500 mb-1">USER: ${h.user}</p>
-                                <p class="text-sm"><b>${h.amount} Poin</b> | ${h.num} (${h.name})</p>
-                                <p class="text-[10px] mt-1 italic opacity-50">Status: ${h.status}</p>
-                                <div class="flex space-x-2 mt-3">
-                                    ${h.status === 'Pending' ? `
-                                        <button onclick="updateWDStatus('${h.user}', ${h.id}, 'Diterima')" class="bg-green-600 px-4 py-2 rounded-lg text-[10px] font-bold">TERIMA</button>
-                                        <button onclick="updateWDStatus('${h.user}', ${h.id}, 'Ditolak')" class="bg-red-600 px-4 py-2 rounded-lg text-[10px] font-bold">TOLAK</button>
-                                    ` : ''}
-                                    <button onclick="deleteWDAdmin('${h.user}', ${h.id})" class="bg-white/10 px-4 py-2 rounded-lg text-[10px] font-bold text-gray-400">HAPUS LOG</button>
-                                </div>
-                            </div>`;
+                        <div class="glass p-4 rounded-xl mb-2 text-[10px]">
+                            <p><b>USER:</b> ${h.user} | <b>STATUS:</b> ${h.status}</p>
+                            <p>${h.amount} Pts -> ${h.num} (${h.name})</p>
+                            <div class="flex space-x-2 mt-2">
+                                ${h.status==='Pending' ? `
+                                <button onclick="admWD('${h.user}', ${h.id}, 'Diterima')" class="bg-green-600 px-3 py-1 rounded">TERIMA</button>
+                                <button onclick="admWD('${h.user}', ${h.id}, 'Ditolak')" class="bg-red-600 px-3 py-1 rounded">TOLAK</button>
+                                `:''}
+                                <button onclick="admDelLog('${h.user}', ${h.id})" class="bg-white/10 px-3 py-1 rounded text-red-400">HAPUS LOG</button>
+                            </div>
+                        </div>`;
                     });
                 });
             }
         }
 
-        function adminAction(type, u) {
-            if(type === 'pass') {
-                const p = prompt("Password baru untuk " + u);
-                if(p) { db[u].pass = p; saveDB(); notify("Password berhasil diubah!"); }
-            } else if(type === 'poin') {
-                const p = prompt("Set total poin untuk " + u, db[u].points);
-                if(p) { db[u].points = parseInt(p); saveDB(); renderAdminContent(); updatePointsDisplay(); notify("Poin diperbarui!"); }
-            } else if(type === 'block') {
-                if(db[u].role === 'admin') return notify("Admin tidak bisa diblokir!", true);
-                db[u].blocked = !db[u].blocked;
-                saveDB(); renderAdminContent(); notify(db[u].blocked ? "User Diblokir!" : "User Diakses kembali!");
+        function adminBroadcast() {
+            const msg = prompt("Masukkan pesan broadcast untuk SEMUA user:");
+            if(msg) {
+                db.global_broadcast = { msg: msg, time: Date.now() };
+                saveDB(); notify("Broadcast Terkirim!");
             }
         }
 
-        function updateWDStatus(user, id, status) {
-            const note = prompt("Catatan untuk user (Opsional):");
-            const idx = db[user].history.findIndex(i => i.id === id);
+        function showBroadcast(msg) {
+            document.getElementById('broadcast-text').innerText = msg;
+            document.getElementById('broadcast-modal').classList.remove('hidden');
+        }
+
+        function closeBroadcast() { document.getElementById('broadcast-modal').classList.add('hidden'); }
+
+        function admWD(u, id, s) {
+            const note = prompt("Catatan (Opsional):");
+            const idx = db[u].history.findIndex(i => i.id === id);
             if(idx !== -1) {
-                db[user].history[idx].status = status;
-                db[user].history[idx].note = note || "";
-                if(status === 'Ditolak') db[user].points += db[user].history[idx].amount;
-                saveDB(); renderAdminContent(); updatePointsDisplay();
-                notify("Permintaan telah " + status);
+                db[u].history[idx].status = s;
+                db[u].history[idx].note = note || "";
+                if(s === 'Ditolak') db[u].points += db[u].history[idx].amount;
+                saveDB(); renderAdminContent(); notify("Berhasil!");
             }
         }
 
-        function deleteWDAdmin(user, id) {
-            if(confirm("Hapus riwayat penarikan ini secara manual?")) {
-                db[user].history = db[user].history.filter(i => i.id !== id);
-                saveDB(); renderAdminContent(); notify("Riwayat dihapus permanen!");
+        function admDelLog(u, id) {
+            if(confirm("Hapus permanen log ini?")) {
+                db[u].history = db[u].history.filter(i => i.id !== id);
+                saveDB(); renderAdminContent(); notify("Log Dihapus", true);
             }
         }
 
-        // SYSTEM HELPERS
-        function updatePointsDisplay() {
-            document.getElementById('display-points').innerText = db[activeUser].points;
-        }
-        function saveDB() { localStorage.setItem('quiz_ultimate_v2_db', JSON.stringify(db)); }
-        function openAdmin() { document.getElementById('admin-modal').classList.remove('hidden'); renderAdminContent(); }
+        function admPass(u) { const p = prompt("Pass Baru:"); if(p) { db[u].pass = p; saveDB(); notify("Updated!"); } }
+        function admPoin(u) { const p = prompt("Set Poin:", db[u].points); if(p) { db[u].points = parseInt(p); saveDB(); notify("Updated!"); } }
+        function admBlock(u) { if(db[u].role==='admin') return; db[u].blocked = !db[u].blocked; saveDB(); renderAdminContent(); notify("Updated!"); }
+
+        function updatePointsDisplay() { document.getElementById('display-points').innerText = db[activeUser].points; }
+        function openAdmin() { document.getElementById('admin-modal').classList.remove('hidden'); switchAdminTab('users'); }
         function closeAdmin() { document.getElementById('admin-modal').classList.add('hidden'); }
     </script>
 </body>
