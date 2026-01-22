@@ -36,7 +36,6 @@
         .page.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Card System */
         .card {
             background: var(--card-bg);
             backdrop-filter: blur(12px);
@@ -74,26 +73,40 @@
             padding: 12px 24px; border-radius: 15px; font-weight: 700;
             display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
         }
-        .btn-main:disabled { background: #ccc; opacity: 0.5; }
 
-        /* --- COMPACT NAVBAR --- */
-        .nav-container { padding-bottom: 20px; display: flex; justify-content: center; }
+        /* --- NAVIGATION DOCK WITH LABELS --- */
+        .nav-container { padding-bottom: 25px; display: flex; justify-content: center; }
         .navbar {
             background: var(--card-bg);
             backdrop-filter: blur(20px);
-            display: flex; gap: 10px; padding: 8px;
-            border-radius: 50px;
+            display: flex; gap: 5px; padding: 8px 15px;
+            border-radius: 40px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.1);
             border: 1px solid rgba(255,255,255,0.2);
         }
 
         .nav-item {
-            width: 50px; height: 50px; display: flex; align-items: center;
-            justify-content: center; border-radius: 50%; color: var(--text);
-            font-size: 24px; opacity: 0.5; transition: 0.3s; cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 65px; /* Lebar ditambah untuk teks */
+            height: 55px;
+            border-radius: 20px;
+            color: var(--text);
+            opacity: 0.5;
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
 
-        .nav-item.active { background: var(--primary); color: white; opacity: 1; transform: scale(1.1); }
+        .nav-item i { font-size: 22px; }
+        .nav-item span { font-size: 10px; font-weight: 700; margin-top: 2px; }
+
+        .nav-item.active {
+            opacity: 1;
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
 
         /* Toast */
         #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; }
@@ -127,7 +140,7 @@
         <section id="poin" class="page">
             <div class="card">
                 <i class='bx bxs-wallet' style="font-size: 3rem; color: #f1c40f;"></i>
-                <h2 style="margin: 10px 0;">Poin</h2>
+                <h2 style="margin: 10px 0;">Dompet Poin</h2>
                 <div style="font-size: 3rem; font-weight: 900;" id="user-poin">0</div>
             </div>
         </section>
@@ -137,20 +150,25 @@
                 <i class='bx bxs-user-circle' style="font-size: 4rem; color: var(--primary);"></i>
                 <h2 style="margin: 10px 0;">Profil Saya</h2>
                 <p id="user-name" style="font-weight: 600; opacity: 0.7;">Telegram User</p>
-                <div style="border-top: 1px solid rgba(0,0,0,0.05); margin-top: 20px; padding-top: 20px;">
-                    <button onclick="resetData()" style="color:var(--danger); border:1px solid var(--danger); background:none; padding:12px; width:100%; border-radius:15px; font-weight:bold; cursor:pointer;">
-                        Hapus Progres Data
-                    </button>
-                </div>
+                <button onclick="resetData()" style="color:var(--danger); border:1px solid var(--danger); background:none; padding:12px; width:100%; border-radius:15px; font-weight:bold; margin-top:20px;">Hapus Data</button>
             </div>
         </section>
     </div>
 
     <div class="nav-container">
         <nav class="navbar">
-            <div class="nav-item active" onclick="navTo('quiz', this)"><i class='bx bxs-grid-alt'></i></div>
-            <div class="nav-item" onclick="navTo('poin', this)"><i class='bx bxs-coin-stack'></i></div>
-            <div class="nav-item" onclick="navTo('saya', this)"><i class='bx bxs-user'></i></div>
+            <div class="nav-item active" onclick="navTo('quiz', this)">
+                <i class='bx bxs-grid-alt'></i>
+                <span>Quiz</span>
+            </div>
+            <div class="nav-item" onclick="navTo('poin', this)">
+                <i class='bx bxs-coin-stack'></i>
+                <span>Poin</span>
+            </div>
+            <div class="nav-item" onclick="navTo('saya', this)">
+                <i class='bx bxs-user'></i>
+                <span>Saya</span>
+            </div>
         </nav>
     </div>
 
@@ -161,7 +179,6 @@
         let ans, p = parseInt(localStorage.getItem('pts')) || 0;
         const ab = document.getElementById('ad-btn');
 
-        // Mengambil nama user dari Telegram
         if (tg.initDataUnsafe?.user) {
             document.getElementById('user-name').innerText = tg.initDataUnsafe.user.first_name;
         }
@@ -228,9 +245,7 @@
         }
 
         function resetData() {
-            tg.showConfirm("Yakin ingin menghapus semua poin?", (ok) => {
-                if(ok) { localStorage.clear(); location.reload(); }
-            });
+            if(confirm("Hapus data?")) { localStorage.clear(); location.reload(); }
         }
 
         refreshPoin(); initQuiz();
