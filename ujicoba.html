@@ -23,7 +23,7 @@
         body {
             background-color: var(--bg);
             color: var(--text);
-            font-family: 'Inter', -apple-system, sans-serif;
+            font-family: 'Inter', sans-serif;
             margin: 0;
             height: 100vh;
             display: flex;
@@ -42,15 +42,7 @@
         @keyframes tIn { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes tOut { to { opacity: 0; transform: translateY(-20px); } }
 
-        /* Main Content */
-        #app {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
+        #app { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .page { display: none; width: 100%; }
         .page.active { display: block; animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
@@ -60,54 +52,69 @@
             background: var(--card-bg);
             backdrop-filter: blur(12px);
             border-radius: 30px;
-            padding: 30px 20px;
+            padding: 25px 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.06);
             text-align: center;
             width: 100%;
-            max-width: 360px; /* Ukuran maksimal kartu */
+            max-width: 360px;
             margin: 0 auto;
             border: 1px solid rgba(255,255,255,0.3);
         }
 
+        /* Skor Di Atas Soal */
+        .score-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.03);
+            padding: 8px 15px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+        }
+        .score-badge {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 800;
+            color: #f1c40f;
+            font-size: 1.1rem;
+        }
+
         .question {
-            font-size: 3rem; /* Ukuran angka lebih besar dan jelas */
+            font-size: 3.2rem;
             font-weight: 900;
-            margin: 20px 0;
+            margin: 15px 0;
             color: var(--primary);
             letter-spacing: -1px;
         }
 
-        /* Grid Jawaban */
         .options-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin: 25px auto;
+            gap: 12px;
+            margin: 20px auto;
             max-width: 280px;
         }
 
         .opt-btn {
             background: var(--bg);
             border: 2px solid transparent;
-            padding: 18px 10px;
+            padding: 16px 10px;
             border-radius: 18px;
             font-size: 1.2rem;
             font-weight: 800;
             color: var(--text);
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            transition: 0.2s;
         }
-        .opt-btn:active { transform: scale(0.9); }
         .opt-btn.correct { background: var(--success); color: white; transform: scale(1.05); }
         .opt-btn.wrong { background: var(--danger); color: white; }
 
-        /* Button Styling */
         .btn-main {
             background: var(--primary);
             color: white;
             border: none;
-            padding: 16px 32px;
+            padding: 15px 30px;
             border-radius: 18px;
             display: inline-flex;
             align-items: center;
@@ -115,17 +122,10 @@
             font-weight: 700;
             font-size: 1rem;
             cursor: pointer;
-            transition: 0.3s;
             box-shadow: 0 6px 20px rgba(0,136,204,0.25);
         }
-        .btn-main:disabled { 
-            background: #b2bec3; 
-            box-shadow: none; 
-            opacity: 0.5; 
-            cursor: not-allowed; 
-        }
+        .btn-main:disabled { background: #b2bec3; opacity: 0.5; box-shadow: none; }
 
-        /* Navbar */
         .navbar {
             background: var(--card-bg);
             display: flex;
@@ -133,22 +133,11 @@
             padding: 15px 10px 30px;
             border-radius: 30px 30px 0 0;
             box-shadow: 0 -5px 20px rgba(0,0,0,0.04);
-            backdrop-filter: blur(10px);
         }
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 12px;
-            font-weight: 600;
-            opacity: 0.4;
-            transition: 0.3s;
-            color: var(--text);
-        }
-        .nav-item i { font-size: 24px; margin-bottom: 4px; }
-        .nav-item.active { opacity: 1; color: var(--primary); transform: translateY(-3px); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 12px; font-weight: 600; opacity: 0.4; color: var(--text); }
+        .nav-item.active { opacity: 1; color: var(--primary); }
 
-        .poin-text { font-size: 3.5rem; font-weight: 900; color: #f1c40f; margin: 10px 0; }
+        .big-poin { font-size: 4rem; font-weight: 900; color: #f1c40f; }
     </style>
 </head>
 <body>
@@ -158,18 +147,25 @@
     <div id="app">
         <section id="quiz" class="page active">
             <div class="card">
-                <span style="font-size: 0.8rem; font-weight: 800; opacity: 0.5; text-transform: uppercase; letter-spacing: 1px;">Challenge</span>
+                <div class="score-header">
+                    <span style="font-size: 0.7rem; font-weight: 700; opacity: 0.5;">POIN KAMU</span>
+                    <div class="score-badge">
+                        <i class='bx bxs-coin-stack'></i>
+                        <span id="mini-poin">0</span>
+                    </div>
+                </div>
+
                 <div class="question" id="q-text">-- + --</div>
                 
                 <div class="options-grid" id="q-options"></div>
                 
-                <button onclick="initQuiz()" style="background:none; border:none; color:var(--primary); font-size: 14px; font-weight:700; cursor:pointer; margin-bottom: 20px;">
-                    <i class='bx bx-skip-next-circle'></i> Lewati Soal
+                <button onclick="initQuiz()" style="background:none; border:none; color:var(--primary); font-size: 13px; font-weight:700; cursor:pointer; margin-bottom: 15px;">
+                    <i class='bx bx-refresh'></i> Lewati Soal
                 </button>
 
-                <div style="border-top: 2px solid rgba(0,0,0,0.03); padding-top: 25px;">
+                <div style="border-top: 2px solid rgba(0,0,0,0.03); padding-top: 20px;">
                     <button id="ad-btn" class="btn-main" onclick="handleAd()" disabled>
-                        <i class='bx bx-play-circle'></i> Tonton Iklan
+                        <i class='bx bx-play-circle'></i> Bonus Iklan
                     </button>
                 </div>
             </div>
@@ -177,37 +173,26 @@
 
         <section id="poin" class="page">
             <div class="card">
-                <i class='bx bxs-badge-dollar' style="font-size: 4rem; color: #f1c40f;"></i>
-                <h2 style="margin: 10px 0 0;">Total Poin</h2>
-                <div class="poin-text" id="user-poin">0</div>
-                <p style="opacity: 0.6; font-size: 0.9rem;">Terus kumpulkan poin untuk ditukarkan!</p>
+                <i class='bx bxs-wallet' style="font-size: 3.5rem; color: #f1c40f;"></i>
+                <h2 style="margin: 10px 0;">Total Saldo</h2>
+                <div class="big-poin" id="user-poin">0</div>
             </div>
         </section>
 
         <section id="admin" class="page">
             <div class="card">
-                <i class='bx bxs-cog' style="font-size: 3rem; opacity: 0.2;"></i>
-                <h2 style="margin: 10px 0 20px;">Pengaturan</h2>
-                <button onclick="resetData()" style="color:var(--danger); background:rgba(214, 48, 49, 0.1); border:none; padding:15px; width:100%; border-radius:15px; font-weight: 800; cursor:pointer;">
-                    RESET SEMUA DATA
+                <h2>Setelan</h2>
+                <button onclick="resetData()" style="color:var(--danger); background:rgba(214, 48, 49, 0.1); border:none; padding:15px; width:100%; border-radius:15px; font-weight: 800;">
+                    RESET SEMUA POIN
                 </button>
             </div>
         </section>
     </div>
 
     <nav class="navbar">
-        <div class="nav-item active" onclick="navTo('quiz', this)">
-            <i class='bx bxs-invader'></i>
-            <span>Main</span>
-        </div>
-        <div class="nav-item" onclick="navTo('poin', this)">
-            <i class='bx bxs-wallet-alt'></i>
-            <span>Poin</span>
-        </div>
-        <div class="nav-item" onclick="navTo('admin', this)">
-            <i class='bx bxs-user-rectangle'></i>
-            <span>Admin</span>
-        </div>
+        <div class="nav-item active" onclick="navTo('quiz', this)"><i class='bx bxs-game' style="font-size:24px"></i><span>Quiz</span></div>
+        <div class="nav-item" onclick="navTo('poin', this)"><i class='bx bxs-wallet' style="font-size:24px"></i><span>Dompet</span></div>
+        <div class="nav-item" onclick="navTo('admin', this)"><i class='bx bxs-cog' style="font-size:24px"></i><span>Admin</span></div>
     </nav>
 
     <script>
@@ -236,6 +221,8 @@
         }
 
         function refreshPoin() {
+            // Update di semua tampilan poin
+            document.getElementById('mini-poin').innerText = p.toLocaleString();
             document.getElementById('user-poin').innerText = p.toLocaleString();
             localStorage.setItem('pts', p);
         }
@@ -263,13 +250,13 @@
                 btn.onclick = () => {
                     if(o === ans) {
                         btn.classList.add('correct');
-                        showToast("Hebat! Jawaban Benar", "success");
+                        showToast("Benar! +5 Poin", "success");
                         p += 5; refreshPoin(); ab.disabled = false;
                         document.querySelectorAll('.opt-btn').forEach(x => x.onclick = null);
                         tg.HapticFeedback.notificationOccurred('success');
                     } else {
                         btn.classList.add('wrong');
-                        showToast("Aduh, Salah!", "error");
+                        showToast("Salah!", "error");
                         tg.HapticFeedback.notificationOccurred('error');
                         setTimeout(initQuiz, 1000);
                     }
@@ -285,13 +272,13 @@
                 showToast("Bonus +50 Poin!", "success");
                 initQuiz();
             }).catch(() => { 
-                showToast("Iklan Belum Tersedia", "error"); 
+                showToast("Iklan Belum Siap", "error"); 
                 initQuiz(); 
             });
         }
 
         function resetData() {
-            tg.showConfirm("Hapus semua progres?", (res) => {
+            tg.showConfirm("Hapus semua poin?", (res) => {
                 if(res) { localStorage.clear(); location.reload(); }
             });
         }
