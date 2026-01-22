@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Modern Quiz App</title>
+    <title>Modern Quiz & Toast</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src='//libtl.com/sdk.js' data-zone='9865183' data-sdk='show_9865183'></script>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     
     <style>
         :root {
             --primary: #0088cc;
-            --secondary: #6c5ce7;
             --success: #00b894;
             --danger: #d63031;
             --bg: var(--tg-theme-bg-color, #f0f2f5);
@@ -19,158 +19,119 @@
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
         body {
             background-color: var(--bg);
             color: var(--text);
-            font-family: 'Inter', -apple-system, sans-serif;
+            font-family: 'Inter', sans-serif;
             margin: 0;
-            overflow: hidden; /* Mencegah scroll yang tidak diinginkan */
             height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
 
-        /* Container Utama */
-        #app {
-            flex: 1;
-            position: relative;
-            padding: 20px;
-            overflow-y: auto;
+        /* --- TOAST SYSTEM --- */
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            width: 80%;
+            max-width: 300px;
+            pointer-events: none;
         }
 
-        /* Animasi Perpindahan Halaman */
-        .page {
-            display: none;
-            animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        .toast {
+            background: white;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 15px;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            margin-bottom: 10px;
+            animation: toastIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards,
+                       toastOut 0.5s 2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
+
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateY(-50px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes toastOut {
+            from { opacity: 1; transform: translateY(0) scale(1); }
+            to { opacity: 0; transform: translateY(-20px) scale(0.9); }
+        }
+
+        /* --- UI COMPONENTS --- */
+        #app { flex: 1; padding: 20px; overflow-y: auto; }
+        .page { display: none; animation: slideUp 0.4s ease; }
         .page.active { display: block; }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Glassmorphism Card */
         .card {
             background: var(--card-bg);
             backdrop-filter: blur(10px);
             border-radius: 28px;
             padding: 24px;
             box-shadow: 0 8px 32px rgba(0,0,0,0.05);
-            border: 1px solid rgba(255,255,255,0.2);
             text-align: center;
-        }
-
-        /* UI Kuis */
-        .q-badge {
-            background: var(--primary);
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            display: inline-block;
-            margin-bottom: 10px;
         }
 
         .question {
             font-size: 42px;
             font-weight: 800;
-            margin: 15px 0;
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .options-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
             margin: 20px 0;
+            color: var(--primary);
         }
 
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
         .opt-btn {
-            background: var(--card-bg);
-            border: 2px solid rgba(0,0,0,0.05);
-            padding: 18px;
-            border-radius: 20px;
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text);
-            transition: 0.2s;
-            cursor: pointer;
+            background: var(--bg); border: 2px solid rgba(0,0,0,0.05);
+            padding: 18px; border-radius: 20px; font-size: 18px; font-weight: 700;
+            color: var(--text); cursor: pointer; transition: 0.2s;
         }
-
-        .opt-btn:active { transform: scale(0.92); }
         .opt-btn.correct { background: var(--success); color: white; border-color: var(--success); }
         .opt-btn.wrong { background: var(--danger); color: white; border-color: var(--danger); }
 
-        /* Floating Navigation */
+        .btn-main {
+            background: var(--primary); color: white; border: none;
+            padding: 18px; border-radius: 20px; width: 100%;
+            font-weight: 800; font-size: 16px; transition: 0.3s;
+        }
+        .btn-main:disabled { background: #ccc; opacity: 0.5; }
+
         .navbar {
-            background: var(--card-bg);
-            backdrop-filter: blur(15px);
-            display: flex;
-            justify-content: space-around;
-            padding: 15px 10px 25px 10px; /* Padding bawah lebih besar untuk iPhone */
-            border-top: 1px solid rgba(0,0,0,0.05);
+            background: var(--card-bg); display: flex; justify-content: space-around;
+            padding: 15px 10px 25px; border-top: 1px solid rgba(0,0,0,0.05);
             border-radius: 24px 24px 0 0;
         }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text);
-            opacity: 0.4;
-            transition: 0.3s;
-            cursor: pointer;
-        }
-
-        .nav-item i { font-size: 24px; margin-bottom: 4px; }
-        .nav-item.active { opacity: 1; color: var(--primary); transform: translateY(-5px); }
-
-        /* Button Utama */
-        .btn-main {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 18px;
-            border-radius: 20px;
-            width: 100%;
-            font-weight: 800;
-            font-size: 16px;
-            box-shadow: 0 4px 15px rgba(0,136,204,0.3);
-            transition: 0.3s;
-        }
-
-        .btn-main:disabled { background: #b2bec3; box-shadow: none; opacity: 0.5; }
-
-        .point-tag {
-            font-size: 48px;
-            font-weight: 900;
-            color: #fdcb6e;
-            text-shadow: 2px 2px 0px rgba(0,0,0,0.05);
-        }
+        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 12px; opacity: 0.4; transition: 0.3s; }
+        .nav-item.active { opacity: 1; color: var(--primary); }
     </style>
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
 <body>
+
+    <div id="toast-container"></div>
 
     <div id="app">
         <section id="quiz" class="page active">
             <div class="card">
-                <div class="q-badge">LEVEL 1</div>
-                <div class="question" id="q-text">0 + 0</div>
+                <div style="font-size: 12px; font-weight: bold; color: var(--primary);">PENJUMLAHAN ACAK</div>
+                <div class="question" id="q-text">-- + --</div>
                 <div class="options-grid" id="q-options"></div>
-                <button onclick="initQuiz()" style="background:none; border:none; color:var(--primary); font-weight:600; cursor:pointer;">
-                    Ganti Soal <i class='bx bx-refresh'></i>
+                <button onclick="initQuiz()" style="background:none; border:none; color:var(--primary); font-weight:600; cursor:pointer; margin-bottom: 20px;">
+                    <i class='bx bx-refresh'></i> Lewati
                 </button>
-                <div style="margin-top: 25px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 20px;">
+                <div style="border-top: 1px solid rgba(0,0,0,0.05); padding-top: 20px;">
                     <button id="ad-btn" class="btn-main" onclick="handleAd()" disabled>
-                        <i class='bx bx-lock-alt'></i> Jawab Dulu
+                        <i class='bx bx-lock-alt'></i> Jawab Benar Dahulu
                     </button>
                 </div>
             </div>
@@ -178,43 +139,24 @@
 
         <section id="poin" class="page">
             <div class="card">
-                <i class='bx bxs-coin-stack' style="font-size: 50px; color: #f1c40f;"></i>
+                <i class='bx bxs-badge-check' style="font-size: 50px; color: #f1c40f;"></i>
                 <h3>Saldo Poin</h3>
-                <div class="point-tag" id="user-poin">0</div>
-                <p style="opacity: 0.6;">Kumpulkan lebih banyak poin untuk ditukarkan hadiah!</p>
+                <div style="font-size: 48px; font-weight: 900;" id="user-poin">0</div>
             </div>
         </section>
 
         <section id="admin" class="page">
-            <div class="card" style="text-align: left;">
-                <h3 style="text-align: center;"><i class='bx bxs-user-badge'></i> Profil Admin</h3>
-                <div style="background: rgba(0,0,0,0.03); padding: 15px; border-radius: 15px;">
-                    <small>Nama User:</small>
-                    <div id="adm-name" style="font-weight: bold;">-</div>
-                    <hr style="border: 0.1px solid rgba(0,0,0,0.05); margin: 10px 0;">
-                    <small>ID Perangkat:</small>
-                    <div style="font-family: monospace; font-size: 10px;">ID-992837482</div>
-                </div>
-                <button onclick="resetData()" style="margin-top: 20px; color: var(--danger); background: none; border: 1px solid var(--danger); padding: 10px; width: 100%; border-radius: 12px; font-weight: bold;">
-                    Reset Data
-                </button>
+            <div class="card">
+                <h3>Pengaturan</h3>
+                <button onclick="resetData()" style="color:var(--danger); background:none; border:1px solid var(--danger); padding:10px; width:100%; border-radius:12px;">Reset Poin</button>
             </div>
         </section>
     </div>
 
     <nav class="navbar">
-        <div class="nav-item active" onclick="navTo('quiz', this)">
-            <i class='bx bxs-game'></i>
-            <span>Main</span>
-        </div>
-        <div class="nav-item" onclick="navTo('poin', this)">
-            <i class='bx bxs-wallet'></i>
-            <span>Dompet</span>
-        </div>
-        <div class="nav-item" onclick="navTo('admin', this)">
-            <i class='bx bxs-cog'></i>
-            <span>Setelan</span>
-        </div>
+        <div class="nav-item active" onclick="navTo('quiz', this)"><i class='bx bxs-game' style="font-size:24px"></i><span>Quiz</span></div>
+        <div class="nav-item" onclick="navTo('poin', this)"><i class='bx bxs-wallet' style="font-size:24px"></i><span>Poin</span></div>
+        <div class="nav-item" onclick="navTo('admin', this)"><i class='bx bxs-cog' style="font-size:24px"></i><span>Admin</span></div>
     </nav>
 
     <script>
@@ -225,9 +167,25 @@
         let p = parseInt(localStorage.getItem('pts')) || 0;
         const ab = document.getElementById('ad-btn');
 
-        // Sync Nama User
-        if(tg.initDataUnsafe?.user) {
-            document.getElementById('adm-name').innerText = tg.initDataUnsafe.user.first_name;
+        // FUNGSI TOAST MODERN
+        function showToast(message, type) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            
+            // Set warna & icon berdasarkan tipe
+            if(type === 'success') {
+                toast.style.backgroundColor = 'var(--success)';
+                toast.innerHTML = `<i class='bx bxs-check-circle'></i> ${message}`;
+            } else {
+                toast.style.backgroundColor = 'var(--danger)';
+                toast.innerHTML = `<i class='bx bxs-x-circle'></i> ${message}`;
+            }
+
+            container.appendChild(toast);
+            
+            // Hapus elemen setelah animasi selesai (2.5 detik)
+            setTimeout(() => { toast.remove(); }, 2500);
         }
 
         function navTo(id, el) {
@@ -245,7 +203,7 @@
 
         function initQuiz() {
             ab.disabled = true;
-            ab.innerHTML = "<i class='bx bx-lock-alt'></i> Jawab Dulu";
+            ab.innerHTML = "<i class='bx bx-lock-alt'></i> Jawab Benar Dahulu";
             const a = Math.floor(Math.random() * 50) + 1;
             const b = Math.floor(Math.random() * 50) + 1;
             ans = a + b;
@@ -268,13 +226,16 @@
                     if(o === ans) {
                         btn.classList.add('correct');
                         tg.HapticFeedback.notificationOccurred('success');
+                        showToast("Jawaban Benar! +5 Poin", "success");
+                        p += 5; refreshPoin();
                         ab.disabled = false;
                         ab.innerHTML = "<i class='bx bx-play-circle'></i> Tonton Iklan (+50)";
                         document.querySelectorAll('.opt-btn').forEach(x => x.onclick = null);
                     } else {
                         btn.classList.add('wrong');
                         tg.HapticFeedback.notificationOccurred('error');
-                        setTimeout(initQuiz, 800);
+                        showToast("Jawaban Salah! Coba lagi.", "error");
+                        setTimeout(initQuiz, 1000);
                     }
                 };
                 cont.appendChild(btn);
@@ -283,22 +244,18 @@
 
         function handleAd() {
             ab.disabled = true;
-            ab.innerText = "Memuat...";
             show_9865183().then(() => {
-                p += 50;
-                refreshPoin();
-                tg.showAlert("Berhasil! +50 Poin");
+                p += 50; refreshPoin();
+                showToast("Iklan Selesai! +50 Poin", "success");
                 initQuiz();
             }).catch(() => {
-                tg.showAlert("Iklan gagal dimuat.");
+                showToast("Iklan gagal dimuat.", "error");
                 initQuiz();
             });
         }
 
         function resetData() {
-            tg.showConfirm("Yakin hapus semua poin?", (ok) => {
-                if(ok) { localStorage.clear(); location.reload(); }
-            });
+            localStorage.clear(); location.reload();
         }
 
         refreshPoin();
