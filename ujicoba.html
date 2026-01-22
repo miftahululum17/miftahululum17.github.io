@@ -22,14 +22,19 @@
             display: flex; flex-direction: column; overflow: hidden;
         }
 
-        /* TOAST */
-        #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; width: 85%; pointer-events: none; }
-        .toast { background: white; padding: 12px 20px; border-radius: 15px; font-weight: 700; font-size: 13px; margin-bottom: 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); border-left: 5px solid var(--primary); animation: toastIn 0.3s ease-out forwards; }
-        @keyframes toastIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        /* --- TOAST MINIMALIS --- */
+        #toast-container { position: fixed; top: 15px; left: 50%; transform: translateX(-50%); z-index: 10000; pointer-events: none; }
+        .toast { 
+            background: rgba(45, 52, 54, 0.9); color: white; padding: 8px 15px; 
+            border-radius: 20px; font-weight: 600; font-size: 11px; margin-bottom: 8px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2); animation: toastIn 0.3s ease-out forwards;
+            white-space: nowrap; border: none; text-align: center;
+        }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* AUTH PAGE */
         #auth-page { position: fixed; inset: 0; background: var(--bg-gradient); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .auth-card { background: var(--card-glass); backdrop-filter: blur(15px); padding: 35px 25px; border-radius: 30px; width: 100%; max-width: 340px; border: 1px solid white; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.05); }
+        .auth-card { background: var(--card-glass); backdrop-filter: blur(15px); padding: 35px 25px; border-radius: 30px; width: 100%; max-width: 340px; border: 1px solid white; text-align: center; }
         .input-group input { width: 100%; padding: 15px; border-radius: 15px; border: 1px solid rgba(0,0,0,0.1); background: white; margin-top: 10px; outline: none; font-size: 14px; }
 
         /* APP CONTENT */
@@ -38,24 +43,26 @@
         .page.active { display: block; }
 
         .card { background: var(--card-glass); backdrop-filter: blur(20px); border-radius: 30px; padding: 20px; border: 1px solid white; text-align: center; }
-        
         .persistent-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .user-tag { display: flex; align-items: center; gap: 5px; font-weight: 800; font-size: 13px; }
 
         .question { font-size: 3rem; font-weight: 800; margin: 10px 0; color: var(--primary); }
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
-        .opt-btn { background: white; border: none; padding: 15px; border-radius: 15px; font-weight: 800; cursor: pointer; font-size: 16px; box-shadow: 0 4px 0 rgba(0,0,0,0.05); }
+        .opt-btn { background: white; border: none; padding: 15px; border-radius: 15px; font-weight: 800; cursor: pointer; font-size: 16px; transition: 0.2s; }
         .opt-btn.correct { background: var(--success); color: white; }
         .opt-btn.wrong { background: var(--danger); color: white; }
 
-        .btn-main { background: linear-gradient(to right, var(--primary), var(--accent)); color: white; border: none; padding: 16px; border-radius: 18px; font-weight: 700; width: 100%; cursor: pointer; font-size: 15px; }
+        .btn-main { background: linear-gradient(to right, var(--primary), var(--accent)); color: white; border: none; padding: 16px; border-radius: 18px; font-weight: 700; width: 100%; cursor: pointer; font-size: 15px; margin-bottom: 10px; }
         .btn-main:disabled { background: var(--disabled); opacity: 0.6; cursor: not-allowed; }
+
+        /* TOMBOL SOAL BERIKUTNYA */
+        .btn-skip { background: none; border: none; color: var(--primary); font-weight: 800; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; margin: 0 auto; opacity: 0.7; }
+        .btn-skip:hover { opacity: 1; }
 
         /* NAVBAR */
         #nav-container { padding-bottom: 25px; display: none; justify-content: center; }
         .navbar { background: white; display: flex; width: 90%; max-width: 340px; padding: 10px; border-radius: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
         .nav-item { flex: 1; text-align: center; color: #b2bec3; font-size: 10px; font-weight: 800; cursor: pointer; }
-        .nav-item i { font-size: 20px; display: block; }
         .nav-item.active { color: var(--accent); }
     </style>
 </head>
@@ -85,13 +92,18 @@
                     <div class="user-tag"><i class='bx bxs-user-circle'></i> <span class="curr-user-display">User</span></div>
                     <i class='bx bx-power-off' style="color:var(--danger); cursor:pointer" id="logout-trigger"></i>
                 </div>
-                <div style="background:rgba(255,255,255,0.5); padding:10px; border-radius:15px; margin-bottom:15px">
-                    <small style="font-weight:800; opacity:0.5">SALDO POIN</small><br>
-                    <span style="font-weight:800; color:#f39c12; font-size:18px" id="mini-poin">0</span>
+                <div style="background:rgba(255,255,255,0.5); padding:8px; border-radius:15px; margin-bottom:15px">
+                    <small style="font-weight:800; opacity:0.5; font-size: 10px;">SALDO POIN</small><br>
+                    <span style="font-weight:800; color:#f39c12; font-size:16px" id="mini-poin">0</span>
                 </div>
                 <div class="question" id="q-text">-- + --</div>
                 <div class="options-grid" id="q-options"></div>
-                <button id="ad-btn" class="btn-main" disabled>Tonton Iklan (+50 Poin)</button>
+                
+                <button id="ad-btn" class="btn-main" disabled>Klaim +50 Poin (Iklan)</button>
+                
+                <button class="btn-skip" id="btn-next-soal">
+                    <i class='bx bx-redo'></i> Soal Berikutnya
+                </button>
             </div>
         </section>
 
@@ -105,8 +117,8 @@
 
     <div id="nav-container">
         <nav class="navbar">
-            <div class="nav-item active" data-page="quiz"><i class='bx bxs-grid-alt'></i>Quiz</div>
-            <div class="nav-item" data-page="poin"><i class='bx bxs-wallet'></i>Poin</div>
+            <div class="nav-item active" data-page="quiz"><i class='bx bxs-grid-alt'></i><br>Quiz</div>
+            <div class="nav-item" data-page="poin"><i class='bx bxs-wallet'></i><br>Poin</div>
         </nav>
     </div>
 
@@ -121,14 +133,16 @@
             let currentAns = 0;
             let currentUser = null;
 
-            // --- UI HELPERS ---
             const showToast = (msg) => {
                 const container = document.getElementById('toast-container');
                 const t = document.createElement('div');
                 t.className = 'toast';
                 t.innerText = msg;
                 container.appendChild(t);
-                setTimeout(() => t.remove(), 2500);
+                setTimeout(() => {
+                    t.style.opacity = '0';
+                    setTimeout(() => t.remove(), 300);
+                }, 1500);
             };
 
             const updateUI = () => {
@@ -137,26 +151,19 @@
                 document.querySelectorAll('.curr-user-display').forEach(el => el.innerText = currentUser);
             };
 
-            // --- AUTH SYSTEM ---
             const handleAuth = () => {
                 const u = document.getElementById('username').value.trim();
                 const p = document.getElementById('password').value;
-
-                if(!u || !p) return showToast("Harap isi semua kolom!");
-
+                if(!u || !p) return showToast("Data kosong!");
                 let db = JSON.parse(localStorage.getItem('quiz_users') || '{}');
-
                 if(isLoginMode) {
-                    if(db[u] && db[u].password === p) {
-                        startApp(u, db[u].points || 0);
-                    } else {
-                        showToast("Username atau Password salah!");
-                    }
+                    if(db[u] && db[u].password === p) startApp(u, db[u].points || 0);
+                    else showToast("User/Pass salah!");
                 } else {
-                    if(db[u]) return showToast("Username sudah terdaftar!");
+                    if(db[u]) return showToast("Sudah ada!");
                     db[u] = { password: p, points: 0 };
                     localStorage.setItem('quiz_users', JSON.stringify(db));
-                    showToast("Pendaftaran Berhasil! Silakan Masuk.");
+                    showToast("Terdaftar!");
                     document.getElementById('auth-link').click();
                 }
             };
@@ -165,31 +172,25 @@
                 currentUser = user;
                 currentPoints = points;
                 localStorage.setItem('quiz_session', JSON.stringify({user, points}));
-                
                 document.getElementById('auth-page').style.display = 'none';
                 document.getElementById('app').style.display = 'flex';
                 document.getElementById('nav-container').style.display = 'flex';
-                
                 updateUI();
                 generateQuiz();
-                showToast(`Selamat datang, ${user}!`);
             };
 
-            // --- QUIZ SYSTEM ---
             const generateQuiz = () => {
                 document.getElementById('ad-btn').disabled = true;
                 const a = Math.floor(Math.random() * 50) + 1;
                 const b = Math.floor(Math.random() * 50) + 1;
                 currentAns = a + b;
                 document.getElementById('q-text').innerText = `${a} + ${b}`;
-
                 let options = [currentAns];
                 while(options.length < 4) {
                     let w = currentAns + (Math.floor(Math.random() * 10) - 5);
                     if(w > 0 && !options.includes(w)) options.push(w);
                 }
                 options.sort(() => Math.random() - 0.5);
-
                 const grid = document.getElementById('q-options');
                 grid.innerHTML = '';
                 options.forEach(opt => {
@@ -199,12 +200,12 @@
                     btn.onclick = () => {
                         if(opt === currentAns) {
                             btn.classList.add('correct');
-                            showToast("Benar! Tonton iklan untuk poin.");
+                            showToast("Benar! Klaim poin.");
                             document.getElementById('ad-btn').disabled = false;
                             grid.querySelectorAll('button').forEach(b => b.onclick = null);
                         } else {
                             btn.classList.add('wrong');
-                            showToast("Salah! Coba lagi.");
+                            showToast("Salah!");
                             setTimeout(generateQuiz, 1000);
                         }
                     };
@@ -212,20 +213,11 @@
                 });
             };
 
-            // --- AD SYSTEM ---
             document.getElementById('ad-btn').onclick = function() {
                 this.disabled = true;
                 if(typeof show_9865183 === 'function') {
-                    show_9865183().then(() => {
-                        rewardUser(50);
-                    }).catch(() => {
-                        showToast("Iklan gagal dimuat.");
-                        this.disabled = false;
-                    });
-                } else {
-                    // Fallback jika SDK error
-                    rewardUser(50);
-                }
+                    show_9865183().then(() => rewardUser(50)).catch(() => { showToast("Iklan gagal"); this.disabled = false; });
+                } else { rewardUser(50); }
             };
 
             const rewardUser = (amt) => {
@@ -234,12 +226,15 @@
                 if(db[currentUser]) db[currentUser].points = currentPoints;
                 localStorage.setItem('quiz_users', JSON.stringify(db));
                 updateUI();
-                showToast(`Poin +${amt} berhasil!`);
-                setTimeout(generateQuiz, 1000);
+                showToast(`+${amt} Poin!`);
+                setTimeout(generateQuiz, 800);
             };
 
-            // --- BINDING EVENTS ---
             document.getElementById('btn-auth-action').onclick = handleAuth;
+            document.getElementById('btn-next-soal').onclick = () => {
+                tg?.HapticFeedback.impactOccurred('light');
+                generateQuiz();
+            };
             
             document.getElementById('auth-link').onclick = function() {
                 isLoginMode = !isLoginMode;
@@ -263,7 +258,6 @@
                 };
             });
 
-            // --- AUTO LOGIN ---
             const session = localStorage.getItem('quiz_session');
             if(session) {
                 const s = JSON.parse(session);
