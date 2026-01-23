@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Reward Pro - Admin Notes</title>
+    <title>Quiz Pro - Cloud Database</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <script src='//libtl.com/sdk.js' data-zone='9865183' data-sdk='show_9865183'></script>
@@ -18,8 +18,6 @@
         
         .floating-chat { position: fixed; bottom: 100px; right: 20px; z-index: 1000; width: 60px; height: 60px; background: #0088cc; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 25px rgba(0, 136, 204, 0.4); }
         .floating-chat img { width: 35px; height: 35px; }
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -31,15 +29,15 @@
     </a>
 
     <div id="maintenance-screen" class="hide-section fixed inset-0 z-[9999] bg-[#070b14] flex flex-col items-center justify-center p-8 text-center">
-        <div class="animate__animated animate__swing animate__infinite text-8xl mb-6">🚧</div>
-        <h1 class="text-3xl font-black mb-4 text-yellow-500 uppercase">Perbaikan Sistem</h1>
-        <p class="opacity-70 text-sm max-w-xs mb-8 leading-relaxed">Kami sedang mengoptimalkan server. Hubungi admin melalui tombol di bawah jika butuh bantuan.</p>
-        <a href="https://wa.me/6282226489067" class="bg-blue-600 px-8 py-3 rounded-full font-bold text-xs uppercase tracking-widest">Chat Admin</a>
+        <div class="text-8xl mb-6">🚧</div>
+        <h1 class="text-3xl font-black mb-4 text-yellow-500 uppercase">Maintenance</h1>
+        <p class="opacity-70 text-sm mb-8">Server sedang dalam perbaikan. Hubungi admin untuk info lebih lanjut.</p>
+        <a href="https://wa.me/6282226489067" class="bg-blue-600 px-8 py-3 rounded-full font-bold text-xs uppercase">Hubungi Admin</a>
     </div>
 
     <div id="auth-page" class="flex items-center justify-center min-h-screen px-4">
         <div class="glass w-full max-w-sm p-8 rounded-[2rem] shadow-2xl">
-            <h2 id="auth-title" class="text-3xl font-black text-center mb-8 uppercase tracking-widest italic">Quiz Pro</h2>
+            <h2 id="auth-title" class="text-3xl font-black text-center mb-8 uppercase italic">Quiz Pro</h2>
             <div class="space-y-4">
                 <input type="text" id="user-input" placeholder="Username" class="w-full p-4 rounded-2xl bg-white/5 border border-white/10 outline-none">
                 <input type="password" id="pass-input" placeholder="Password" class="w-full p-4 rounded-2xl bg-white/5 border border-white/10 outline-none">
@@ -48,7 +46,7 @@
                     <p class="text-center mt-4 text-xs opacity-50">Belum punya akun? <button onclick="switchAuth(false)" class="text-blue-400 font-bold underline">Daftar</button></p>
                 </div>
                 <div id="reg-area" class="hidden">
-                    <button onclick="doRegister()" class="w-full bg-purple-600 py-4 rounded-2xl font-bold">DAFTAR SEKARANG</button>
+                    <button onclick="doRegister()" class="w-full bg-purple-600 py-4 rounded-2xl font-bold">DAFTAR</button>
                     <p class="text-center mt-4 text-xs opacity-50">Sudah punya akun? <button onclick="switchAuth(true)" class="text-purple-400 font-bold underline">Login</button></p>
                 </div>
             </div>
@@ -56,16 +54,16 @@
     </div>
 
     <main id="main-app" class="hide-section pb-24">
-        <div class="p-6 flex justify-between items-center glass m-4 rounded-3xl border-b-2 border-blue-500/30">
+        <div class="p-6 flex justify-between items-center glass m-4 rounded-3xl">
             <div><p class="text-[10px] text-blue-400 font-black">PLAYER</p><h3 id="display-name" class="font-bold">---</h3></div>
             <div class="text-right"><p class="text-[10px] text-yellow-400 font-black">SALDO</p><h3 id="display-points" class="text-2xl font-black text-yellow-400">0</h3></div>
         </div>
 
         <div id="quiz-view" class="px-6 mt-6">
-            <div class="glass p-10 rounded-[3rem] text-center border border-white/5">
-                <h1 id="question" class="text-6xl font-black mb-10 tracking-tighter">0 + 0</h1>
+            <div class="glass p-10 rounded-[3rem] text-center">
+                <h1 id="question" class="text-6xl font-black mb-10">0 + 0</h1>
                 <div id="options-grid" class="grid grid-cols-2 gap-4"></div>
-                <button id="ad-btn" disabled onclick="playAd()" class="w-full mt-8 bg-gray-800 text-gray-500 py-4 rounded-2xl font-black">
+                <button id="ad-btn" disabled onclick="playAd()" class="w-full mt-8 bg-gray-800 text-gray-500 py-4 rounded-2xl font-black opacity-30">
                     🎁 KLAIM <span id="ad-reward-display">5</span> POIN
                 </button>
             </div>
@@ -73,13 +71,12 @@
 
         <div id="points-view" class="hide-section px-6 mt-6">
             <div class="glass p-6 rounded-3xl mb-6">
-                <h3 class="font-bold mb-4">Form Penarikan</h3>
-                <input type="number" id="wd-amount" placeholder="Poin" class="w-full p-4 rounded-xl bg-white/5 mb-3 outline-none border border-white/10">
-                <input type="text" id="wd-dana" placeholder="Nomor DANA" class="w-full p-4 rounded-xl bg-white/5 mb-3 outline-none border border-white/10">
-                <input type="text" id="wd-name" placeholder="Nama Akun" class="w-full p-4 rounded-xl bg-white/5 mb-4 outline-none border border-white/10">
-                <button onclick="submitWD()" class="w-full bg-green-600 py-4 rounded-xl font-bold uppercase">Tarik Saldo</button>
+                <h3 class="font-bold mb-4">Penarikan DANA</h3>
+                <input type="number" id="wd-amount" placeholder="Poin" class="w-full p-4 rounded-xl bg-white/5 mb-3 border border-white/10 outline-none">
+                <input type="text" id="wd-dana" placeholder="Nomor DANA" class="w-full p-4 rounded-xl bg-white/5 mb-3 border border-white/10 outline-none">
+                <input type="text" id="wd-name" placeholder="Nama Akun" class="w-full p-4 rounded-xl bg-white/5 mb-4 border border-white/10 outline-none">
+                <button onclick="submitWD()" class="w-full bg-green-600 py-4 rounded-xl font-bold uppercase">Tarik Sekarang</button>
             </div>
-            <h3 class="font-bold mb-4 px-2 text-xs opacity-50 italic">RIWAYAT TRANSAKSI</h3>
             <div id="user-history" class="space-y-4"></div>
         </div>
     </main>
@@ -88,249 +85,155 @@
         <div class="absolute inset-0 bg-black/95 backdrop-blur-md" onclick="closeAdmin()"></div>
         <div class="glass w-full max-w-2xl max-h-[90vh] rounded-[2.5rem] p-8 relative flex flex-col border border-red-600/20">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-black text-red-500 italic uppercase">Dashboard Admin</h2>
-                <button onclick="toggleMaintenance()" id="maint-btn" class="px-4 py-1 rounded-full text-[9px] font-black">MT OFF</button>
+                <h2 class="text-xl font-black text-red-500 italic uppercase">Admin Dashboard</h2>
+                <button onclick="toggleMaintenance()" id="maint-btn" class="px-4 py-1 rounded-full text-[9px] font-black">OFF</button>
             </div>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-6 text-center">
-                <div onclick="switchAdminTab('users')" id="tab-u" class="bg-red-600 p-2 rounded-xl text-[8px] font-bold cursor-pointer">USER</div>
-                <div onclick="switchAdminTab('wd')" id="tab-w" class="bg-white/10 p-2 rounded-xl text-[8px] font-bold opacity-50 cursor-pointer">WITHDRAW</div>
-                <div onclick="adminSetAdReward()" class="bg-yellow-600 p-2 rounded-xl text-[8px] font-bold cursor-pointer">SET POIN</div>
-                <div onclick="adminBroadcast()" class="bg-blue-600 p-2 rounded-xl text-[8px] font-bold cursor-pointer">BROADCAST</div>
-            </div>
-            <div id="admin-content" class="overflow-y-auto flex-1 pr-2 custom-scrollbar"></div>
+            <div id="admin-content" class="overflow-y-auto flex-1 pr-2"></div>
         </div>
     </div>
 
-    <nav id="bottom-nav" class="hidden fixed bottom-0 left-0 right-0 glass border-t border-white/5 p-4 flex justify-around items-center rounded-t-[2.5rem] z-50">
-        <div onclick="showSection('quiz')" id="nav-quiz" class="flex flex-col items-center cursor-pointer text-blue-500"><span class="text-2xl">🎮</span><span class="text-[10px] font-bold uppercase">Main</span></div>
-        <div onclick="showSection('points')" id="nav-points" class="flex flex-col items-center cursor-pointer opacity-30"><span class="text-2xl">💰</span><span class="text-[10px] font-bold uppercase">Poin</span></div>
-        <div id="admin-btn" class="hidden flex flex-col items-center cursor-pointer text-red-500"><span class="text-2xl">🛡️</span><span class="text-[10px] font-bold uppercase">Admin</span></div>
-        <div onclick="location.reload()" class="flex flex-col items-center cursor-pointer opacity-30"><span class="text-2xl">🚪</span><span class="text-[10px] font-bold uppercase">Log</span></div>
+    <nav id="bottom-nav" class="hidden fixed bottom-0 left-0 right-0 glass p-4 flex justify-around items-center rounded-t-[2.5rem] z-50">
+        <div onclick="showSection('quiz')" id="nav-quiz" class="flex flex-col items-center cursor-pointer text-blue-500"><span class="text-2xl">🎮</span><span class="text-[10px] font-bold">GAME</span></div>
+        <div onclick="showSection('points')" id="nav-points" class="flex flex-col items-center cursor-pointer opacity-30"><span class="text-2xl">💰</span><span class="text-[10px] font-bold">TARIK</span></div>
+        <div id="admin-btn" class="hidden flex flex-col items-center cursor-pointer text-red-500"><span class="text-2xl">👑</span><span class="text-[10px] font-bold">ADMIN</span></div>
+        <div onclick="location.reload()" class="flex flex-col items-center cursor-pointer opacity-30"><span class="text-2xl">🚪</span><span class="text-[10px] font-bold">OUT</span></div>
     </nav>
 
     <script>
-        let db = JSON.parse(localStorage.getItem('quiz_sync_v9_db')) || { 
-            global_broadcast: { msg: "", time: 0 },
-            config: { ad_reward: 5, maintenance: false }
-        };
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz0ndL7qg78AqSrRGBzaKNGR7LCFQqPkYYvumrJQEORL8o5x0Fu_RTPOiIXpd4p8qpq/exec";
         
+        let db = { users: {}, config: {} };
         let activeUser = null;
         let rightAnswer = 0;
-        let adminTab = 'users';
         let currentSection = 'quiz';
 
-        window.onload = () => { setInterval(syncData, 2000); };
-
-        function syncData() {
-            db = JSON.parse(localStorage.getItem('quiz_sync_v9_db')) || db;
-            if(activeUser) {
-                const userRole = db[activeUser].role;
-                document.getElementById('chat-admin').classList.remove('hide-section');
-                document.getElementById('maintenance-screen').classList.toggle('hide-section', !(db.config.maintenance && userRole !== 'admin'));
-                updatePointsDisplay();
-                document.getElementById('ad-reward-display').innerText = db.config.ad_reward;
-                if(currentSection === 'points') renderUserHistory();
-            }
-            const mBtn = document.getElementById('maint-btn');
-            if(mBtn) {
-                mBtn.innerText = db.config.maintenance ? "MT AKTIF" : "MT OFF";
-                mBtn.className = db.config.maintenance ? "px-4 py-1 rounded-full text-[9px] font-black bg-red-600" : "px-4 py-1 rounded-full text-[9px] font-black bg-gray-600";
-            }
+        // SINKRONISASI
+        async function syncData() {
+            try {
+                const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'sync' })});
+                db = await res.json();
+                if(activeUser) {
+                    const u = db.users[activeUser];
+                    document.getElementById('chat-admin').classList.remove('hide-section');
+                    document.getElementById('maintenance-screen').classList.toggle('hide-section', !(db.config.maintenance && u.role !== 'admin'));
+                    document.getElementById('display-points').innerText = u.points;
+                    document.getElementById('ad-reward-display').innerText = db.config.ad_reward;
+                    if(currentSection === 'points') renderUserHistory();
+                }
+                const mBtn = document.getElementById('maint-btn');
+                if(mBtn) mBtn.className = db.config.maintenance ? "bg-red-600 px-4 py-1 rounded-full text-[9px] font-black" : "bg-gray-600 px-4 py-1 rounded-full text-[9px] font-black";
+            } catch (e) { console.error("Sync Error"); }
         }
 
-        function toggleMaintenance() {
-            db.config.maintenance = !db.config.maintenance; saveDB();
-            notify(db.config.maintenance ? "Mode Maintenance ON" : "Mode Maintenance OFF");
+        async function saveUser(u) {
+            await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'updateUser', userData: { username: u, ...db.users[u] }})});
         }
 
-        function notify(text, isErr = false) {
-            const t = document.getElementById('toast');
-            t.innerText = text;
-            t.className = `toast-box animate__animated animate__fadeInDown ${isErr ? 'bg-red-600' : 'bg-green-600'}`;
-            t.classList.remove('hidden');
-            setTimeout(() => t.classList.add('hidden'), 3000);
+        async function saveConfig() {
+            await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'updateConfig', configData: db.config })});
         }
 
-        function saveDB() { localStorage.setItem('quiz_sync_v9_db', JSON.stringify(db)); }
-
-        // --- AUTH ---
+        // AUTH
         function switchAuth(isL) {
-            document.getElementById('auth-title').innerText = isL ? "Quiz Pro" : "Register";
             document.getElementById('login-area').classList.toggle('hidden', !isL);
             document.getElementById('reg-area').classList.toggle('hidden', isL);
         }
 
-        function doRegister() {
+        async function doRegister() {
             const u = document.getElementById('user-input').value.trim();
             const p = document.getElementById('pass-input').value.trim();
-            if(!u || !p) return notify("Input Kosong!", true);
-            if(db[u]) return notify("Username Terpakai!", true);
-            const isFirst = Object.keys(db).filter(k => k !== 'global_broadcast' && k !== 'config').length === 0;
-            db[u] = { pass: p, points: 0, role: isFirst ? 'admin' : 'user', history: [], blocked: false };
-            saveDB(); notify(isFirst ? "Halo Admin!" : "Berhasil!"); switchAuth(true);
+            if(!u || !p) return notify("Lengkapi data!", true);
+            notify("Mengecek...");
+            await syncData();
+            if(db.users[u]) return notify("Username ada!", true);
+            const isFirst = Object.keys(db.users).length === 0;
+            db.users[u] = { pass: p, points: 0, role: isFirst ? 'admin' : 'user', history: [], blocked: false };
+            await saveUser(u);
+            notify("Berhasil Daftar!"); switchAuth(true);
         }
 
-        function doLogin() {
+        async function doLogin() {
+            notify("Loading...");
+            await syncData();
             const u = document.getElementById('user-input').value.trim();
             const p = document.getElementById('pass-input').value.trim();
-            const user = db[u];
+            const user = db.users[u];
             if(user && user.pass === p) {
-                if(user.blocked) return notify("Blocked!", true);
+                if(user.blocked) return notify("DIBLOKIR!", true);
                 activeUser = u;
                 document.getElementById('auth-page').classList.add('hide-section');
                 document.getElementById('main-app').classList.remove('hide-section');
                 document.getElementById('bottom-nav').classList.remove('hidden');
-                if(user.role === 'admin') {
-                    document.getElementById('admin-btn').classList.remove('hidden');
-                    document.getElementById('admin-btn').onclick = openAdmin;
-                }
+                if(user.role === 'admin') document.getElementById('admin-btn').classList.remove('hidden');
                 document.getElementById('display-name').innerText = u;
-                syncData(); showSection('quiz');
-            } else { notify("Login Salah!", true); }
+                showSection('quiz');
+            } else notify("Salah password!", true);
         }
 
-        // --- GAME ---
+        // GAME
         function showSection(name) {
             currentSection = name;
             document.getElementById('quiz-view').classList.toggle('hide-section', name !== 'quiz');
             document.getElementById('points-view').classList.toggle('hide-section', name !== 'points');
-            document.getElementById('nav-quiz').style.opacity = name === 'quiz' ? '1' : '0.3';
-            document.getElementById('nav-points').style.opacity = name === 'points' ? '1' : '0.3';
             if(name === 'quiz') initQuiz();
         }
 
         function initQuiz() {
-            const adBtn = document.getElementById('ad-btn');
-            adBtn.disabled = true; adBtn.className = "w-full mt-8 bg-gray-800 text-gray-500 py-4 rounded-2xl font-black opacity-30";
-            const a = Math.floor(Math.random() * 99), b = Math.floor(Math.random() * 99);
+            const a = Math.floor(Math.random()*99), b = Math.floor(Math.random()*99);
             rightAnswer = a + b;
             document.getElementById('question').innerText = `${a} + ${b}`;
             const grid = document.getElementById('options-grid'); grid.innerHTML = '';
-            let choices = [rightAnswer];
-            while(choices.length < 4) {
-                let r = rightAnswer + (Math.floor(Math.random() * 10) - 5);
-                if(!choices.includes(r) && r >= 0) choices.push(r);
-            }
-            choices.sort(() => Math.random() - 0.5).forEach(v => {
+            [rightAnswer, rightAnswer+5, rightAnswer-3, rightAnswer+10].sort(()=>Math.random()-0.5).forEach(v => {
                 const btn = document.createElement('button');
-                btn.innerText = v; btn.className = "glass p-6 rounded-2xl font-black text-2xl hover:bg-blue-600 transition";
+                btn.innerText = v; btn.className = "glass p-6 rounded-2xl font-bold";
                 btn.onclick = () => {
                     if(v === rightAnswer) {
-                        notify("BENAR!"); adBtn.disabled = false;
-                        adBtn.className = "w-full mt-8 bg-yellow-500 text-black py-4 rounded-2xl font-black cursor-pointer shadow-xl animate__animated animate__pulse";
-                    } else notify("Salah!", true);
+                        notify("BENAR!");
+                        document.getElementById('ad-btn').disabled = false;
+                        document.getElementById('ad-btn').classList.remove('opacity-30');
+                    }
                 };
                 grid.appendChild(btn);
             });
         }
 
-        function playAd() {
-            show_9865183().then(() => {
-                const r = db.config.ad_reward || 5;
-                db[activeUser].points += r; saveDB(); updatePointsDisplay();
-                notify("+" + r + " Poin!"); initQuiz();
-            }).catch(() => notify("Ads Error!", true));
+        async function playAd() {
+            show_9865183().then(async () => {
+                db.users[activeUser].points += parseInt(db.config.ad_reward);
+                await saveUser(activeUser);
+                notify("Poin bertambah!"); initQuiz();
+            });
         }
 
-        // --- WITHDRAW & HISTORY ---
-        function submitWD() {
+        async function submitWD() {
             const amount = parseInt(document.getElementById('wd-amount').value);
-            const num = document.getElementById('wd-dana').value.trim();
-            const name = document.getElementById('wd-name').value.trim();
-            if(!amount || !num || !name) return notify("Lengkapi Form!", true);
-            if(db[activeUser].points < amount) return notify("Poin Kurang!", true);
-            db[activeUser].points -= amount;
-            db[activeUser].history.unshift({ id: Date.now(), user: activeUser, amount, num, name, status: 'Pending', note: '' });
-            saveDB(); renderUserHistory(); notify("Berhasil!");
+            if(db.users[activeUser].points < amount) return notify("Poin kurang", true);
+            db.users[activeUser].points -= amount;
+            db.users[activeUser].history.unshift({ id: Date.now(), amount, status: 'Pending', note: '' });
+            await saveUser(activeUser);
+            notify("Berhasil ditarik!");
         }
 
-        // FUNGSI INI SEKARANG MENAMPILKAN CATATAN ADMIN
         function renderUserHistory() {
             const cont = document.getElementById('user-history'); cont.innerHTML = '';
-            db[activeUser].history.forEach(i => {
+            db.users[activeUser].history.forEach(h => {
                 cont.innerHTML += `
-                <div class="glass p-5 rounded-[2rem] border-l-4 ${i.status==='Pending'?'border-yellow-500':(i.status==='Diterima'?'border-green-500':'border-red-500')} animate__animated animate__fadeInUp">
-                    <div class="flex justify-between items-start mb-2">
-                        <div>
-                            <span class="text-2xl font-black">${i.amount}</span>
-                            <span class="text-[10px] opacity-40">Pts</span>
-                        </div>
-                        <span class="text-[8px] font-black uppercase px-2 py-1 rounded-lg status-${i.status.toLowerCase()}">${i.status}</span>
-                    </div>
-                    <p class="text-[10px] opacity-60 mb-2">${i.num} | ${i.name}</p>
-                    
-                    ${i.note ? `
-                    <div class="mt-3 bg-blue-500/10 border border-blue-500/20 p-3 rounded-2xl">
-                        <p class="text-[9px] text-blue-400 font-bold uppercase mb-1">Catatan Admin:</p>
-                        <p class="text-xs text-white italic">"${i.note}"</p>
-                    </div>` : ''}
+                <div class="glass p-4 rounded-2xl border-l-4 ${h.status==='Pending'?'border-yellow-500':'border-green-500'}">
+                    <p class="font-bold">${h.amount} Poin - ${h.status}</p>
+                    ${h.note ? `<p class="text-[10px] text-blue-400 mt-2">Pesan: ${h.note}</p>` : ''}
                 </div>`;
             });
         }
 
-        // --- ADMIN ---
-        function switchAdminTab(t) {
-            adminTab = t;
-            document.getElementById('tab-u').style.opacity = t === 'users' ? '1' : '0.5';
-            document.getElementById('tab-w').style.opacity = t === 'wd' ? '1' : '0.5';
-            renderAdminContent();
+        function notify(m, e=false) {
+            const t = document.getElementById('toast'); t.innerText = m;
+            t.className = `toast-box ${e?'bg-red-600':'bg-green-600'}`;
+            t.classList.remove('hidden');
+            setTimeout(()=>t.classList.add('hidden'), 2000);
         }
 
-        function renderAdminContent() {
-            const cont = document.getElementById('admin-content'); cont.innerHTML = '';
-            if(adminTab === 'users') {
-                Object.keys(db).forEach(u => {
-                    if(u === 'global_broadcast' || u === 'config') return;
-                    const user = db[u];
-                    cont.innerHTML += `<div class="glass p-4 rounded-2xl mb-2 flex justify-between items-center ${user.blocked?'opacity-30':''}">
-                        <div><p class="font-bold text-xs">${u} (${user.role})</p><p class="text-[10px] text-yellow-500">${user.points} Pts</p></div>
-                        <div class="flex space-x-1">
-                            <button onclick="admPass('${u}')" class="bg-blue-600/20 p-2 rounded text-[8px] font-bold">PASS</button>
-                            <button onclick="admPoin('${u}')" class="bg-yellow-600/20 p-2 rounded text-[8px] font-bold">POIN</button>
-                            <button onclick="admBlock('${u}')" class="bg-red-600/20 p-2 rounded text-[8px] font-bold">${user.blocked?'UN':'BLCK'}</button>
-                        </div>
-                    </div>`;
-                });
-            } else {
-                Object.keys(db).forEach(u => {
-                    if(u === 'global_broadcast' || u === 'config') return;
-                    db[u].history.forEach(h => {
-                        cont.innerHTML += `<div class="glass p-4 rounded-xl mb-2 text-[10px]">
-                            <p><b>${h.user}:</b> ${h.amount} Pts -> ${h.num}</p>
-                            <p class="text-[8px] opacity-40 italic">Note: ${h.note || '-'}</p>
-                            <div class="flex space-x-2 mt-3">
-                                ${h.status==='Pending' ? `
-                                <button onclick="admWD('${h.user}', ${h.id}, 'Diterima')" class="bg-green-600 px-3 py-1 rounded font-bold">TERIMA</button>
-                                <button onclick="admWD('${h.user}', ${h.id}, 'Ditolak')" class="bg-red-600 px-3 py-1 rounded font-bold">TOLAK</button>
-                                `:''}
-                                <button onclick="admDelLog('${h.user}', ${h.id})" class="bg-white/10 px-3 py-1 rounded text-red-400 font-bold">HAPUS</button>
-                            </div>
-                        </div>`;
-                    });
-                });
-            }
-        }
-
-        function admWD(u, id, s) { 
-            const note = prompt("Berikan pesan/catatan untuk user:");
-            const idx = db[u].history.findIndex(i => i.id === id);
-            if(idx !== -1) {
-                db[u].history[idx].status = s;
-                db[u].history[idx].note = note || "";
-                if(s === 'Ditolak') db[u].points += db[u].history[idx].amount;
-                saveDB(); renderAdminContent(); notify("Selesai!");
-            }
-        }
-
-        function adminSetAdReward() { const v = prompt("Poin Iklan:", db.config.ad_reward); if(v) { db.config.ad_reward = parseInt(v); saveDB(); notify("Set!"); } }
-        function adminBroadcast() { const m = prompt("Pesan:"); if(m) { db.global_broadcast = { msg: m, time: Date.now() }; saveDB(); notify("Sent!"); } }
-        function admDelLog(u, id) { if(confirm("Hapus log ini?")) { db[u].history = db[u].history.filter(i => i.id !== id); saveDB(); renderAdminContent(); } }
-        function admPass(u) { const p = prompt("New Pass:"); if(p) { db[u].pass = p; saveDB(); } }
-        function admPoin(u) { const p = prompt("Set Poin:", db[u].points); if(p) { db[u].points = parseInt(p); saveDB(); } }
-        function admBlock(u) { if(db[u].role==='admin') return; db[u].blocked = !db[u].blocked; saveDB(); renderAdminContent(); }
-
-        function updatePointsDisplay() { document.getElementById('display-points').innerText = db[activeUser].points; }
-        function openAdmin() { document.getElementById('admin-modal').classList.remove('hidden'); switchAdminTab('users'); }
+        window.onload = () => { syncData(); setInterval(syncData, 10000); };
+        function openAdmin() { document.getElementById('admin-modal').classList.remove('hidden'); }
         function closeAdmin() { document.getElementById('admin-modal').classList.add('hidden'); }
     </script>
 </body>
