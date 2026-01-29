@@ -643,7 +643,7 @@
 
             <!-- Navigation - MENU SETTING HIDDEN BY DEFAULT -->
             <div class="nav-container">
-                <ul class="nav-menu" id="navMenu">
+                <ul class="nav-menu">
                     <li class="nav-item">
                         <a href="#" class="nav-link active" onclick="showPage('quiz')" id="navQuiz">
                             <i class="fas fa-brain"></i>
@@ -662,7 +662,6 @@
                             <span>Profil</span>
                         </a>
                     </li>
-                    <!-- Settings menu item TIDAK ada di sini, akan ditambahkan secara dinamis untuk admin -->
                 </ul>
             </div>
 
@@ -920,9 +919,6 @@
                 // Add settings menu for admin ONLY
                 if (state.currentUser.role === 'admin') {
                     addSettingsMenu();
-                } else {
-                    // Pastikan tombol setting TIDAK ada untuk user biasa
-                    removeSettingsMenu();
                 }
                 
                 return true;
@@ -941,9 +937,6 @@
         }
 
         function logout() {
-            // Hapus menu settings jika ada
-            removeSettingsMenu();
-            
             state.currentUser = null;
             localStorage.removeItem('currentUserId');
             showLogin();
@@ -987,7 +980,7 @@
 
         // Add settings menu dynamically for admin
         function addSettingsMenu() {
-            const navMenu = document.getElementById('navMenu');
+            const navMenu = document.querySelector('.nav-menu');
             
             // Check if settings menu already exists
             if (!document.getElementById('navSettingsItem')) {
@@ -1534,7 +1527,6 @@
                         setTimeout(() => {
                             logout();
                         }, 1000);
-                    }
                 }
             }
         }
