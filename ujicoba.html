@@ -1,6 +1,6 @@
 // Configuration
 const CONFIG = {
-    API_URL: 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec', // Ganti dengan URL Web App Anda
+    API_URL: 'https://script.google.com/macros/s/AKfycbxtFAF06vDSMAZhroqFrlHcty-_legsVJA3MpyT4DtQ2_AjcdyIByngdFj8DIRXZgsR/exec', // Ganti dengan URL Web App Anda
     LOCAL_STORAGE_KEY: 'quizAppData',
     SYNC_INTERVAL: 30000 // Sync every 30 seconds
 };
@@ -218,3 +218,148 @@ async function initializeApp() {
             }
         }
     }
+    
+    hideLoading();
+    showLogin();
+}
+
+// Update login function to use API
+async function login(username, password) {
+    try {
+        const result = await callAPI('login', {
+            username: username,
+            password: password
+        });
+        
+        if (result.success) {
+            state.currentUser = result.user;
+            localStorage.setItem('currentUserId', result.user.id);
+            
+            // Update local data
+            const userIndex = state.users.findIndex(u => u.id == result.user.id);
+            if (userIndex !== -1) {
+                state.users[userIndex] = result.user;
+            } else {
+                state.users.push(result.user);
+            }
+            saveToLocalStorage();
+            
+            showToast(result.message, 'success');
+            
+            if (state.maintenance) {
+                showMaintenancePage();
+            } else {
+                showApp();
+            }
+            
+            updateUserInfo();
+            updateRewardButton();
+            generateNewQuestion();
+            
+            if (state.currentUser.role === 'admin') {
+                addSettingsMenu();
+            } else {
+                removeSettingsMenu();
+            }
+            
+            return true;
+        } else {
+            showToast(result.error, 'error');
+            return false;
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        showToast('Gagal login', 'error');
+        return false;
+    }
+}
+
+// Update register function to use API
+async function register(username, password) {
+    try {
+        const result = await callAPI('register', {
+            username: username,
+            password: password,
+            deviceId: state.deviceId
+        });
+        
+        if (result.success) {
+            // Add to local state
+            state.users.push(result.user);
+            saveToLocalStorage();
+            
+            showToast(result.message, 'success');
+            showLogin();
+            return true;
+        } else {
+            showToast(result.error, 'error');
+            return false;
+        }
+    } catch (error) {
+        console.error('Register error:', error);
+        showToast('Gagal mendaftar', 'error');
+        return false;
+    }
+}
+
+// Update withdrawal function to use API
+async function submitWithdrawal(points, accountName, phone) {
+    try {
+        const result = await callAPI('createWithdrawal', {
+            userId: state.currentUser.id,
+            username: state.currentUser.username,
+            points: points,
+            accountName: accountName,
+            phone: phone,
+            amount: points
+        });
+        
+        if (result.success) {
+            // Update local state
+            const withdrawal = {
+                id: result.withdrawalId,
+                userId: state.currentUser.id,
+                username: state.currentUser.username,
+                points: parseInt(points),
+                accountName: accountName,
+                phone: phone,
+                amount: points,
+                status: 'pending',
+                date: new Date().toISOString(),
+                adminNotes: ''
+            };
+            
+            state.withdrawals.push(withdrawal);
+            state.currentUser.points -= parseInt(points);
+            
+            const userIndex = state.users.findIndex(u => u.id === state.currentUser.id);
+            if (userIndex !== -1) {
+                state.users[userIndex].points = state.currentUser.points;
+            }
+            
+            saveToLocalStorage();
+            
+            showToast(result.message, 'success');
+            updateUserInfo();
+            loadWithdrawalHistory();
+            document.getElementById('withdrawalForm').reset();
+            
+            return true;
+        } else {
+            showToast(result.error, 'error');
+            return false;
+        }
+    } catch (error) {
+        console.error('Withdrawal error:', error);
+        showToast('Gagal mengirim permintaan penukaran', 'error');
+        return false;
+    }
+}
+
+// Update event listener for initialization
+document.addEventListener('DOMContentLoaded', function() {
+    initializeApp();
+    
+    // Your existing event listeners...
+    // [Keep all your existing event listeners here]
+});
