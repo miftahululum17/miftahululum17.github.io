@@ -4,11 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz Matematika - Telegram Mini App</title>
+    
     <!-- Telegram Web App SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
     <!-- Monetag Ads SDK -->
     <script src='//libtl.com/sdk.js' data-zone='9865183' data-sdk='show_9865183'></script>
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
+        /* Reset dan Base Styles */
         * {
             margin: 0;
             padding: 0;
@@ -40,6 +47,7 @@
             z-index: 1000;
             animation: slideIn 0.3s ease;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none;
         }
 
         @keyframes slideIn {
@@ -65,7 +73,7 @@
             background: linear-gradient(135deg, #2196F3, #1976D2);
         }
 
-        /* Auth Pages */
+        /* Authentication Pages */
         .auth-container {
             display: flex;
             justify-content: center;
@@ -175,7 +183,7 @@
             font-weight: 500;
         }
 
-        /* Header */
+        /* Main App Header */
         .header {
             background: white;
             border-radius: 20px;
@@ -204,35 +212,40 @@
             gap: 5px;
         }
 
-        /* Navigation */
+        /* Navigation - DIUBAH untuk satu baris di mobile */
         .nav-container {
             background: white;
             border-radius: 20px;
-            padding: 15px;
+            padding: 10px 15px;
             margin-bottom: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .nav-menu {
             display: flex;
             justify-content: space-around;
             list-style: none;
+            min-width: min-content;
+            width: 100%;
         }
 
         .nav-item {
-            flex: 1;
-            text-align: center;
+            flex: 0 0 auto;
+            min-width: 80px;
         }
 
         .nav-link {
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 10px;
+            padding: 8px 12px;
             color: #666;
             text-decoration: none;
             border-radius: 10px;
             transition: all 0.3s;
+            white-space: nowrap;
         }
 
         .nav-link.active {
@@ -241,8 +254,28 @@
         }
 
         .nav-link i {
-            font-size: 20px;
-            margin-bottom: 5px;
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .nav-link span {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* Scrollbar styling untuk mobile */
+        .nav-container::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .nav-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .nav-container::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
         }
 
         /* Quiz Page */
@@ -290,9 +323,42 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
+        .option-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .option-btn.correct {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border-color: #4CAF50;
+        }
+
+        .option-btn.incorrect {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            color: white;
+            border-color: #f44336;
+        }
+
         .reward-btn {
             margin: 20px auto;
             max-width: 300px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+            }
         }
 
         /* History Page */
@@ -343,7 +409,7 @@
             border-bottom: 1px solid #e0e0e0;
         }
 
-        /* Settings Page (Admin Only) - HIDDEN BY DEFAULT */
+        /* Settings Page (Admin Only) */
         .settings-container {
             background: white;
             border-radius: 20px;
@@ -377,6 +443,7 @@
             gap: 10px;
         }
 
+        /* Status Badges */
         .status-badge {
             padding: 5px 10px;
             border-radius: 20px;
@@ -496,42 +563,6 @@
             color: #333;
         }
 
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-
-            .options-container {
-                grid-template-columns: 1fr;
-            }
-
-            .nav-menu {
-                flex-wrap: wrap;
-            }
-
-            .nav-item {
-                flex: 1 0 45%;
-                margin-bottom: 10px;
-            }
-        }
-
-        /* Loading Spinner */
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
         /* Reward Points Settings */
         .reward-settings {
             display: flex;
@@ -569,14 +600,127 @@
             color: #667eea;
             margin: 10px 0;
         }
+
+        /* Responsive Design - DIUBAH untuk menu satu baris */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            /* Menu akan tetap satu baris dengan scroll horizontal */
+            .nav-container {
+                padding: 8px 10px;
+            }
+
+            .nav-item {
+                min-width: 70px;
+            }
+
+            .nav-link {
+                padding: 6px 8px;
+            }
+
+            .nav-link i {
+                font-size: 16px;
+                margin-bottom: 3px;
+            }
+
+            .nav-link span {
+                font-size: 11px;
+            }
+
+            /* Quiz options menjadi 1 kolom di mobile */
+            .options-container {
+                grid-template-columns: 1fr;
+            }
+
+            /* Perbaikan ukuran font untuk mobile */
+            .question {
+                font-size: 36px;
+            }
+
+            .quiz-title {
+                font-size: 20px;
+            }
+
+            /* Header adjustment */
+            .header {
+                padding: 15px;
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+
+            .user-info {
+                justify-content: space-between;
+            }
+
+            .points-display {
+                padding: 6px 12px;
+                font-size: 14px;
+            }
+
+            .reward-btn {
+                padding: 12px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-item {
+                min-width: 65px;
+            }
+
+            .nav-link {
+                padding: 5px 6px;
+            }
+
+            .nav-link i {
+                font-size: 14px;
+            }
+
+            .nav-link span {
+                font-size: 10px;
+            }
+
+            .question {
+                font-size: 32px;
+                margin: 20px 0;
+            }
+
+            .option-btn {
+                padding: 15px;
+                font-size: 18px;
+            }
+
+            .reward-btn {
+                padding: 10px;
+                font-size: 13px;
+            }
+        }
+
+        /* Utility Classes */
+        .page {
+            display: none;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-20 {
+            margin-top: 20px;
+        }
+
+        .mb-20 {
+            margin-bottom: 20px;
+        }
     </style>
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
         <!-- Toast Notification -->
-        <div id="toast" class="toast" style="display: none;"></div>
+        <div id="toast" class="toast"></div>
 
         <!-- Login Page -->
         <div id="loginPage" class="auth-container">
@@ -641,7 +785,7 @@
                 <button onclick="logout()" class="btn btn-danger">Logout</button>
             </div>
 
-            <!-- Navigation - MENU SETTING HIDDEN BY DEFAULT -->
+            <!-- Navigation - SEKARANG SATU BARIS DI MOBILE -->
             <div class="nav-container">
                 <ul class="nav-menu" id="navMenu">
                     <li class="nav-item">
@@ -662,7 +806,7 @@
                             <span>Profil</span>
                         </a>
                     </li>
-                    <!-- Settings menu item TIDAK ada di sini, akan ditambahkan secara dinamis untuk admin -->
+                    <!-- Settings menu akan ditambahkan secara dinamis untuk admin -->
                 </ul>
             </div>
 
@@ -672,7 +816,7 @@
                     <h2 class="quiz-title">Quiz Matematika</h2>
                     <div class="question" id="question">10 + 20</div>
                     <div class="options-container" id="optionsContainer">
-                        <!-- Options will be generated here -->
+                        <!-- Opsi jawaban akan dibuat secara dinamis -->
                     </div>
                     <button id="rewardBtn" class="btn btn-success reward-btn" style="display: none;">
                         <i class="fas fa-gift"></i> Klaim Reward <span id="rewardPoints">50</span> Poin
@@ -704,7 +848,7 @@
                         </form>
                     </div>
                     <div class="history-list" id="withdrawalHistory">
-                        <!-- History items will be added here -->
+                        <!-- Riwayat penukaran akan ditambahkan di sini -->
                     </div>
                 </div>
             </div>
@@ -742,9 +886,9 @@
                 </div>
             </div>
 
-            <!-- Settings Page (Admin Only) - HIDDEN BY DEFAULT -->
+            <!-- Settings Page (Hanya untuk Admin) -->
             <div id="settingsPage" class="page" style="display: none;">
-                <!-- Settings content will be dynamically generated -->
+                <!-- Konten settings akan dibuat secara dinamis -->
             </div>
 
             <!-- Maintenance Page -->
@@ -830,11 +974,11 @@
             users: JSON.parse(localStorage.getItem('users')) || [],
             withdrawals: JSON.parse(localStorage.getItem('withdrawals')) || [],
             maintenance: localStorage.getItem('maintenance') === 'true',
-            rewardPoints: parseInt(localStorage.getItem('rewardPoints')) || 50, // Default 50 poin
+            rewardPoints: parseInt(localStorage.getItem('rewardPoints')) || 50,
             currentQuestion: null,
             correctAnswer: null,
             deviceId: generateDeviceId(),
-            lastAutoLogout: null
+            canClaimReward: false // Tambah state untuk melacak apakah reward bisa diklaim
         };
 
         // Generate unique device ID
@@ -905,7 +1049,7 @@
                 
                 showToast('Login berhasil!', 'success');
                 
-                // Jika maintenance mode aktif, langsung tampilkan maintenance page
+                // Jika maintenance mode aktif, tampilkan halaman maintenance
                 if (state.maintenance) {
                     showMaintenancePage();
                 } else {
@@ -917,22 +1061,19 @@
                 updateRewardButton();
                 generateNewQuestion();
                 
-                // Add settings menu for admin ONLY
+                // Tambahkan menu settings untuk admin
                 if (state.currentUser.role === 'admin') {
                     addSettingsMenu();
                 } else {
-                    // Pastikan tombol setting TIDAK ada untuk user biasa
                     removeSettingsMenu();
                 }
                 
                 return true;
             } else {
-                // Cek apakah user ada tapi password salah
                 const userExists = state.users.find(u => u.username === username);
                 if (userExists) {
                     showToast('Password salah', 'error');
                 } else {
-                    // Tampilkan pesan untuk daftar
                     document.getElementById('noAccountMessage').style.display = 'block';
                     showToast('Belum punya akun? Silakan daftar terlebih dahulu', 'info');
                 }
@@ -941,9 +1082,7 @@
         }
 
         function logout() {
-            // Hapus menu settings jika ada
             removeSettingsMenu();
-            
             state.currentUser = null;
             localStorage.removeItem('currentUserId');
             showLogin();
@@ -951,22 +1090,19 @@
         }
 
         function register(username, password) {
-            // Check if username already exists
             if (state.users.some(u => u.username === username)) {
                 showToast('Username sudah digunakan', 'error');
                 return false;
             }
             
-            // Determine role: first user becomes admin, others become user
             const role = isFirstUser() ? 'admin' : 'user';
             
-            // Create new user dengan 0 poin awal
             const newUser = {
                 id: state.users.length + 1,
                 username,
                 password,
                 role: role,
-                points: 0, // POIN AWAL 0
+                points: 0,
                 joinDate: new Date().toISOString(),
                 deviceId: state.deviceId,
                 isBlocked: false
@@ -989,7 +1125,6 @@
         function addSettingsMenu() {
             const navMenu = document.getElementById('navMenu');
             
-            // Check if settings menu already exists
             if (!document.getElementById('navSettingsItem')) {
                 const settingsItem = document.createElement('li');
                 settingsItem.className = 'nav-item';
@@ -1004,7 +1139,6 @@
             }
         }
 
-        // Remove settings menu (when logging out or if user is not admin)
         function removeSettingsMenu() {
             const settingsItem = document.getElementById('navSettingsItem');
             if (settingsItem) {
@@ -1014,40 +1148,31 @@
 
         // Page Navigation
         function showPage(pageName) {
-            // Hide all pages
             document.querySelectorAll('.page').forEach(page => {
                 page.style.display = 'none';
             });
             
-            // Remove active class from all nav links
             document.querySelectorAll('.nav-link').forEach(link => {
                 link.classList.remove('active');
             });
             
-            // Show selected page
             if (pageName === 'settings') {
-                // Generate settings page dynamically
                 generateSettingsPage();
             }
             
             document.getElementById(`${pageName}Page`).style.display = 'block';
             
-            // Add active class to clicked nav link
             const navElement = document.getElementById(`nav${pageName.charAt(0).toUpperCase() + pageName.slice(1)}`);
             if (navElement) {
                 navElement.classList.add('active');
             }
             
-            // Load page-specific data
             switch(pageName) {
                 case 'history':
                     loadWithdrawalHistory();
                     break;
                 case 'profile':
                     loadProfile();
-                    break;
-                case 'settings':
-                    // Settings page is already generated
                     break;
             }
         }
@@ -1082,7 +1207,7 @@
                 return;
             }
             
-            // Hitung statistik penarikan
+            // Hitung statistik
             const totalWithdrawals = state.withdrawals.length;
             const pendingWithdrawals = state.withdrawals.filter(w => w.status === 'pending').length;
             const approvedWithdrawals = state.withdrawals.filter(w => w.status === 'approved').length;
@@ -1148,7 +1273,7 @@
                     <div class="admin-section">
                         <h3><i class="fas fa-users"></i> Manajemen Pengguna</h3>
                         <div class="users-list" id="usersList">
-                            <!-- Users will be loaded here -->
+                            <!-- Daftar user akan dimuat di sini -->
                         </div>
                     </div>
 
@@ -1156,28 +1281,26 @@
                     <div class="admin-section">
                         <h3><i class="fas fa-exchange-alt"></i> Permintaan Penukaran Poin</h3>
                         <div class="history-list" id="adminWithdrawalHistory">
-                            <!-- Withdrawal requests will be loaded here -->
+                            <!-- Permintaan penukaran akan dimuat di sini -->
                         </div>
                     </div>
                 </div>
             `;
             
-            // Load admin data
             loadUsersList();
             loadAdminWithdrawalHistory();
         }
 
-        // Quiz Functions
+        // Quiz Functions - DIPERBAIKI
         function generateNewQuestion() {
-            // Generate two random numbers between 1 and 100
             const num1 = Math.floor(Math.random() * 100) + 1;
             const num2 = Math.floor(Math.random() * 100) + 1;
             const answer = num1 + num2;
             
             state.currentQuestion = `${num1} + ${num2}`;
             state.correctAnswer = answer;
+            state.canClaimReward = false; // Reset status reward
             
-            // Generate wrong answers
             const wrongAnswers = [];
             while (wrongAnswers.length < 3) {
                 const wrongAnswer = answer + Math.floor(Math.random() * 20) - 10;
@@ -1186,11 +1309,9 @@
                 }
             }
             
-            // Combine and shuffle answers
             const allAnswers = [answer, ...wrongAnswers];
             shuffleArray(allAnswers);
             
-            // Update UI
             document.getElementById('question').textContent = state.currentQuestion;
             
             const optionsContainer = document.getElementById('optionsContainer');
@@ -1200,78 +1321,116 @@
                 const button = document.createElement('button');
                 button.className = 'option-btn';
                 button.textContent = ans;
-                button.onclick = () => checkAnswer(ans);
+                button.onclick = () => checkAnswer(ans, button);
                 optionsContainer.appendChild(button);
             });
             
-            // Hide reward button
+            // Pastikan tombol reward disembunyikan
             document.getElementById('rewardBtn').style.display = 'none';
         }
 
-        function checkAnswer(selectedAnswer) {
-            if (parseInt(selectedAnswer) === state.correctAnswer) {
+        function checkAnswer(selectedAnswer, buttonElement) {
+            const isCorrect = parseInt(selectedAnswer) === state.correctAnswer;
+            
+            // Tampilkan feedback visual untuk jawaban
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.disabled = true;
+                if (parseInt(btn.textContent) === state.correctAnswer) {
+                    btn.classList.add('correct');
+                } else if (btn === buttonElement && !isCorrect) {
+                    btn.classList.add('incorrect');
+                }
+            });
+            
+            if (isCorrect) {
                 showToast('Jawaban benar! 🎉', 'success');
+                state.canClaimReward = true; // Izinkan klaim reward
                 document.getElementById('rewardBtn').style.display = 'block';
             } else {
                 showToast('Jawaban salah 😢', 'error');
-                setTimeout(generateNewQuestion, 1000);
+                state.canClaimReward = false; // Tidak izinkan klaim reward
+                setTimeout(generateNewQuestion, 2000);
             }
-            
-            // Disable all option buttons
-            document.querySelectorAll('.option-btn').forEach(btn => {
-                btn.disabled = true;
-                btn.style.opacity = '0.6';
-            });
         }
 
+        // FUNGSI CLAIM REWARD YANG DIPERBAIKI
         function claimReward() {
-            // Show Monetag interstitial ad
+            // Periksa apakah reward bisa diklaim
+            if (!state.canClaimReward) {
+                showToast('Jawab pertanyaan dengan benar terlebih dahulu!', 'error');
+                return;
+            }
+            
+            if (!state.currentUser) {
+                showToast('Anda harus login terlebih dahulu', 'error');
+                return;
+            }
+            
+            showToast('Memproses reward...', 'info');
+            
             try {
+                // Coba tampilkan iklan dari Monetag
                 if (typeof show_9865183 !== 'undefined') {
+                    console.log('Menampilkan iklan Monetag...');
                     show_9865183().then(() => {
-                        // Ad completed successfully
+                        console.log('Iklan selesai, memberikan reward...');
                         rewardUserPoints();
                     }).catch(error => {
-                        console.error('Ad error:', error);
-                        showToast('Gagal menampilkan iklan', 'error');
-                        // Simulate success for testing
+                        console.error('Error iklan Monetag:', error);
+                        showToast('Menggunakan mode simulasi...', 'info');
+                        // Fallback ke simulasi jika iklan gagal
                         simulateAdSuccess();
                     });
                 } else {
-                    // Simulate ad for testing
+                    console.log('SDK iklan tidak ditemukan, menggunakan mode simulasi');
+                    // Jika SDK tidak tersedia, langsung berikan reward (untuk testing)
                     simulateAdSuccess();
                 }
             } catch (error) {
-                console.error('Error:', error);
-                showToast('Error: ' + error.message, 'error');
+                console.error('Error saat menampilkan iklan:', error);
+                showToast('Gagal menampilkan iklan, mencoba mode alternatif...', 'error');
+                // Fallback ke simulasi
+                simulateAdSuccess();
             }
         }
 
         function rewardUserPoints() {
-            if (state.currentUser) {
+            if (state.currentUser && state.canClaimReward) {
+                const oldPoints = state.currentUser.points;
                 state.currentUser.points += state.rewardPoints;
+                
+                // Update user di array users
                 const userIndex = state.users.findIndex(u => u.id === state.currentUser.id);
                 if (userIndex !== -1) {
                     state.users[userIndex].points = state.currentUser.points;
                     saveState();
-                    updateUserInfo();
                 }
-                showToast(`Reward ${state.rewardPoints} poin berhasil diklaim!`, 'success');
+                
+                updateUserInfo();
+                showToast(`+${state.rewardPoints} poin! Total: ${state.currentUser.points} poin`, 'success');
+                
+                // Reset dan buat pertanyaan baru
+                state.canClaimReward = false;
                 document.getElementById('rewardBtn').style.display = 'none';
-                generateNewQuestion();
+                setTimeout(() => {
+                    generateNewQuestion();
+                }, 1500);
+            } else {
+                showToast('Tidak dapat memberikan reward', 'error');
             }
         }
 
         function simulateAdSuccess() {
-            rewardUserPoints();
+            // Simulasi jeda untuk efek "menonton iklan"
+            setTimeout(() => {
+                rewardUserPoints();
+            }, 1000);
         }
 
-        // Update reward points button text
         function updateRewardButton() {
             document.getElementById('rewardPoints').textContent = state.rewardPoints;
         }
 
-        // Update reward points value
         function updateRewardPoints() {
             const newPoints = parseInt(document.getElementById('rewardPointsInput').value);
             if (newPoints && newPoints > 0) {
@@ -1280,7 +1439,6 @@
                 updateRewardButton();
                 showToast(`Poin reward diubah menjadi ${newPoints}`, 'success');
                 
-                // Update profile if user is on profile page
                 if (state.currentUser && document.getElementById('profilePage').style.display === 'block') {
                     document.getElementById('profileRewardPerQuiz').textContent = state.rewardPoints;
                 }
@@ -1303,7 +1461,6 @@
                 return;
             }
             
-            // Create withdrawal request
             const withdrawal = {
                 id: state.withdrawals.length + 1,
                 userId: state.currentUser.id,
@@ -1311,13 +1468,12 @@
                 points: parseInt(points),
                 accountName,
                 phone,
-                amount: points, // 1 point = Rp 1
+                amount: points,
                 status: 'pending',
                 date: new Date().toISOString(),
                 adminNotes: ''
             };
             
-            // Deduct points
             state.currentUser.points -= points;
             const userIndex = state.users.findIndex(u => u.id === state.currentUser.id);
             if (userIndex !== -1) {
@@ -1332,7 +1488,6 @@
             loadWithdrawalHistory();
             document.getElementById('withdrawalForm').reset();
             
-            // Update admin page if open
             if (state.currentUser.role === 'admin' && document.getElementById('settingsPage').style.display === 'block') {
                 generateSettingsPage();
             }
@@ -1380,7 +1535,6 @@
                 if (withdrawalIndex !== -1) {
                     const withdrawal = state.withdrawals[withdrawalIndex];
                     
-                    // Return points to user only if status is pending
                     if (withdrawal.status === 'pending') {
                         const userIndex = state.users.findIndex(u => u.id === withdrawal.userId);
                         if (userIndex !== -1) {
@@ -1396,7 +1550,6 @@
                     updateUserInfo();
                     loadWithdrawalHistory();
                     
-                    // Reload admin page if it's open
                     if (state.currentUser?.role === 'admin' && document.getElementById('settingsPage').style.display === 'block') {
                         generateSettingsPage();
                     }
@@ -1481,11 +1634,9 @@
                 user.role = document.getElementById('editRole').value;
                 user.points = newPoints;
                 
-                // Update current user if it's the same user
                 if (state.currentUser && state.currentUser.id === userId) {
                     state.currentUser = { ...user };
                     
-                    // If current user is no longer admin, remove settings menu
                     if (user.role !== 'admin') {
                         removeSettingsMenu();
                     }
@@ -1507,7 +1658,6 @@
                 loadUsersList();
                 showToast(`User ${state.users[userIndex].isBlocked ? 'diblokir' : 'dibuka'}`, 'success');
                 
-                // If current user is blocked, log them out
                 if (state.currentUser && state.currentUser.id === userId && state.users[userIndex].isBlocked) {
                     setTimeout(() => {
                         logout();
@@ -1520,16 +1670,12 @@
             if (confirm('Apakah Anda yakin ingin menghapus user ini? Semua data user akan hilang.')) {
                 const userIndex = state.users.findIndex(u => u.id === userId);
                 if (userIndex !== -1 && state.users[userIndex].role !== 'admin') {
-                    // Delete user's withdrawals
                     state.withdrawals = state.withdrawals.filter(w => w.userId !== userId);
-                    
-                    // Delete user
                     state.users.splice(userIndex, 1);
                     saveState();
                     loadUsersList();
                     showToast('User dihapus', 'success');
                     
-                    // If current user is deleted, log them out
                     if (state.currentUser && state.currentUser.id === userId) {
                         setTimeout(() => {
                             logout();
@@ -1552,11 +1698,9 @@
             
             showToast(`Maintenance mode ${state.maintenance ? 'diaktifkan' : 'dinonaktifkan'}`, 'success');
             
-            // Jika maintenance mode aktif, redirect semua user ke maintenance page
             if (state.maintenance && state.currentUser) {
                 showMaintenancePage();
             } else if (!state.maintenance && state.currentUser?.role === 'user') {
-                // Jika maintenance mode dimatikan, user kembali ke halaman quiz
                 if (document.getElementById('maintenancePage').style.display === 'block') {
                     showPage('quiz');
                 }
@@ -1623,7 +1767,6 @@
                 state.withdrawals[withdrawalIndex].status = newStatus;
                 state.withdrawals[withdrawalIndex].adminNotes = adminNotes;
                 
-                // If status changed from pending to rejected, return points
                 if (oldStatus === 'pending' && newStatus === 'rejected') {
                     const userIndex = state.users.findIndex(u => u.id === state.withdrawals[withdrawalIndex].userId);
                     if (userIndex !== -1) {
@@ -1632,7 +1775,6 @@
                     }
                 }
                 
-                // If status changed from rejected to approved, deduct points again
                 if (oldStatus === 'rejected' && newStatus === 'approved') {
                     const userIndex = state.users.findIndex(u => u.id === state.withdrawals[withdrawalIndex].userId);
                     if (userIndex !== -1) {
@@ -1643,12 +1785,10 @@
                 
                 saveState();
                 
-                // Update UI
                 if (document.getElementById('settingsPage').style.display === 'block') {
                     generateSettingsPage();
                 }
                 
-                // Update user's points display if they are the current user
                 if (state.currentUser && state.currentUser.id === state.withdrawals[withdrawalIndex].userId) {
                     updateUserInfo();
                     loadWithdrawalHistory();
@@ -1701,12 +1841,12 @@
             document.getElementById(modalId).style.display = 'none';
         }
 
-        // Event Listeners
+        // Event Listeners - DIPERBAIKI untuk tombol reward
         document.addEventListener('DOMContentLoaded', function() {
-            // Check auto-logout every hour
+            // Check auto-logout setiap jam
             setInterval(checkAutoLogout, 60 * 60 * 1000);
             
-            // Check if user is already logged in
+            // Cek apakah user sudah login
             const savedUserId = localStorage.getItem('currentUserId');
             if (savedUserId) {
                 const user = state.users.find(u => u.id === parseInt(savedUserId));
@@ -1717,7 +1857,7 @@
                 }
             }
             
-            // Show login page by default
+            // Tampilkan halaman login
             showLogin();
             
             // Login form
@@ -1753,8 +1893,11 @@
                 submitWithdrawal(points, accountName, phone);
             });
             
-            // Reward button
-            document.getElementById('rewardBtn').addEventListener('click', claimReward);
+            // PERBAIKAN: Event listener untuk tombol reward
+            document.getElementById('rewardBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                claimReward();
+            });
             
             // Edit user form
             document.getElementById('editUserForm').addEventListener('submit', function(e) {
