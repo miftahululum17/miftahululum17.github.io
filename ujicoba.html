@@ -9,9 +9,610 @@
     <!-- Monetag Ads SDK -->
     <script src='//libtl.com/sdk.js' data-zone='9865183' data-sdk='show_9865183'></script>
     <style>
-        /* Semua CSS dari sebelumnya tetap sama */
-        /* ... (paste semua CSS dari kode sebelumnya) ... */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast.success {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+        }
+
+        .toast.error {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+        }
+
+        .toast.info {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+        }
+
+        .toast.warning {
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+        }
+
+        /* Auth Pages */
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .auth-box {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .auth-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+
+        .auth-links {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .auth-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .points-display {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Navigation */
+        .nav-container {
+            background: white;
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .nav-menu {
+            display: flex;
+            justify-content: space-around;
+            list-style: none;
+        }
+
+        .nav-item {
+            flex: 1;
+            text-align: center;
+        }
+
+        .nav-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            color: #666;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .nav-link i {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        /* Quiz Page */
+        .quiz-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .quiz-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .question {
+            font-size: 48px;
+            font-weight: 700;
+            margin: 30px 0;
+            color: #667eea;
+        }
+
+        .options-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option-btn {
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            background: white;
+            font-size: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .option-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .reward-btn {
+            margin: 20px auto;
+            max-width: 300px;
+        }
+
+        /* History Page */
+        .history-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .withdrawal-form {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .history-list {
+            margin-top: 20px;
+        }
+
+        .history-item {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Profile Page */
+        .profile-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .profile-info {
+            margin-top: 20px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        /* Settings Page (Admin Only) */
+        .settings-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .admin-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 15px;
+        }
+
+        .users-list {
+            margin-top: 20px;
+        }
+
+        .user-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #FFEAA7;
+            color: #E17055;
+        }
+
+        .status-approved {
+            background: #55EFC4;
+            color: #00B894;
+        }
+
+        .status-rejected {
+            background: #FD79A8;
+            color: #E84393;
+        }
+
+        /* Switch Toggle */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            margin-right: 10px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Maintenance Page */
+        .maintenance-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 50vh;
+            text-align: center;
+        }
+
+        .maintenance-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .maintenance-text {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1001;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-title {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .options-container {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-menu {
+                flex-wrap: wrap;
+            }
+
+            .nav-item {
+                flex: 1 0 45%;
+                margin-bottom: 10px;
+            }
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Reward Points Settings */
+        .reward-settings {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .reward-input {
+            width: 100px;
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .withdrawal-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+        }
+
+        /* Database Status */
+        .db-status {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+
+        .db-online {
+            color: #4CAF50;
+        }
+
+        .db-offline {
+            color: #f44336;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            color: white;
+            font-size: 18px;
+            flex-direction: column;
+        }
     </style>
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -30,9 +631,243 @@
             <i class="fas fa-database"></i> <span id="dbStatusText">Database: Offline</span>
         </div>
 
-        <!-- Semua HTML dari sebelumnya tetap sama -->
-        <!-- ... (paste semua HTML dari kode sebelumnya) ... -->
-        
+        <!-- Login Page -->
+        <div id="loginPage" class="auth-container">
+            <div class="auth-box">
+                <h2 class="auth-title">Login</h2>
+                <div id="noAccountMessage" style="display: none; background: #ffebee; color: #c62828; padding: 10px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
+                    <i class="fas fa-exclamation-circle"></i> Belum punya akun? Silakan daftar terlebih dahulu.
+                </div>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginUsername">Username</label>
+                        <input type="text" id="loginUsername" class="form-control" placeholder="Masukkan username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" class="form-control" placeholder="Masukkan password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </form>
+                <div class="auth-links">
+                    <a href="#" class="auth-link" onclick="showRegister()">Belum punya akun? Daftar</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Register Page -->
+        <div id="registerPage" class="auth-container" style="display: none;">
+            <div class="auth-box">
+                <h2 class="auth-title">Daftar Akun</h2>
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="registerUsername">Username</label>
+                        <input type="text" id="registerUsername" class="form-control" placeholder="Buat username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">Password</label>
+                        <input type="password" id="registerPassword" class="form-control" placeholder="Buat password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerConfirmPassword">Konfirmasi Password</label>
+                        <input type="password" id="registerConfirmPassword" class="form-control" placeholder="Ulangi password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Daftar</button>
+                </form>
+                <div class="auth-links">
+                    <a href="#" class="auth-link" onclick="showLogin()">Sudah punya akun? Login</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main App (hidden by default) -->
+        <div id="appContainer" style="display: none;">
+            <!-- Header -->
+            <div class="header">
+                <div class="user-info">
+                    <span id="userGreeting">Selamat datang!</span>
+                    <div class="points-display">
+                        <i class="fas fa-coins"></i>
+                        <span id="userPoints">0</span> Poin
+                    </div>
+                </div>
+                <button onclick="logout()" class="btn btn-danger">Logout</button>
+            </div>
+
+            <!-- Navigation -->
+            <div class="nav-container">
+                <ul class="nav-menu" id="navMenu">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link active" onclick="showPage('quiz')" id="navQuiz">
+                            <i class="fas fa-brain"></i>
+                            <span>Quiz</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" onclick="showPage('history')" id="navHistory">
+                            <i class="fas fa-history"></i>
+                            <span>Riwayat</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" onclick="showPage('profile')" id="navProfile">
+                            <i class="fas fa-user"></i>
+                            <span>Profil</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Quiz Page -->
+            <div id="quizPage" class="page">
+                <div class="quiz-container">
+                    <h2 class="quiz-title">Quiz Matematika</h2>
+                    <div class="question" id="question">10 + 20</div>
+                    <div class="options-container" id="optionsContainer">
+                        <!-- Options will be generated here -->
+                    </div>
+                    <button id="rewardBtn" class="btn btn-success reward-btn" style="display: none;">
+                        <i class="fas fa-gift"></i> Klaim Reward <span id="rewardPoints">50</span> Poin
+                    </button>
+                </div>
+            </div>
+
+            <!-- History Page -->
+            <div id="historyPage" class="page" style="display: none;">
+                <div class="history-container">
+                    <h2>Riwayat Penukaran Poin</h2>
+                    <div class="withdrawal-form">
+                        <h3>Tukar Poin ke Dana</h3>
+                        <form id="withdrawalForm">
+                            <div class="form-group">
+                                <label>Jumlah Poin (Minimal 50)</label>
+                                <input type="number" id="withdrawalPoints" class="form-control" min="50" required>
+                                <small>50 Poin = Rp 50</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Nama Akun Dana</label>
+                                <input type="text" id="danaAccountName" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Nomor HP Dana</label>
+                                <input type="tel" id="danaPhone" class="form-control" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Kirim Permintaan</button>
+                        </form>
+                    </div>
+                    <div class="history-list" id="withdrawalHistory">
+                        <!-- History items will be added here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Page -->
+            <div id="profilePage" class="page" style="display: none;">
+                <div class="profile-container">
+                    <h2>Profil Pengguna</h2>
+                    <div class="profile-info">
+                        <div class="info-item">
+                            <span>Username:</span>
+                            <span id="profileUsername">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span>Role:</span>
+                            <span id="profileRole">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span>ID Perangkat:</span>
+                            <span id="deviceId">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span>Total Poin:</span>
+                            <span id="profilePoints">0</span>
+                        </div>
+                        <div class="info-item">
+                            <span>Poin per Reward:</span>
+                            <span id="profileRewardPerQuiz">0</span>
+                        </div>
+                        <div class="info-item">
+                            <span>Bergabung:</span>
+                            <span id="joinDate">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Page (Admin Only) -->
+            <div id="settingsPage" class="page" style="display: none;">
+                <!-- Settings content will be dynamically generated -->
+            </div>
+
+            <!-- Maintenance Page -->
+            <div id="maintenancePage" class="page" style="display: none;">
+                <div class="maintenance-container">
+                    <div>
+                        <div class="maintenance-icon">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <h2 class="maintenance-text">Sedang dalam Perbaikan</h2>
+                        <p>Mohon maaf, aplikasi sedang dalam perawatan.</p>
+                        <p>Silakan kembali lagi nanti.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modals -->
+        <div id="editUserModal" class="modal">
+            <div class="modal-content">
+                <h3 class="modal-title">Edit User</h3>
+                <form id="editUserForm">
+                    <input type="hidden" id="editUserId">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="editUsername" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password Baru (kosongkan jika tidak diubah)</label>
+                        <input type="password" id="editPassword" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Role</label>
+                        <select id="editRole" class="form-control">
+                            <option value="user">User</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Ubah Poin</label>
+                        <input type="number" id="editUserPoints" class="form-control" min="0" required>
+                        <small>Atur jumlah poin user</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('editUserModal')">Batal</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="withdrawalStatusModal" class="modal">
+            <div class="modal-content">
+                <h3 class="modal-title">Ubah Status Penukaran</h3>
+                <form id="withdrawalStatusForm">
+                    <input type="hidden" id="withdrawalId">
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="withdrawalStatus" class="form-control">
+                            <option value="pending">Pending</option>
+                            <option value="approved">Berhasil</option>
+                            <option value="rejected">Ditolak</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Catatan Admin</label>
+                        <textarea id="adminNotes" class="form-control" rows="3" placeholder="Tambahkan catatan..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Simpan Status</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('withdrawalStatusModal')">Batal</button>
+                </form>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -43,9 +878,14 @@
 
         // Configuration
         const CONFIG = {
-            API_URL: 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec', // Ganti dengan URL Web App Anda
-            CACHE_DURATION: 30000,
-            OFFLINE_MODE: true // Enable offline mode
+            SPREADSHEET_ID: 'YOUR_SPREADSHEET_ID', // Ganti dengan ID Spreadsheet Anda
+            API_KEY: 'YOUR_GOOGLE_API_KEY', // Ganti dengan Google API Key Anda
+            SHEETS: {
+                USERS: 'users',
+                WITHDRAWALS: 'withdrawals',
+                SETTINGS: 'settings'
+            },
+            CACHE_DURATION: 30000 // Cache data untuk 30 detik
         };
 
         // Application State
@@ -61,13 +901,7 @@
             deviceId: generateDeviceId(),
             lastAutoLogout: null,
             lastFetchTime: {},
-            cache: {},
-            offlineMode: false,
-            pendingSync: {
-                users: [],
-                withdrawals: [],
-                settings: []
-            }
+            cache: {}
         };
 
         // Generate unique device ID
@@ -81,204 +915,299 @@
         }
 
         // Database Functions
-        async function callAPI(action, params = {}) {
-            try {
-                const url = new URL(CONFIG.API_URL);
-                url.searchParams.append('action', action);
-                
-                Object.keys(params).forEach(key => {
-                    url.searchParams.append(key, params[key]);
-                });
-                
-                // Add timestamp to prevent caching
-                url.searchParams.append('_t', Date.now());
-                
-                const response = await fetch(url, {
-                    method: 'GET',
-                    mode: 'no-cors' // Important for Google Apps Script
-                }).catch(error => {
-                    // If fetch fails, use offline mode
-                    throw new Error('Network error');
-                });
-                
-                // Note: With 'no-cors' mode, we can't read response
-                // So we'll use a different approach
-                return await callAPIWithProxy(action, params);
-                
-            } catch (error) {
-                console.log(`API ${action} failed, using offline mode:`, error);
-                state.offlineMode = true;
-                return await handleOfflineAction(action, params);
+        async function fetchData(sheetName, useCache = true) {
+            const now = Date.now();
+            const cacheKey = sheetName;
+            
+            // Check cache
+            if (useCache && 
+                state.cache[cacheKey] && 
+                state.lastFetchTime[cacheKey] && 
+                (now - state.lastFetchTime[cacheKey]) < CONFIG.CACHE_DURATION) {
+                return state.cache[cacheKey];
             }
-        }
-
-        // Proxy method to handle CORS
-        async function callAPIWithProxy(action, params) {
+            
             try {
-                // Create form data
-                const formData = new FormData();
-                formData.append('action', action);
-                Object.keys(params).forEach(key => {
-                    formData.append(key, params[key]);
-                });
+                showLoading(`Memuat data ${sheetName}...`);
                 
-                const response = await fetch(CONFIG.API_URL, {
-                    method: 'POST',
-                    body: formData,
-                    mode: 'cors',
-                    credentials: 'omit'
-                });
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.SPREADSHEET_ID}/values/${sheetName}?key=${CONFIG.API_KEY}`;
+                const response = await fetch(url);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
                 }
                 
                 const data = await response.json();
-                state.offlineMode = false;
+                
+                if (!data.values || data.values.length < 2) {
+                    // Empty sheet, return empty array
+                    state.cache[cacheKey] = [];
+                    state.lastFetchTime[cacheKey] = now;
+                    hideLoading();
+                    updateDbStatus(true);
+                    return [];
+                }
+                
+                const headers = data.values[0];
+                const rows = data.values.slice(1);
+                
+                const result = rows.map(row => {
+                    const obj = {};
+                    headers.forEach((header, index) => {
+                        obj[header] = row[index] || '';
+                    });
+                    return obj;
+                });
+                
+                // Update cache
+                state.cache[cacheKey] = result;
+                state.lastFetchTime[cacheKey] = now;
+                
+                hideLoading();
                 updateDbStatus(true);
-                return data;
+                return result;
                 
             } catch (error) {
-                console.log(`API ${action} failed, using offline mode:`, error);
-                state.offlineMode = true;
+                console.error(`Error fetching ${sheetName}:`, error);
+                showToast(`Gagal memuat data ${sheetName}`, 'error');
+                hideLoading();
                 updateDbStatus(false);
-                return await handleOfflineAction(action, params);
-            }
-        }
-
-        // Handle actions in offline mode
-        async function handleOfflineAction(action, params) {
-            // Load from localStorage first
-            loadFromLocalStorage();
-            
-            switch(action) {
-                case 'getUsers':
-                    return { success: true, users: state.users };
-                case 'getWithdrawals':
-                    return { success: true, withdrawals: state.withdrawals };
-                case 'getSettings':
-                    return { success: true, settings: state.settings };
-                case 'login':
-                    return handleOfflineLogin(params);
-                case 'register':
-                    return handleOfflineRegister(params);
-                case 'updateUser':
-                    return handleOfflineUpdateUser(params);
-                case 'createWithdrawal':
-                    return handleOfflineCreateWithdrawal(params);
-                case 'updateWithdrawal':
-                    return handleOfflineUpdateWithdrawal(params);
-                case 'updateSettings':
-                    return handleOfflineUpdateSettings(params);
-                default:
-                    return { success: false, error: 'Action not supported offline' };
-            }
-        }
-
-        // Offline handlers
-        function handleOfflineLogin(params) {
-            const user = state.users.find(u => 
-                u.username === params.username && 
-                u.password === params.password && 
-                u.isBlocked !== 'true'
-            );
-            
-            if (user) {
-                // Update last login
-                user.lastLogin = new Date().toISOString();
-                saveToLocalStorage();
                 
-                return { 
-                    success: true, 
-                    message: 'Login berhasil (offline mode)', 
-                    user: user 
-                };
+                // Return cache if available
+                if (state.cache[cacheKey]) {
+                    return state.cache[cacheKey];
+                }
+                return [];
             }
-            
-            return { success: false, error: 'Username atau password salah' };
         }
 
-        function handleOfflineRegister(params) {
-            if (state.users.some(u => u.username === params.username)) {
-                return { success: false, error: 'Username sudah digunakan' };
+        async function saveData(sheetName, data) {
+            try {
+                showLoading(`Menyimpan data ke ${sheetName}...`);
+                
+                // First, get all data to find the next ID
+                const allData = await fetchData(sheetName, false);
+                
+                // Convert data to array format for Google Sheets
+                const values = [];
+                
+                if (sheetName === CONFIG.SHEETS.USERS) {
+                    values.push([
+                        data.id || (allData.length + 1),
+                        data.username,
+                        data.password,
+                        data.role,
+                        data.points || 0,
+                        data.joinDate || new Date().toISOString(),
+                        data.deviceId || state.deviceId,
+                        data.isBlocked || 'false',
+                        data.lastLogin || ''
+                    ]);
+                } else if (sheetName === CONFIG.SHEETS.WITHDRAWALS) {
+                    values.push([
+                        data.id || (allData.length + 1),
+                        data.userId,
+                        data.username,
+                        data.points,
+                        data.accountName,
+                        data.phone,
+                        data.amount,
+                        data.status,
+                        data.date || new Date().toISOString(),
+                        data.adminNotes || ''
+                    ]);
+                } else if (sheetName === CONFIG.SHEETS.SETTINGS) {
+                    values.push([
+                        data.key,
+                        data.value,
+                        new Date().toISOString()
+                    ]);
+                }
+                
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.SPREADSHEET_ID}/values/${sheetName}!A:Z:append?valueInputOption=USER_ENTERED&key=${CONFIG.API_KEY}`;
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        values: values,
+                        majorDimension: 'ROWS'
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                // Clear cache
+                delete state.cache[sheetName];
+                delete state.lastFetchTime[sheetName];
+                
+                hideLoading();
+                updateDbStatus(true);
+                return true;
+                
+            } catch (error) {
+                console.error(`Error saving to ${sheetName}:`, error);
+                showToast(`Gagal menyimpan data ke ${sheetName}`, 'error');
+                hideLoading();
+                updateDbStatus(false);
+                return false;
             }
-            
-            const role = state.users.length === 0 ? 'admin' : 'user';
-            const id = state.users.length + 1;
-            
-            const newUser = {
-                id: id,
-                username: params.username,
-                password: params.password,
-                role: role,
-                points: 0,
-                joinDate: new Date().toISOString(),
-                deviceId: state.deviceId,
-                isBlocked: 'false',
-                lastLogin: ''
-            };
-            
-            state.users.push(newUser);
-            saveToLocalStorage();
-            
-            return { 
-                success: true, 
-                message: 'Pendaftaran berhasil (offline mode)', 
-                user: newUser 
-            };
         }
 
-        // Local storage functions
-        function saveToLocalStorage() {
-            localStorage.setItem('quizApp_users', JSON.stringify(state.users));
-            localStorage.setItem('quizApp_withdrawals', JSON.stringify(state.withdrawals));
-            localStorage.setItem('quizApp_settings', JSON.stringify(state.settings));
-            localStorage.setItem('quizApp_lastSync', Date.now().toString());
+        async function updateData(sheetName, rowIndex, data) {
+            try {
+                showLoading(`Memperbarui data di ${sheetName}...`);
+                
+                const allData = await fetchData(sheetName, false);
+                if (rowIndex < 0 || rowIndex >= allData.length) {
+                    throw new Error('Row index out of bounds');
+                }
+                
+                // Convert data to array format
+                const rowData = allData[rowIndex];
+                const updatedRow = { ...rowData, ...data };
+                
+                let values;
+                if (sheetName === CONFIG.SHEETS.USERS) {
+                    values = [
+                        updatedRow.id,
+                        updatedRow.username,
+                        updatedRow.password,
+                        updatedRow.role,
+                        updatedRow.points,
+                        updatedRow.joinDate,
+                        updatedRow.deviceId,
+                        updatedRow.isBlocked,
+                        updatedRow.lastLogin
+                    ];
+                } else if (sheetName === CONFIG.SHEETS.WITHDRAWALS) {
+                    values = [
+                        updatedRow.id,
+                        updatedRow.userId,
+                        updatedRow.username,
+                        updatedRow.points,
+                        updatedRow.accountName,
+                        updatedRow.phone,
+                        updatedRow.amount,
+                        updatedRow.status,
+                        updatedRow.date,
+                        updatedRow.adminNotes
+                    ];
+                }
+                
+                // Google Sheets uses 1-based indexing, so add 2 (1 for header, 1 for 1-based)
+                const range = `${sheetName}!A${rowIndex + 2}:Z${rowIndex + 2}`;
+                
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.SPREADSHEET_ID}/values/${range}?valueInputOption=USER_ENTERED&key=${CONFIG.API_KEY}`;
+                
+                const response = await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        values: [values],
+                        majorDimension: 'ROWS'
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                // Clear cache
+                delete state.cache[sheetName];
+                delete state.lastFetchTime[sheetName];
+                
+                hideLoading();
+                updateDbStatus(true);
+                return true;
+                
+            } catch (error) {
+                console.error(`Error updating ${sheetName}:`, error);
+                showToast(`Gagal memperbarui data di ${sheetName}`, 'error');
+                hideLoading();
+                updateDbStatus(false);
+                return false;
+            }
         }
 
-        function loadFromLocalStorage() {
-            const users = localStorage.getItem('quizApp_users');
-            const withdrawals = localStorage.getItem('quizApp_withdrawals');
-            const settings = localStorage.getItem('quizApp_settings');
-            
-            if (users) state.users = JSON.parse(users);
-            if (withdrawals) state.withdrawals = JSON.parse(withdrawals);
-            if (settings) state.settings = JSON.parse(settings);
-            
-            // Set maintenance and reward points
-            state.maintenance = state.settings.maintenance === 'true';
-            state.rewardPoints = parseInt(state.settings.rewardPoints) || 50;
+        async function deleteData(sheetName, rowIndex) {
+            try {
+                showLoading(`Menghapus data dari ${sheetName}...`);
+                
+                // Note: Google Sheets API doesn't have a simple delete endpoint
+                // We'll implement this by clearing the row
+                const allData = await fetchData(sheetName, false);
+                if (rowIndex < 0 || rowIndex >= allData.length) {
+                    throw new Error('Row index out of bounds');
+                }
+                
+                const range = `${sheetName}!A${rowIndex + 2}:Z${rowIndex + 2}`;
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.SPREADSHEET_ID}/values/${range}?valueInputOption=USER_ENTERED&key=${CONFIG.API_KEY}`;
+                
+                const response = await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        values: [Array(10).fill('')], // Clear the row with empty values
+                        majorDimension: 'ROWS'
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                // Clear cache
+                delete state.cache[sheetName];
+                delete state.lastFetchTime[sheetName];
+                
+                hideLoading();
+                updateDbStatus(true);
+                return true;
+                
+            } catch (error) {
+                console.error(`Error deleting from ${sheetName}:`, error);
+                showToast(`Gagal menghapus data dari ${sheetName}`, 'error');
+                hideLoading();
+                updateDbStatus(false);
+                return false;
+            }
         }
 
-        // Initialize application
+        // Initialize application data
         async function initializeApp() {
             try {
                 showLoading('Memuat aplikasi...');
                 
-                // Try to load from API first
-                const [usersData, withdrawalsData, settingsData] = await Promise.all([
-                    callAPI('getUsers'),
-                    callAPI('getWithdrawals'),
-                    callAPI('getSettings')
-                ]);
+                // Load all data
+                state.users = await fetchData(CONFIG.SHEETS.USERS);
+                state.withdrawals = await fetchData(CONFIG.SHEETS.WITHDRAWALS);
+                const settingsData = await fetchData(CONFIG.SHEETS.SETTINGS);
                 
-                if (usersData.success) state.users = usersData.users;
-                if (withdrawalsData.success) state.withdrawals = withdrawalsData.withdrawals;
-                if (settingsData.success) {
-                    state.settings = settingsData.settings;
-                    state.maintenance = settingsData.settings.maintenance === 'true';
-                    state.rewardPoints = parseInt(settingsData.settings.rewardPoints) || 50;
-                }
+                // Convert settings array to object
+                state.settings = {};
+                settingsData.forEach(setting => {
+                    state.settings[setting.key] = setting.value;
+                });
                 
-                // Save to localStorage for offline use
-                saveToLocalStorage();
+                // Set maintenance and reward points from settings
+                state.maintenance = state.settings.maintenance === 'true';
+                state.rewardPoints = parseInt(state.settings.rewardPoints) || 50;
                 
                 hideLoading();
                 
                 // Check if user is already logged in
                 const savedUserId = localStorage.getItem('currentUserId');
                 if (savedUserId) {
-                    const user = state.users.find(u => u.id == savedUserId);
+                    const user = state.users.find(u => u.id === savedUserId);
                     if (user) {
                         if (await login(user.username, user.password)) {
                             return;
@@ -286,12 +1215,12 @@
                     }
                 }
                 
+                // Show login page
                 showLogin();
                 
             } catch (error) {
                 console.error('Error initializing app:', error);
-                // Fallback to localStorage
-                loadFromLocalStorage();
+                showToast('Gagal memuat aplikasi', 'error');
                 hideLoading();
                 showLogin();
             }
@@ -332,6 +1261,7 @@
                 dbStatus.style.display = 'block';
             }
             
+            // Hide after 3 seconds if online
             if (isOnline) {
                 setTimeout(() => {
                     dbStatus.style.display = 'none';
@@ -353,27 +1283,51 @@
 
         async function login(username, password) {
             try {
-                const result = await callAPI('login', {
-                    username: username,
-                    password: password
-                });
+                // Refresh users data
+                state.users = await fetchData(CONFIG.SHEETS.USERS, false);
                 
-                if (result.success) {
-                    state.currentUser = result.user;
-                    localStorage.setItem('currentUserId', result.user.id);
+                const user = state.users.find(u => 
+                    u.username === username && 
+                    u.password === password && 
+                    u.isBlocked !== 'true'
+                );
+                
+                if (user) {
+                    // Check auto-logout (2 days)
+                    const lastLogin = user.lastLogin;
+                    const twoDaysAgo = Date.now() - (2 * 24 * 60 * 60 * 1000);
                     
-                    showToast(result.message, 'success');
+                    if (lastLogin && new Date(lastLogin).getTime() < twoDaysAgo) {
+                        showToast('Sesi telah habis, silakan login kembali', 'info');
+                        return false;
+                    }
                     
+                    state.currentUser = user;
+                    localStorage.setItem('currentUserId', user.id);
+                    
+                    // Update last login
+                    const userIndex = state.users.findIndex(u => u.id === user.id);
+                    if (userIndex !== -1) {
+                        await updateData(CONFIG.SHEETS.USERS, userIndex, {
+                            lastLogin: new Date().toISOString()
+                        });
+                    }
+                    
+                    showToast('Login berhasil!', 'success');
+                    
+                    // Check maintenance mode
                     if (state.maintenance) {
                         showMaintenancePage();
                     } else {
                         showApp();
                     }
                     
+                    // Update UI
                     updateUserInfo();
                     updateRewardButton();
                     generateNewQuestion();
                     
+                    // Add settings menu for admin ONLY
                     if (state.currentUser.role === 'admin') {
                         addSettingsMenu();
                     } else {
@@ -382,7 +1336,17 @@
                     
                     return true;
                 } else {
-                    showToast(result.error, 'error');
+                    const userExists = state.users.find(u => u.username === username);
+                    if (userExists) {
+                        if (userExists.isBlocked === 'true') {
+                            showToast('Akun Anda diblokir', 'error');
+                        } else {
+                            showToast('Password salah', 'error');
+                        }
+                    } else {
+                        document.getElementById('noAccountMessage').style.display = 'block';
+                        showToast('Belum punya akun? Silakan daftar terlebih dahulu', 'info');
+                    }
                     return false;
                 }
             } catch (error) {
@@ -402,22 +1366,47 @@
 
         async function register(username, password) {
             try {
-                const result = await callAPI('register', {
-                    username: username,
-                    password: password,
-                    deviceId: state.deviceId
-                });
+                // Check if username already exists
+                state.users = await fetchData(CONFIG.SHEETS.USERS, false);
                 
-                if (result.success) {
+                if (state.users.some(u => u.username === username)) {
+                    showToast('Username sudah digunakan', 'error');
+                    return false;
+                }
+                
+                // Determine role: first user becomes admin, others become user
+                const role = state.users.length === 0 ? 'admin' : 'user';
+                
+                // Create new user with 0 points
+                const newUser = {
+                    id: state.users.length + 1,
+                    username,
+                    password,
+                    role: role,
+                    points: 0,
+                    joinDate: new Date().toISOString(),
+                    deviceId: state.deviceId,
+                    isBlocked: 'false',
+                    lastLogin: ''
+                };
+                
+                // Save to database
+                const success = await saveData(CONFIG.SHEETS.USERS, newUser);
+                
+                if (success) {
                     // Update local state
-                    state.users.push(result.user);
-                    saveToLocalStorage();
+                    state.users.push(newUser);
                     
-                    showToast(result.message, 'success');
+                    if (role === 'admin') {
+                        showToast('Pendaftaran berhasil! Anda adalah ADMIN pertama.', 'success');
+                    } else {
+                        showToast('Pendaftaran berhasil! Silakan login.', 'success');
+                    }
+                    
                     showLogin();
                     return true;
                 } else {
-                    showToast(result.error, 'error');
+                    showToast('Gagal mendaftar', 'error');
                     return false;
                 }
             } catch (error) {
@@ -425,6 +1414,85 @@
                 showToast('Gagal mendaftar', 'error');
                 return false;
             }
+        }
+
+        // Add settings menu dynamically for admin
+        function addSettingsMenu() {
+            const navMenu = document.getElementById('navMenu');
+            
+            if (!document.getElementById('navSettingsItem')) {
+                const settingsItem = document.createElement('li');
+                settingsItem.className = 'nav-item';
+                settingsItem.id = 'navSettingsItem';
+                settingsItem.innerHTML = `
+                    <a href="#" class="nav-link" onclick="showPage('settings')" id="navSettings">
+                        <i class="fas fa-cog"></i>
+                        <span>Setting</span>
+                    </a>
+                `;
+                navMenu.appendChild(settingsItem);
+            }
+        }
+
+        function removeSettingsMenu() {
+            const settingsItem = document.getElementById('navSettingsItem');
+            if (settingsItem) {
+                settingsItem.remove();
+            }
+        }
+
+        // Page Navigation
+        async function showPage(pageName) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.style.display = 'none';
+            });
+            
+            // Remove active class from all nav links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Show selected page
+            if (pageName === 'settings') {
+                await generateSettingsPage();
+            }
+            
+            document.getElementById(`${pageName}Page`).style.display = 'block';
+            
+            // Add active class to clicked nav link
+            const navElement = document.getElementById(`nav${pageName.charAt(0).toUpperCase() + pageName.slice(1)}`);
+            if (navElement) {
+                navElement.classList.add('active');
+            }
+            
+            // Load page-specific data
+            switch(pageName) {
+                case 'history':
+                    await loadWithdrawalHistory();
+                    break;
+                case 'profile':
+                    loadProfile();
+                    break;
+            }
+        }
+
+        function showApp() {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('registerPage').style.display = 'none';
+            document.getElementById('appContainer').style.display = 'block';
+            showPage('quiz');
+        }
+
+        function showMaintenancePage() {
+            document.getElementById('appContainer').style.display = 'block';
+            document.querySelectorAll('.page').forEach(page => {
+                page.style.display = 'none';
+            });
+            document.getElementById('maintenancePage').style.display = 'block';
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
         }
 
         // Quiz Functions
@@ -499,31 +1567,281 @@
 
         async function rewardUserPoints() {
             if (state.currentUser) {
+                // Update user points
                 const newPoints = parseInt(state.currentUser.points) + state.rewardPoints;
+                state.currentUser.points = newPoints;
                 
-                // Update in API
-                const result = await callAPI('updateUser', {
-                    userId: state.currentUser.id,
-                    points: newPoints
-                });
-                
-                if (result.success) {
-                    // Update local state
-                    state.currentUser.points = newPoints;
-                    const userIndex = state.users.findIndex(u => u.id == state.currentUser.id);
-                    if (userIndex !== -1) {
-                        state.users[userIndex].points = newPoints;
-                        saveToLocalStorage();
-                    }
+                // Find user index and update in database
+                const userIndex = state.users.findIndex(u => u.id === state.currentUser.id);
+                if (userIndex !== -1) {
+                    await updateData(CONFIG.SHEETS.USERS, userIndex, {
+                        points: newPoints
+                    });
                     
-                    updateUserInfo();
-                    showToast(`Reward ${state.rewardPoints} poin berhasil diklaim!`, 'success');
-                    document.getElementById('rewardBtn').style.display = 'none';
-                    generateNewQuestion();
-                } else {
-                    showToast('Gagal mengupdate poin', 'error');
+                    // Update local cache
+                    state.users[userIndex].points = newPoints;
                 }
+                
+                updateUserInfo();
+                showToast(`Reward ${state.rewardPoints} poin berhasil diklaim!`, 'success');
+                document.getElementById('rewardBtn').style.display = 'none';
+                generateNewQuestion();
             }
+        }
+
+        async function simulateAdSuccess() {
+            await rewardUserPoints();
+        }
+
+        function updateRewardButton() {
+            document.getElementById('rewardPoints').textContent = state.rewardPoints;
+        }
+
+        async function updateRewardPoints() {
+            const newPoints = parseInt(document.getElementById('rewardPointsInput').value);
+            if (newPoints && newPoints > 0) {
+                state.rewardPoints = newPoints;
+                
+                // Update in settings
+                const settingsData = await fetchData(CONFIG.SHEETS.SETTINGS, false);
+                const rewardSettingIndex = settingsData.findIndex(s => s.key === 'rewardPoints');
+                
+                if (rewardSettingIndex !== -1) {
+                    await updateData(CONFIG.SHEETS.SETTINGS, rewardSettingIndex, {
+                        key: 'rewardPoints',
+                        value: newPoints.toString(),
+                        updatedAt: new Date().toISOString()
+                    });
+                } else {
+                    await saveData(CONFIG.SHEETS.SETTINGS, {
+                        key: 'rewardPoints',
+                        value: newPoints.toString(),
+                        updatedAt: new Date().toISOString()
+                    });
+                }
+                
+                // Update local settings
+                state.settings.rewardPoints = newPoints.toString();
+                
+                updateRewardButton();
+                showToast(`Poin reward diubah menjadi ${newPoints}`, 'success');
+                
+                if (state.currentUser && document.getElementById('profilePage').style.display === 'block') {
+                    document.getElementById('profileRewardPerQuiz').textContent = state.rewardPoints;
+                }
+            } else {
+                showToast('Masukkan jumlah poin yang valid', 'error');
+            }
+        }
+
+        // Withdrawal Functions
+        async function submitWithdrawal(points, accountName, phone) {
+            try {
+                if (!state.currentUser) return;
+                
+                if (points < 50) {
+                    showToast('Minimal penukaran 50 poin', 'error');
+                    return;
+                }
+                
+                if (points > parseInt(state.currentUser.points)) {
+                    showToast('Poin tidak cukup', 'error');
+                    return;
+                }
+                
+                // Create withdrawal request
+                const withdrawal = {
+                    userId: state.currentUser.id,
+                    username: state.currentUser.username,
+                    points: parseInt(points),
+                    accountName,
+                    phone,
+                    amount: points,
+                    status: 'pending',
+                    date: new Date().toISOString(),
+                    adminNotes: ''
+                };
+                
+                // Update user points
+                const newPoints = parseInt(state.currentUser.points) - points;
+                state.currentUser.points = newPoints;
+                
+                const userIndex = state.users.findIndex(u => u.id === state.currentUser.id);
+                if (userIndex !== -1) {
+                    await updateData(CONFIG.SHEETS.USERS, userIndex, {
+                        points: newPoints
+                    });
+                    
+                    // Update local cache
+                    state.users[userIndex].points = newPoints;
+                }
+                
+                // Save withdrawal to database
+                await saveData(CONFIG.SHEETS.WITHDRAWALS, withdrawal);
+                
+                // Refresh withdrawals data
+                state.withdrawals = await fetchData(CONFIG.SHEETS.WITHDRAWALS, false);
+                
+                showToast('Permintaan penukaran berhasil dikirim', 'success');
+                updateUserInfo();
+                await loadWithdrawalHistory();
+                document.getElementById('withdrawalForm').reset();
+                
+            } catch (error) {
+                console.error('Withdrawal error:', error);
+                showToast('Gagal mengirim permintaan penukaran', 'error');
+            }
+        }
+
+        async function loadWithdrawalHistory() {
+            if (!state.currentUser) return;
+            
+            const container = document.getElementById('withdrawalHistory');
+            container.innerHTML = '';
+            
+            // Refresh data
+            state.withdrawals = await fetchData(CONFIG.SHEETS.WITHDRAWALS, false);
+            
+            const userWithdrawals = state.withdrawals
+                .filter(w => w.userId == state.currentUser.id)
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            if (userWithdrawals.length === 0) {
+                container.innerHTML = '<p>Belum ada riwayat penukaran</p>';
+                return;
+            }
+            
+            userWithdrawals.forEach(withdrawal => {
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                item.innerHTML = `
+                    <div>
+                        <strong>${withdrawal.points} Poin</strong>
+                        <div>Rp ${withdrawal.amount}</div>
+                        <small>${new Date(withdrawal.date).toLocaleDateString('id-ID')}</small>
+                        <br>
+                        <small>Status: </small>
+                        <span class="status-badge status-${withdrawal.status}">${getStatusText(withdrawal.status)}</span>
+                        ${withdrawal.adminNotes ? `<br><small>Catatan: ${withdrawal.adminNotes}</small>` : ''}
+                    </div>
+                    <div>
+                        ${withdrawal.status === 'pending' ? `<button onclick="deleteWithdrawal(${withdrawal.id})" class="btn btn-danger btn-sm">Hapus</button>` : ''}
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // Generate Settings Page Dynamically
+        async function generateSettingsPage() {
+            if (state.currentUser?.role !== 'admin') {
+                document.getElementById('settingsPage').innerHTML = `
+                    <div class="settings-container">
+                        <h2>Akses Ditolak</h2>
+                        <p>Hanya admin yang dapat mengakses halaman ini.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Refresh data
+            state.users = await fetchData(CONFIG.SHEETS.USERS, false);
+            state.withdrawals = await fetchData(CONFIG.SHEETS.WITHDRAWALS, false);
+            
+            // Calculate statistics
+            const totalWithdrawals = state.withdrawals.length;
+            const pendingWithdrawals = state.withdrawals.filter(w => w.status === 'pending').length;
+            const approvedWithdrawals = state.withdrawals.filter(w => w.status === 'approved').length;
+            const rejectedWithdrawals = state.withdrawals.filter(w => w.status === 'rejected').length;
+            const totalPointsWithdrawn = state.withdrawals
+                .filter(w => w.status === 'approved')
+                .reduce((sum, w) => sum + parseInt(w.points || 0), 0);
+            
+            document.getElementById('settingsPage').innerHTML = `
+                <div class="settings-container">
+                    <h2><i class="fas fa-cog"></i> Admin Settings</h2>
+                    
+                    <!-- Maintenance Toggle -->
+                    <div class="admin-section">
+                        <h3><i class="fas fa-tools"></i> Maintenance Mode</h3>
+                        <label class="switch">
+                            <input type="checkbox" id="maintenanceToggle" ${state.maintenance ? 'checked' : ''} onchange="toggleMaintenance()">
+                            <span class="slider"></span>
+                        </label>
+                        <span id="maintenanceStatus">Mode Maintenance: ${state.maintenance ? 'ON' : 'OFF'}</span>
+                        <p><small>Jika aktif, semua user akan melihat halaman maintenance setelah login</small></p>
+                    </div>
+                    
+                    <!-- Reward Points Settings -->
+                    <div class="admin-section">
+                        <h3><i class="fas fa-coins"></i> Pengaturan Poin Reward</h3>
+                        <div class="reward-settings">
+                            <label>Poin per Reward:</label>
+                            <input type="number" id="rewardPointsInput" class="reward-input" value="${state.rewardPoints}" min="1">
+                            <button onclick="updateRewardPoints()" class="btn btn-primary btn-sm">Update</button>
+                        </div>
+                        <p><small>Jumlah poin yang didapat user setiap kali menyelesaikan quiz dengan benar</small></p>
+                    </div>
+                    
+                    <!-- Withdrawal Statistics -->
+                    <div class="admin-section">
+                        <h3><i class="fas fa-chart-bar"></i> Statistik Penarikan</h3>
+                        <div class="withdrawal-stats">
+                            <div class="stat-card">
+                                <div>Total Penarikan</div>
+                                <div class="stat-value">${totalWithdrawals}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div>Pending</div>
+                                <div class="stat-value">${pendingWithdrawals}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div>Berhasil</div>
+                                <div class="stat-value">${approvedWithdrawals}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div>Ditolak</div>
+                                <div class="stat-value">${rejectedWithdrawals}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div>Total Poin</div>
+                                <div class="stat-value">${totalPointsWithdrawn}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Users Management -->
+                    <div class="admin-section">
+                        <h3><i class="fas fa-users"></i> Manajemen Pengguna</h3>
+                        <div class="users-list" id="usersList">
+                            <!-- Users will be loaded here -->
+                        </div>
+                    </div>
+
+                    <!-- Withdrawal Requests -->
+                    <div class="admin-section">
+                        <h3><i class="fas fa-exchange-alt"></i> Permintaan Penukaran Poin</h3>
+                        <div class="history-list" id="adminWithdrawalHistory">
+                            <!-- Withdrawal requests will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            await loadUsersList();
+            await loadAdminWithdrawalHistory();
+        }
+
+        // Profile Functions
+        function loadProfile() {
+            if (!state.currentUser) return;
+            
+            document.getElementById('profileUsername').textContent = state.currentUser.username;
+            document.getElementById('profileRole').textContent = state.currentUser.role === 'admin' ? 'Administrator' : 'Pengguna';
+            document.getElementById('deviceId').textContent = state.deviceId;
+            document.getElementById('profilePoints').textContent = state.currentUser.points;
+            document.getElementById('profileRewardPerQuiz').textContent = state.rewardPoints;
+            document.getElementById('joinDate').textContent = new Date(state.currentUser.joinDate).toLocaleDateString('id-ID');
         }
 
         // Update user info in UI
@@ -534,8 +1852,35 @@
             }
         }
 
+        // Utility Functions
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'pending': 'Pending',
+                'approved': 'Berhasil',
+                'rejected': 'Ditolak'
+            };
+            return statusMap[status] || status;
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
         // Event Listeners
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize app
             initializeApp();
             
             // Login form
@@ -573,78 +1918,135 @@
             
             // Reward button
             document.getElementById('rewardBtn').addEventListener('click', claimReward);
+            
+            // Close modals when clicking outside
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        this.style.display = 'none';
+                    }
+                });
+            });
         });
 
-        // Helper functions
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
+        // Admin Functions
+        async function loadUsersList() {
+            const container = document.getElementById('usersList');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            if (state.users.length === 0) {
+                container.innerHTML = '<p>Belum ada pengguna terdaftar</p>';
+                return;
             }
-            return array;
-        }
-
-        function addSettingsMenu() {
-            const navMenu = document.getElementById('navMenu');
-            if (!document.getElementById('navSettingsItem')) {
-                const settingsItem = document.createElement('li');
-                settingsItem.className = 'nav-item';
-                settingsItem.id = 'navSettingsItem';
-                settingsItem.innerHTML = `
-                    <a href="#" class="nav-link" onclick="showPage('settings')" id="navSettings">
-                        <i class="fas fa-cog"></i>
-                        <span>Setting</span>
-                    </a>
+            
+            state.users.forEach(user => {
+                const item = document.createElement('div');
+                item.className = 'user-item';
+                item.innerHTML = `
+                    <div>
+                        <strong>${user.username} ${user.role === 'admin' ? '<i class="fas fa-crown" style="color: #FFD700;"></i>' : ''}</strong>
+                        <div>Role: ${user.role} | Poin: ${user.points}</div>
+                        <small>${user.isBlocked === 'true' ? '<span style="color:red">Diblokir</span>' : 'Aktif'}</small>
+                    </div>
+                    <div class="user-actions">
+                        <button onclick="editUser('${user.id}')" class="btn btn-primary btn-sm">Edit</button>
+                        ${user.role !== 'admin' ? `
+                            <button onclick="toggleBlockUser('${user.id}')" class="btn btn-warning btn-sm">
+                                ${user.isBlocked === 'true' ? 'Buka' : 'Blokir'}
+                            </button>
+                            <button onclick="deleteUser('${user.id}')" class="btn btn-danger btn-sm">Hapus</button>
+                        ` : ''}
+                    </div>
                 `;
-                navMenu.appendChild(settingsItem);
+                container.appendChild(item);
+            });
+        }
+
+        async function loadAdminWithdrawalHistory() {
+            const container = document.getElementById('adminWithdrawalHistory');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            const sortedWithdrawals = [...state.withdrawals].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            if (sortedWithdrawals.length === 0) {
+                container.innerHTML = '<p>Belum ada permintaan penukaran</p>';
+                return;
+            }
+            
+            sortedWithdrawals.forEach(withdrawal => {
+                const user = state.users.find(u => u.id == withdrawal.userId);
+                const userRole = user ? user.role : 'unknown';
+                
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                item.innerHTML = `
+                    <div>
+                        <strong>${withdrawal.username} <small>(${userRole})</small></strong>
+                        <div>${withdrawal.points} Poin → Rp ${withdrawal.amount}</div>
+                        <small>${new Date(withdrawal.date).toLocaleDateString('id-ID')}</small>
+                        <br>
+                        <small>Dana: ${withdrawal.accountName} (${withdrawal.phone})</small>
+                        <br>
+                        <span class="status-badge status-${withdrawal.status}">${getStatusText(withdrawal.status)}</span>
+                        ${withdrawal.adminNotes ? `<br><small>Catatan Admin: ${withdrawal.adminNotes}</small>` : ''}
+                    </div>
+                    <div>
+                        <button onclick="updateWithdrawalStatus('${withdrawal.id}')" class="btn btn-primary btn-sm">Ubah Status</button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        async function toggleMaintenance() {
+            const toggle = document.getElementById('maintenanceToggle');
+            if (!toggle) return;
+            
+            state.maintenance = toggle.checked;
+            
+            // Update in settings
+            const settingsData = await fetchData(CONFIG.SHEETS.SETTINGS, false);
+            const maintenanceIndex = settingsData.findIndex(s => s.key === 'maintenance');
+            
+            if (maintenanceIndex !== -1) {
+                await updateData(CONFIG.SHEETS.SETTINGS, maintenanceIndex, {
+                    key: 'maintenance',
+                    value: state.maintenance.toString(),
+                    updatedAt: new Date().toISOString()
+                });
+            } else {
+                await saveData(CONFIG.SHEETS.SETTINGS, {
+                    key: 'maintenance',
+                    value: state.maintenance.toString(),
+                    updatedAt: new Date().toISOString()
+                });
+            }
+            
+            // Update local settings
+            state.settings.maintenance = state.maintenance.toString();
+            
+            const statusElement = document.getElementById('maintenanceStatus');
+            if (statusElement) {
+                statusElement.textContent = `Mode Maintenance: ${state.maintenance ? 'ON' : 'OFF'}`;
+            }
+            
+            showToast(`Maintenance mode ${state.maintenance ? 'diaktifkan' : 'dinonaktifkan'}`, 'success');
+            
+            if (state.maintenance && state.currentUser) {
+                showMaintenancePage();
+            } else if (!state.maintenance && state.currentUser?.role === 'user') {
+                if (document.getElementById('maintenancePage').style.display === 'block') {
+                    showPage('quiz');
+                }
             }
         }
 
-        function removeSettingsMenu() {
-            const settingsItem = document.getElementById('navSettingsItem');
-            if (settingsItem) {
-                settingsItem.remove();
-            }
-        }
-
-        // Page navigation functions
-        function showPage(pageName) {
-            document.querySelectorAll('.page').forEach(page => {
-                page.style.display = 'none';
-            });
-            
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.classList.remove('active');
-            });
-            
-            document.getElementById(`${pageName}Page`).style.display = 'block';
-            
-            const navElement = document.getElementById(`nav${pageName.charAt(0).toUpperCase() + pageName.slice(1)}`);
-            if (navElement) {
-                navElement.classList.add('active');
-            }
-        }
-
-        function showApp() {
-            document.getElementById('loginPage').style.display = 'none';
-            document.getElementById('registerPage').style.display = 'none';
-            document.getElementById('appContainer').style.display = 'block';
-            showPage('quiz');
-        }
-
-        function showMaintenancePage() {
-            document.getElementById('appContainer').style.display = 'block';
-            document.querySelectorAll('.page').forEach(page => {
-                page.style.display = 'none';
-            });
-            document.getElementById('maintenancePage').style.display = 'block';
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.classList.remove('active');
-            });
-        }
-
-        // Simpan function lainnya yang sudah ada sebelumnya
-        // ... (paste semua fungsi JavaScript lainnya dari kode sebelumnya) ...
+        // Note: Fungsi editUser, toggleBlockUser, deleteUser, dan updateWithdrawalStatus
+        // perlu diimplementasikan sesuai dengan struktur database Google Sheets
 
     </script>
 </body>
