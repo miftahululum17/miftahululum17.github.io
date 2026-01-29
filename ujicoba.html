@@ -65,6 +65,10 @@
             background: linear-gradient(135deg, #2196F3, #1976D2);
         }
 
+        .toast.warning {
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+        }
+
         /* Auth Pages */
         .auth-container {
             display: flex;
@@ -343,7 +347,7 @@
             border-bottom: 1px solid #e0e0e0;
         }
 
-        /* Settings Page (Admin Only) - HIDDEN BY DEFAULT */
+        /* Settings Page (Admin Only) */
         .settings-container {
             background: white;
             border-radius: 20px;
@@ -569,14 +573,63 @@
             color: #667eea;
             margin: 10px 0;
         }
+
+        /* Database Status */
+        .db-status {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+
+        .db-online {
+            color: #4CAF50;
+        }
+
+        .db-offline {
+            color: #f44336;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            color: white;
+            font-size: 18px;
+            flex-direction: column;
+        }
     </style>
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="spinner"></div>
+        <div id="loadingText">Memuat data...</div>
+    </div>
+
     <div class="container">
         <!-- Toast Notification -->
         <div id="toast" class="toast" style="display: none;"></div>
+
+        <!-- Database Status -->
+        <div id="dbStatus" class="db-status" style="display: none;">
+            <i class="fas fa-database"></i> <span id="dbStatusText">Database: Offline</span>
+        </div>
 
         <!-- Login Page -->
         <div id="loginPage" class="auth-container">
@@ -641,7 +694,7 @@
                 <button onclick="logout()" class="btn btn-danger">Logout</button>
             </div>
 
-            <!-- Navigation - MENU SETTING HIDDEN BY DEFAULT -->
+            <!-- Navigation -->
             <div class="nav-container">
                 <ul class="nav-menu" id="navMenu">
                     <li class="nav-item">
@@ -662,7 +715,6 @@
                             <span>Profil</span>
                         </a>
                     </li>
-                    <!-- Settings menu item TIDAK ada di sini, akan ditambahkan secara dinamis untuk admin -->
                 </ul>
             </div>
 
@@ -742,7 +794,7 @@
                 </div>
             </div>
 
-            <!-- Settings Page (Admin Only) - HIDDEN BY DEFAULT -->
+            <!-- Settings Page (Admin Only) -->
             <div id="settingsPage" class="page" style="display: none;">
                 <!-- Settings content will be dynamically generated -->
             </div>
@@ -824,17 +876,32 @@
         tg.expand();
         tg.MainButton.hide();
 
+        // Configuration
+        const CONFIG = {
+            SPREADSHEET_ID: 'YOUR_SPREADSHEET_ID', // Ganti dengan ID Spreadsheet Anda
+            API_KEY: 'YOUR_GOOGLE_API_KEY', // Ganti dengan Google API Key Anda
+            SHEETS: {
+                USERS: 'users',
+                WITHDRAWALS: 'withdrawals',
+                SETTINGS: 'settings'
+            },
+            CACHE_DURATION: 30000 // Cache data untuk 30 detik
+        };
+
         // Application State
         const state = {
             currentUser: null,
-            users: JSON.parse(localStorage.getItem('users')) || [],
-            withdrawals: JSON.parse(localStorage.getItem('withdrawals')) || [],
-            maintenance: localStorage.getItem('maintenance') === 'true',
-            rewardPoints: parseInt(localStorage.getItem('rewardPoints')) || 50, // Default 50 poin
+            users: [],
+            withdrawals: [],
+            settings: {},
+            maintenance: false,
+            rewardPoints: 50,
             currentQuestion: null,
             correctAnswer: null,
             deviceId: generateDeviceId(),
-            lastAutoLogout: null
+            lastAutoLogout: null,
+            lastFetchTime: {},
+            cache: {}
         };
 
         // Generate unique device ID
@@ -847,12 +914,319 @@
             return deviceId;
         }
 
-        // Check if first user should be admin
-        function isFirstUser() {
-            return state.users.length === 0;
+        // Database Functions
+        async function fetchData(sheetName, useCache = true) {
+            const now = Date.now();
+            const cacheKey = sheetName;
+            
+            // Check cache
+            if (useCache && 
+                state.cache[cacheKey] && 
+                state.lastFetchTime[cacheKey] && 
+                (now - state.lastFetchTime[cacheKey]) < CONFIG.CACHE_DURATION) {
+                return state.cache[cacheKey];
+            }
+            
+            try {
+                showLoading(`Memuat data ${sheetName}...`);
+                
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.SPREADSHEET_ID}/values/${sheetName}?key=${CONFIG.API_KEY}`;
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (!data.values || data.values.length < 2) {
+                    // Empty sheet, return empty array
+                    state.cache[cacheKey] = [];
+                    state.lastFetchTime[cacheKey] = now;
+                    hideLoading();
+                    updateDbStatus(true);
+                    return [];
+                }
+                
+                const headers = data.values[0];
+                const rows = data.values.slice(1);
+                
+                const result = rows.map(row => {
+                    const obj = {};
+                    headers.forEach((header, index) => {
+                        obj[header] = row[index] || '';
+                    });
+                    return obj;
+                });
+                
+                // Update cache
+                state.cache[cacheKey] = result;
+                state.lastFetchTime[cacheKey] = now;
+                
+                hideLoading();
+                updateDbStatus(true);
+                return result;
+                
+            } catch (error) {
+                console.error(`Error fetching ${sheetName}:`, error);
+                showToast(`Gagal memuat data ${sheetName}`, 'error');
+                hideLoading();
+                updateDbStatus(false);
+                
+                // Return cache if available
+                if (state.cache[cacheKey]) {
+                    return state.cache[cacheKey];
+                }
+                return [];
+            }
         }
 
-        // Toast Notification Function
+        async function saveData(sheetName, data) {
+            try {
+                showLoading(`Menyimpan data ke ${sheetName}...`);
+                
+                // First, get all data to find the next ID
+                const allData = await fetchData(sheetName, false);
+                
+                // Convert data to array format for Google Sheets
+                const values = [];
+                
+                if (sheetName === CONFIG.SHEETS.USERS) {
+                    values.push([
+                        data.id || (allData.length + 1),
+                        data.username,
+                        data.password,
+                        data.role,
+                        data.points || 0,
+                        data.joinDate || new Date().toISOString(),
+                        data.deviceId || state.deviceId,
+                        data.isBlocked || 'false',
+                        data.lastLogin || ''
+                    ]);
+                } else if (sheetName === CONFIG.SHEETS.WITHDRAWALS) {
+                    values.push([
+                        data.id || (allData.length + 1),
+                        data.userId,
+                        data.username,
+                        data.points,
+                        data.accountName,
+                        data.phone,
+                        data.amount,
+                        data.status,
+                        data.date || new Date().toISOString(),
+                        data.adminNotes || ''
+                    ]);
+                } else if (sheetName === CONFIG.SHEETS.SETTINGS) {
+                    values.push([
+                        data.key,
+                        data.value,
+                        new Date().toISOString()
+                    ]);
+                }
+                
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.SPREADSHEET_ID}/values/${sheetName}!A:Z:append?valueInputOption=USER_ENTERED&key=${CONFIG.API_KEY}`;
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        values: values,
+                        majorDimension: 'ROWS'
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                // Clear cache
+                delete state.cache[sheetName];
+                delete state.lastFetchTime[sheetName];
+                
+                hideLoading();
+                updateDbStatus(true);
+                return true;
+                
+            } catch (error) {
+                console.error(`Error saving to ${sheetName}:`, error);
+                showToast(`Gagal menyimpan data ke ${sheetName}`, 'error');
+                hideLoading();
+                updateDbStatus(false);
+                return false;
+            }
+        }
+
+        async function updateData(sheetName, rowIndex, data) {
+            try {
+                showLoading(`Memperbarui data di ${sheetName}...`);
+                
+                const allData = await fetchData(sheetName, false);
+                if (rowIndex < 0 || rowIndex >= allData.length) {
+                    throw new Error('Row index out of bounds');
+                }
+                
+                // Convert data to array format
+                const rowData = allData[rowIndex];
+                const updatedRow = { ...rowData, ...data };
+                
+                let values;
+                if (sheetName === CONFIG.SHEETS.USERS) {
+                    values = [
+                        updatedRow.id,
+                        updatedRow.username,
+                        updatedRow.password,
+                        updatedRow.role,
+                        updatedRow.points,
+                        updatedRow.joinDate,
+                        updatedRow.deviceId,
+                        updatedRow.isBlocked,
+                        updatedRow.lastLogin
+                    ];
+                } else if (sheetName === CONFIG.SHEETS.WITHDRAWALS) {
+                    values = [
+                        updatedRow.id,
+                        updatedRow.userId,
+                        updatedRow.username,
+                        updatedRow.points,
+                        updatedRow.accountName,
+                        updatedRow.phone,
+                        updatedRow.amount,
+                        updatedRow.status,
+                        updatedRow.date,
+                        updatedRow.adminNotes
+                    ];
+                }
+                
+                // Google Sheets uses 1-based indexing, so add 2 (1 for header, 1 for 1-based)
+                const range = `${sheetName}!A${rowIndex + 2}:Z${rowIndex + 2}`;
+                
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.SPREADSHEET_ID}/values/${range}?valueInputOption=USER_ENTERED&key=${CONFIG.API_KEY}`;
+                
+                const response = await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        values: [values],
+                        majorDimension: 'ROWS'
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                // Clear cache
+                delete state.cache[sheetName];
+                delete state.lastFetchTime[sheetName];
+                
+                hideLoading();
+                updateDbStatus(true);
+                return true;
+                
+            } catch (error) {
+                console.error(`Error updating ${sheetName}:`, error);
+                showToast(`Gagal memperbarui data di ${sheetName}`, 'error');
+                hideLoading();
+                updateDbStatus(false);
+                return false;
+            }
+        }
+
+        async function deleteData(sheetName, rowIndex) {
+            try {
+                showLoading(`Menghapus data dari ${sheetName}...`);
+                
+                // Note: Google Sheets API doesn't have a simple delete endpoint
+                // We'll implement this by clearing the row
+                const allData = await fetchData(sheetName, false);
+                if (rowIndex < 0 || rowIndex >= allData.length) {
+                    throw new Error('Row index out of bounds');
+                }
+                
+                const range = `${sheetName}!A${rowIndex + 2}:Z${rowIndex + 2}`;
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.SPREADSHEET_ID}/values/${range}?valueInputOption=USER_ENTERED&key=${CONFIG.API_KEY}`;
+                
+                const response = await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        values: [Array(10).fill('')], // Clear the row with empty values
+                        majorDimension: 'ROWS'
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                // Clear cache
+                delete state.cache[sheetName];
+                delete state.lastFetchTime[sheetName];
+                
+                hideLoading();
+                updateDbStatus(true);
+                return true;
+                
+            } catch (error) {
+                console.error(`Error deleting from ${sheetName}:`, error);
+                showToast(`Gagal menghapus data dari ${sheetName}`, 'error');
+                hideLoading();
+                updateDbStatus(false);
+                return false;
+            }
+        }
+
+        // Initialize application data
+        async function initializeApp() {
+            try {
+                showLoading('Memuat aplikasi...');
+                
+                // Load all data
+                state.users = await fetchData(CONFIG.SHEETS.USERS);
+                state.withdrawals = await fetchData(CONFIG.SHEETS.WITHDRAWALS);
+                const settingsData = await fetchData(CONFIG.SHEETS.SETTINGS);
+                
+                // Convert settings array to object
+                state.settings = {};
+                settingsData.forEach(setting => {
+                    state.settings[setting.key] = setting.value;
+                });
+                
+                // Set maintenance and reward points from settings
+                state.maintenance = state.settings.maintenance === 'true';
+                state.rewardPoints = parseInt(state.settings.rewardPoints) || 50;
+                
+                hideLoading();
+                
+                // Check if user is already logged in
+                const savedUserId = localStorage.getItem('currentUserId');
+                if (savedUserId) {
+                    const user = state.users.find(u => u.id === savedUserId);
+                    if (user) {
+                        if (await login(user.username, user.password)) {
+                            return;
+                        }
+                    }
+                }
+                
+                // Show login page
+                showLogin();
+                
+            } catch (error) {
+                console.error('Error initializing app:', error);
+                showToast('Gagal memuat aplikasi', 'error');
+                hideLoading();
+                showLogin();
+            }
+        }
+
+        // Utility Functions
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             toast.textContent = message;
@@ -864,12 +1238,35 @@
             }, 3000);
         }
 
-        // Save state to localStorage
-        function saveState() {
-            localStorage.setItem('users', JSON.stringify(state.users));
-            localStorage.setItem('withdrawals', JSON.stringify(state.withdrawals));
-            localStorage.setItem('maintenance', state.maintenance);
-            localStorage.setItem('rewardPoints', state.rewardPoints);
+        function showLoading(message = 'Memuat...') {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            document.getElementById('loadingText').textContent = message;
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        function updateDbStatus(isOnline) {
+            const dbStatus = document.getElementById('dbStatus');
+            const dbStatusText = document.getElementById('dbStatusText');
+            
+            if (isOnline) {
+                dbStatusText.textContent = 'Database: Online';
+                dbStatusText.className = 'db-online';
+                dbStatus.style.display = 'block';
+            } else {
+                dbStatusText.textContent = 'Database: Offline';
+                dbStatusText.className = 'db-offline';
+                dbStatus.style.display = 'block';
+            }
+            
+            // Hide after 3 seconds if online
+            if (isOnline) {
+                setTimeout(() => {
+                    dbStatus.style.display = 'none';
+                }, 3000);
+            }
         }
 
         // Authentication Functions
@@ -884,112 +1281,145 @@
             document.getElementById('registerPage').style.display = 'flex';
         }
 
-        function login(username, password) {
-            const user = state.users.find(u => 
-                u.username === username && u.password === password && !u.isBlocked
-            );
-            
-            if (user) {
-                // Check auto-logout (2 days)
-                const lastLogin = localStorage.getItem(`lastLogin_${user.id}`);
-                const twoDaysAgo = Date.now() - (2 * 24 * 60 * 60 * 1000);
+        async function login(username, password) {
+            try {
+                // Refresh users data
+                state.users = await fetchData(CONFIG.SHEETS.USERS, false);
                 
-                if (lastLogin && parseInt(lastLogin) < twoDaysAgo) {
-                    showToast('Sesi telah habis, silakan login kembali', 'info');
+                const user = state.users.find(u => 
+                    u.username === username && 
+                    u.password === password && 
+                    u.isBlocked !== 'true'
+                );
+                
+                if (user) {
+                    // Check auto-logout (2 days)
+                    const lastLogin = user.lastLogin;
+                    const twoDaysAgo = Date.now() - (2 * 24 * 60 * 60 * 1000);
+                    
+                    if (lastLogin && new Date(lastLogin).getTime() < twoDaysAgo) {
+                        showToast('Sesi telah habis, silakan login kembali', 'info');
+                        return false;
+                    }
+                    
+                    state.currentUser = user;
+                    localStorage.setItem('currentUserId', user.id);
+                    
+                    // Update last login
+                    const userIndex = state.users.findIndex(u => u.id === user.id);
+                    if (userIndex !== -1) {
+                        await updateData(CONFIG.SHEETS.USERS, userIndex, {
+                            lastLogin: new Date().toISOString()
+                        });
+                    }
+                    
+                    showToast('Login berhasil!', 'success');
+                    
+                    // Check maintenance mode
+                    if (state.maintenance) {
+                        showMaintenancePage();
+                    } else {
+                        showApp();
+                    }
+                    
+                    // Update UI
+                    updateUserInfo();
+                    updateRewardButton();
+                    generateNewQuestion();
+                    
+                    // Add settings menu for admin ONLY
+                    if (state.currentUser.role === 'admin') {
+                        addSettingsMenu();
+                    } else {
+                        removeSettingsMenu();
+                    }
+                    
+                    return true;
+                } else {
+                    const userExists = state.users.find(u => u.username === username);
+                    if (userExists) {
+                        if (userExists.isBlocked === 'true') {
+                            showToast('Akun Anda diblokir', 'error');
+                        } else {
+                            showToast('Password salah', 'error');
+                        }
+                    } else {
+                        document.getElementById('noAccountMessage').style.display = 'block';
+                        showToast('Belum punya akun? Silakan daftar terlebih dahulu', 'info');
+                    }
                     return false;
                 }
-                
-                state.currentUser = user;
-                localStorage.setItem(`lastLogin_${user.id}`, Date.now().toString());
-                localStorage.setItem('currentUserId', user.id.toString());
-                
-                showToast('Login berhasil!', 'success');
-                
-                // Jika maintenance mode aktif, langsung tampilkan maintenance page
-                if (state.maintenance) {
-                    showMaintenancePage();
-                } else {
-                    showApp();
-                }
-                
-                // Update UI
-                updateUserInfo();
-                updateRewardButton();
-                generateNewQuestion();
-                
-                // Add settings menu for admin ONLY
-                if (state.currentUser.role === 'admin') {
-                    addSettingsMenu();
-                } else {
-                    // Pastikan tombol setting TIDAK ada untuk user biasa
-                    removeSettingsMenu();
-                }
-                
-                return true;
-            } else {
-                // Cek apakah user ada tapi password salah
-                const userExists = state.users.find(u => u.username === username);
-                if (userExists) {
-                    showToast('Password salah', 'error');
-                } else {
-                    // Tampilkan pesan untuk daftar
-                    document.getElementById('noAccountMessage').style.display = 'block';
-                    showToast('Belum punya akun? Silakan daftar terlebih dahulu', 'info');
-                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showToast('Gagal login', 'error');
                 return false;
             }
         }
 
-        function logout() {
-            // Hapus menu settings jika ada
+        async function logout() {
             removeSettingsMenu();
-            
             state.currentUser = null;
             localStorage.removeItem('currentUserId');
             showLogin();
             showToast('Anda telah logout', 'success');
         }
 
-        function register(username, password) {
-            // Check if username already exists
-            if (state.users.some(u => u.username === username)) {
-                showToast('Username sudah digunakan', 'error');
+        async function register(username, password) {
+            try {
+                // Check if username already exists
+                state.users = await fetchData(CONFIG.SHEETS.USERS, false);
+                
+                if (state.users.some(u => u.username === username)) {
+                    showToast('Username sudah digunakan', 'error');
+                    return false;
+                }
+                
+                // Determine role: first user becomes admin, others become user
+                const role = state.users.length === 0 ? 'admin' : 'user';
+                
+                // Create new user with 0 points
+                const newUser = {
+                    id: state.users.length + 1,
+                    username,
+                    password,
+                    role: role,
+                    points: 0,
+                    joinDate: new Date().toISOString(),
+                    deviceId: state.deviceId,
+                    isBlocked: 'false',
+                    lastLogin: ''
+                };
+                
+                // Save to database
+                const success = await saveData(CONFIG.SHEETS.USERS, newUser);
+                
+                if (success) {
+                    // Update local state
+                    state.users.push(newUser);
+                    
+                    if (role === 'admin') {
+                        showToast('Pendaftaran berhasil! Anda adalah ADMIN pertama.', 'success');
+                    } else {
+                        showToast('Pendaftaran berhasil! Silakan login.', 'success');
+                    }
+                    
+                    showLogin();
+                    return true;
+                } else {
+                    showToast('Gagal mendaftar', 'error');
+                    return false;
+                }
+            } catch (error) {
+                console.error('Register error:', error);
+                showToast('Gagal mendaftar', 'error');
                 return false;
             }
-            
-            // Determine role: first user becomes admin, others become user
-            const role = isFirstUser() ? 'admin' : 'user';
-            
-            // Create new user dengan 0 poin awal
-            const newUser = {
-                id: state.users.length + 1,
-                username,
-                password,
-                role: role,
-                points: 0, // POIN AWAL 0
-                joinDate: new Date().toISOString(),
-                deviceId: state.deviceId,
-                isBlocked: false
-            };
-            
-            state.users.push(newUser);
-            saveState();
-            
-            if (role === 'admin') {
-                showToast('Pendaftaran berhasil! Anda adalah ADMIN pertama.', 'success');
-            } else {
-                showToast('Pendaftaran berhasil! Silakan login.', 'success');
-            }
-            
-            showLogin();
-            return true;
         }
 
         // Add settings menu dynamically for admin
         function addSettingsMenu() {
             const navMenu = document.getElementById('navMenu');
             
-            // Check if settings menu already exists
             if (!document.getElementById('navSettingsItem')) {
                 const settingsItem = document.createElement('li');
                 settingsItem.className = 'nav-item';
@@ -1004,7 +1434,6 @@
             }
         }
 
-        // Remove settings menu (when logging out or if user is not admin)
         function removeSettingsMenu() {
             const settingsItem = document.getElementById('navSettingsItem');
             if (settingsItem) {
@@ -1013,7 +1442,7 @@
         }
 
         // Page Navigation
-        function showPage(pageName) {
+        async function showPage(pageName) {
             // Hide all pages
             document.querySelectorAll('.page').forEach(page => {
                 page.style.display = 'none';
@@ -1026,8 +1455,7 @@
             
             // Show selected page
             if (pageName === 'settings') {
-                // Generate settings page dynamically
-                generateSettingsPage();
+                await generateSettingsPage();
             }
             
             document.getElementById(`${pageName}Page`).style.display = 'block';
@@ -1041,13 +1469,10 @@
             // Load page-specific data
             switch(pageName) {
                 case 'history':
-                    loadWithdrawalHistory();
+                    await loadWithdrawalHistory();
                     break;
                 case 'profile':
                     loadProfile();
-                    break;
-                case 'settings':
-                    // Settings page is already generated
                     break;
             }
         }
@@ -1070,8 +1495,245 @@
             });
         }
 
+        // Quiz Functions
+        function generateNewQuestion() {
+            const num1 = Math.floor(Math.random() * 100) + 1;
+            const num2 = Math.floor(Math.random() * 100) + 1;
+            const answer = num1 + num2;
+            
+            state.currentQuestion = `${num1} + ${num2}`;
+            state.correctAnswer = answer;
+            
+            const wrongAnswers = [];
+            while (wrongAnswers.length < 3) {
+                const wrongAnswer = answer + Math.floor(Math.random() * 20) - 10;
+                if (wrongAnswer !== answer && wrongAnswer > 0 && !wrongAnswers.includes(wrongAnswer)) {
+                    wrongAnswers.push(wrongAnswer);
+                }
+            }
+            
+            const allAnswers = [answer, ...wrongAnswers];
+            shuffleArray(allAnswers);
+            
+            document.getElementById('question').textContent = state.currentQuestion;
+            
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            
+            allAnswers.forEach((ans, index) => {
+                const button = document.createElement('button');
+                button.className = 'option-btn';
+                button.textContent = ans;
+                button.onclick = () => checkAnswer(ans);
+                optionsContainer.appendChild(button);
+            });
+            
+            document.getElementById('rewardBtn').style.display = 'none';
+        }
+
+        function checkAnswer(selectedAnswer) {
+            if (parseInt(selectedAnswer) === state.correctAnswer) {
+                showToast('Jawaban benar! 🎉', 'success');
+                document.getElementById('rewardBtn').style.display = 'block';
+            } else {
+                showToast('Jawaban salah 😢', 'error');
+                setTimeout(generateNewQuestion, 1000);
+            }
+            
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.disabled = true;
+                btn.style.opacity = '0.6';
+            });
+        }
+
+        async function claimReward() {
+            try {
+                if (typeof show_9865183 !== 'undefined') {
+                    show_9865183().then(async () => {
+                        await rewardUserPoints();
+                    }).catch(async error => {
+                        console.error('Ad error:', error);
+                        showToast('Gagal menampilkan iklan', 'error');
+                        await simulateAdSuccess();
+                    });
+                } else {
+                    await simulateAdSuccess();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error: ' + error.message, 'error');
+            }
+        }
+
+        async function rewardUserPoints() {
+            if (state.currentUser) {
+                // Update user points
+                const newPoints = parseInt(state.currentUser.points) + state.rewardPoints;
+                state.currentUser.points = newPoints;
+                
+                // Find user index and update in database
+                const userIndex = state.users.findIndex(u => u.id === state.currentUser.id);
+                if (userIndex !== -1) {
+                    await updateData(CONFIG.SHEETS.USERS, userIndex, {
+                        points: newPoints
+                    });
+                    
+                    // Update local cache
+                    state.users[userIndex].points = newPoints;
+                }
+                
+                updateUserInfo();
+                showToast(`Reward ${state.rewardPoints} poin berhasil diklaim!`, 'success');
+                document.getElementById('rewardBtn').style.display = 'none';
+                generateNewQuestion();
+            }
+        }
+
+        async function simulateAdSuccess() {
+            await rewardUserPoints();
+        }
+
+        function updateRewardButton() {
+            document.getElementById('rewardPoints').textContent = state.rewardPoints;
+        }
+
+        async function updateRewardPoints() {
+            const newPoints = parseInt(document.getElementById('rewardPointsInput').value);
+            if (newPoints && newPoints > 0) {
+                state.rewardPoints = newPoints;
+                
+                // Update in settings
+                const settingsData = await fetchData(CONFIG.SHEETS.SETTINGS, false);
+                const rewardSettingIndex = settingsData.findIndex(s => s.key === 'rewardPoints');
+                
+                if (rewardSettingIndex !== -1) {
+                    await updateData(CONFIG.SHEETS.SETTINGS, rewardSettingIndex, {
+                        key: 'rewardPoints',
+                        value: newPoints.toString(),
+                        updatedAt: new Date().toISOString()
+                    });
+                } else {
+                    await saveData(CONFIG.SHEETS.SETTINGS, {
+                        key: 'rewardPoints',
+                        value: newPoints.toString(),
+                        updatedAt: new Date().toISOString()
+                    });
+                }
+                
+                // Update local settings
+                state.settings.rewardPoints = newPoints.toString();
+                
+                updateRewardButton();
+                showToast(`Poin reward diubah menjadi ${newPoints}`, 'success');
+                
+                if (state.currentUser && document.getElementById('profilePage').style.display === 'block') {
+                    document.getElementById('profileRewardPerQuiz').textContent = state.rewardPoints;
+                }
+            } else {
+                showToast('Masukkan jumlah poin yang valid', 'error');
+            }
+        }
+
+        // Withdrawal Functions
+        async function submitWithdrawal(points, accountName, phone) {
+            try {
+                if (!state.currentUser) return;
+                
+                if (points < 50) {
+                    showToast('Minimal penukaran 50 poin', 'error');
+                    return;
+                }
+                
+                if (points > parseInt(state.currentUser.points)) {
+                    showToast('Poin tidak cukup', 'error');
+                    return;
+                }
+                
+                // Create withdrawal request
+                const withdrawal = {
+                    userId: state.currentUser.id,
+                    username: state.currentUser.username,
+                    points: parseInt(points),
+                    accountName,
+                    phone,
+                    amount: points,
+                    status: 'pending',
+                    date: new Date().toISOString(),
+                    adminNotes: ''
+                };
+                
+                // Update user points
+                const newPoints = parseInt(state.currentUser.points) - points;
+                state.currentUser.points = newPoints;
+                
+                const userIndex = state.users.findIndex(u => u.id === state.currentUser.id);
+                if (userIndex !== -1) {
+                    await updateData(CONFIG.SHEETS.USERS, userIndex, {
+                        points: newPoints
+                    });
+                    
+                    // Update local cache
+                    state.users[userIndex].points = newPoints;
+                }
+                
+                // Save withdrawal to database
+                await saveData(CONFIG.SHEETS.WITHDRAWALS, withdrawal);
+                
+                // Refresh withdrawals data
+                state.withdrawals = await fetchData(CONFIG.SHEETS.WITHDRAWALS, false);
+                
+                showToast('Permintaan penukaran berhasil dikirim', 'success');
+                updateUserInfo();
+                await loadWithdrawalHistory();
+                document.getElementById('withdrawalForm').reset();
+                
+            } catch (error) {
+                console.error('Withdrawal error:', error);
+                showToast('Gagal mengirim permintaan penukaran', 'error');
+            }
+        }
+
+        async function loadWithdrawalHistory() {
+            if (!state.currentUser) return;
+            
+            const container = document.getElementById('withdrawalHistory');
+            container.innerHTML = '';
+            
+            // Refresh data
+            state.withdrawals = await fetchData(CONFIG.SHEETS.WITHDRAWALS, false);
+            
+            const userWithdrawals = state.withdrawals
+                .filter(w => w.userId == state.currentUser.id)
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            if (userWithdrawals.length === 0) {
+                container.innerHTML = '<p>Belum ada riwayat penukaran</p>';
+                return;
+            }
+            
+            userWithdrawals.forEach(withdrawal => {
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                item.innerHTML = `
+                    <div>
+                        <strong>${withdrawal.points} Poin</strong>
+                        <div>Rp ${withdrawal.amount}</div>
+                        <small>${new Date(withdrawal.date).toLocaleDateString('id-ID')}</small>
+                        <br>
+                        <small>Status: </small>
+                        <span class="status-badge status-${withdrawal.status}">${getStatusText(withdrawal.status)}</span>
+                        ${withdrawal.adminNotes ? `<br><small>Catatan: ${withdrawal.adminNotes}</small>` : ''}
+                    </div>
+                    <div>
+                        ${withdrawal.status === 'pending' ? `<button onclick="deleteWithdrawal(${withdrawal.id})" class="btn btn-danger btn-sm">Hapus</button>` : ''}
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
         // Generate Settings Page Dynamically
-        function generateSettingsPage() {
+        async function generateSettingsPage() {
             if (state.currentUser?.role !== 'admin') {
                 document.getElementById('settingsPage').innerHTML = `
                     <div class="settings-container">
@@ -1082,14 +1744,18 @@
                 return;
             }
             
-            // Hitung statistik penarikan
+            // Refresh data
+            state.users = await fetchData(CONFIG.SHEETS.USERS, false);
+            state.withdrawals = await fetchData(CONFIG.SHEETS.WITHDRAWALS, false);
+            
+            // Calculate statistics
             const totalWithdrawals = state.withdrawals.length;
             const pendingWithdrawals = state.withdrawals.filter(w => w.status === 'pending').length;
             const approvedWithdrawals = state.withdrawals.filter(w => w.status === 'approved').length;
             const rejectedWithdrawals = state.withdrawals.filter(w => w.status === 'rejected').length;
             const totalPointsWithdrawn = state.withdrawals
                 .filter(w => w.status === 'approved')
-                .reduce((sum, w) => sum + w.points, 0);
+                .reduce((sum, w) => sum + parseInt(w.points || 0), 0);
             
             document.getElementById('settingsPage').innerHTML = `
                 <div class="settings-container">
@@ -1103,7 +1769,7 @@
                             <span class="slider"></span>
                         </label>
                         <span id="maintenanceStatus">Mode Maintenance: ${state.maintenance ? 'ON' : 'OFF'}</span>
-                        <p><small>Jika aktif, user akan melihat halaman maintenance setelah login</small></p>
+                        <p><small>Jika aktif, semua user akan melihat halaman maintenance setelah login</small></p>
                     </div>
                     
                     <!-- Reward Points Settings -->
@@ -1162,248 +1828,8 @@
                 </div>
             `;
             
-            // Load admin data
-            loadUsersList();
-            loadAdminWithdrawalHistory();
-        }
-
-        // Quiz Functions
-        function generateNewQuestion() {
-            // Generate two random numbers between 1 and 100
-            const num1 = Math.floor(Math.random() * 100) + 1;
-            const num2 = Math.floor(Math.random() * 100) + 1;
-            const answer = num1 + num2;
-            
-            state.currentQuestion = `${num1} + ${num2}`;
-            state.correctAnswer = answer;
-            
-            // Generate wrong answers
-            const wrongAnswers = [];
-            while (wrongAnswers.length < 3) {
-                const wrongAnswer = answer + Math.floor(Math.random() * 20) - 10;
-                if (wrongAnswer !== answer && wrongAnswer > 0 && !wrongAnswers.includes(wrongAnswer)) {
-                    wrongAnswers.push(wrongAnswer);
-                }
-            }
-            
-            // Combine and shuffle answers
-            const allAnswers = [answer, ...wrongAnswers];
-            shuffleArray(allAnswers);
-            
-            // Update UI
-            document.getElementById('question').textContent = state.currentQuestion;
-            
-            const optionsContainer = document.getElementById('optionsContainer');
-            optionsContainer.innerHTML = '';
-            
-            allAnswers.forEach((ans, index) => {
-                const button = document.createElement('button');
-                button.className = 'option-btn';
-                button.textContent = ans;
-                button.onclick = () => checkAnswer(ans);
-                optionsContainer.appendChild(button);
-            });
-            
-            // Hide reward button
-            document.getElementById('rewardBtn').style.display = 'none';
-        }
-
-        function checkAnswer(selectedAnswer) {
-            if (parseInt(selectedAnswer) === state.correctAnswer) {
-                showToast('Jawaban benar! 🎉', 'success');
-                document.getElementById('rewardBtn').style.display = 'block';
-            } else {
-                showToast('Jawaban salah 😢', 'error');
-                setTimeout(generateNewQuestion, 1000);
-            }
-            
-            // Disable all option buttons
-            document.querySelectorAll('.option-btn').forEach(btn => {
-                btn.disabled = true;
-                btn.style.opacity = '0.6';
-            });
-        }
-
-        function claimReward() {
-            // Show Monetag interstitial ad
-            try {
-                if (typeof show_9865183 !== 'undefined') {
-                    show_9865183().then(() => {
-                        // Ad completed successfully
-                        rewardUserPoints();
-                    }).catch(error => {
-                        console.error('Ad error:', error);
-                        showToast('Gagal menampilkan iklan', 'error');
-                        // Simulate success for testing
-                        simulateAdSuccess();
-                    });
-                } else {
-                    // Simulate ad for testing
-                    simulateAdSuccess();
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showToast('Error: ' + error.message, 'error');
-            }
-        }
-
-        function rewardUserPoints() {
-            if (state.currentUser) {
-                state.currentUser.points += state.rewardPoints;
-                const userIndex = state.users.findIndex(u => u.id === state.currentUser.id);
-                if (userIndex !== -1) {
-                    state.users[userIndex].points = state.currentUser.points;
-                    saveState();
-                    updateUserInfo();
-                }
-                showToast(`Reward ${state.rewardPoints} poin berhasil diklaim!`, 'success');
-                document.getElementById('rewardBtn').style.display = 'none';
-                generateNewQuestion();
-            }
-        }
-
-        function simulateAdSuccess() {
-            rewardUserPoints();
-        }
-
-        // Update reward points button text
-        function updateRewardButton() {
-            document.getElementById('rewardPoints').textContent = state.rewardPoints;
-        }
-
-        // Update reward points value
-        function updateRewardPoints() {
-            const newPoints = parseInt(document.getElementById('rewardPointsInput').value);
-            if (newPoints && newPoints > 0) {
-                state.rewardPoints = newPoints;
-                saveState();
-                updateRewardButton();
-                showToast(`Poin reward diubah menjadi ${newPoints}`, 'success');
-                
-                // Update profile if user is on profile page
-                if (state.currentUser && document.getElementById('profilePage').style.display === 'block') {
-                    document.getElementById('profileRewardPerQuiz').textContent = state.rewardPoints;
-                }
-            } else {
-                showToast('Masukkan jumlah poin yang valid', 'error');
-            }
-        }
-
-        // Withdrawal Functions
-        function submitWithdrawal(points, accountName, phone) {
-            if (!state.currentUser) return;
-            
-            if (points < 50) {
-                showToast('Minimal penukaran 50 poin', 'error');
-                return;
-            }
-            
-            if (points > state.currentUser.points) {
-                showToast('Poin tidak cukup', 'error');
-                return;
-            }
-            
-            // Create withdrawal request
-            const withdrawal = {
-                id: state.withdrawals.length + 1,
-                userId: state.currentUser.id,
-                username: state.currentUser.username,
-                points: parseInt(points),
-                accountName,
-                phone,
-                amount: points, // 1 point = Rp 1
-                status: 'pending',
-                date: new Date().toISOString(),
-                adminNotes: ''
-            };
-            
-            // Deduct points
-            state.currentUser.points -= points;
-            const userIndex = state.users.findIndex(u => u.id === state.currentUser.id);
-            if (userIndex !== -1) {
-                state.users[userIndex].points = state.currentUser.points;
-            }
-            
-            state.withdrawals.push(withdrawal);
-            saveState();
-            
-            showToast('Permintaan penukaran berhasil dikirim', 'success');
-            updateUserInfo();
-            loadWithdrawalHistory();
-            document.getElementById('withdrawalForm').reset();
-            
-            // Update admin page if open
-            if (state.currentUser.role === 'admin' && document.getElementById('settingsPage').style.display === 'block') {
-                generateSettingsPage();
-            }
-        }
-
-        function loadWithdrawalHistory() {
-            if (!state.currentUser) return;
-            
-            const container = document.getElementById('withdrawalHistory');
-            container.innerHTML = '';
-            
-            const userWithdrawals = state.withdrawals
-                .filter(w => w.userId === state.currentUser.id)
-                .sort((a, b) => new Date(b.date) - new Date(a.date));
-            
-            if (userWithdrawals.length === 0) {
-                container.innerHTML = '<p>Belum ada riwayat penukaran</p>';
-                return;
-            }
-            
-            userWithdrawals.forEach(withdrawal => {
-                const item = document.createElement('div');
-                item.className = 'history-item';
-                item.innerHTML = `
-                    <div>
-                        <strong>${withdrawal.points} Poin</strong>
-                        <div>Rp ${withdrawal.amount}</div>
-                        <small>${new Date(withdrawal.date).toLocaleDateString('id-ID')}</small>
-                        <br>
-                        <small>Status: </small>
-                        <span class="status-badge status-${withdrawal.status}">${getStatusText(withdrawal.status)}</span>
-                        ${withdrawal.adminNotes ? `<br><small>Catatan: ${withdrawal.adminNotes}</small>` : ''}
-                    </div>
-                    <div>
-                        ${withdrawal.status === 'pending' ? `<button onclick="deleteWithdrawal(${withdrawal.id})" class="btn btn-danger btn-sm">Hapus</button>` : ''}
-                    </div>
-                `;
-                container.appendChild(item);
-            });
-        }
-
-        function deleteWithdrawal(id) {
-            if (confirm('Apakah Anda yakin ingin menghapus permintaan penukaran ini?')) {
-                const withdrawalIndex = state.withdrawals.findIndex(w => w.id === id);
-                if (withdrawalIndex !== -1) {
-                    const withdrawal = state.withdrawals[withdrawalIndex];
-                    
-                    // Return points to user only if status is pending
-                    if (withdrawal.status === 'pending') {
-                        const userIndex = state.users.findIndex(u => u.id === withdrawal.userId);
-                        if (userIndex !== -1) {
-                            state.users[userIndex].points += withdrawal.points;
-                            if (state.currentUser && state.currentUser.id === withdrawal.userId) {
-                                state.currentUser.points = state.users[userIndex].points;
-                            }
-                        }
-                    }
-                    
-                    state.withdrawals.splice(withdrawalIndex, 1);
-                    saveState();
-                    updateUserInfo();
-                    loadWithdrawalHistory();
-                    
-                    // Reload admin page if it's open
-                    if (state.currentUser?.role === 'admin' && document.getElementById('settingsPage').style.display === 'block') {
-                        generateSettingsPage();
-                    }
-                    
-                    showToast('Riwayat penukaran dihapus', 'success');
-                }
-            }
+            await loadUsersList();
+            await loadAdminWithdrawalHistory();
         }
 
         // Profile Functions
@@ -1418,253 +1844,11 @@
             document.getElementById('joinDate').textContent = new Date(state.currentUser.joinDate).toLocaleDateString('id-ID');
         }
 
-        // Admin Functions
-        function loadUsersList() {
-            const container = document.getElementById('usersList');
-            if (!container) return;
-            
-            container.innerHTML = '';
-            
-            if (state.users.length === 0) {
-                container.innerHTML = '<p>Belum ada pengguna terdaftar</p>';
-                return;
-            }
-            
-            state.users.forEach(user => {
-                const item = document.createElement('div');
-                item.className = 'user-item';
-                item.innerHTML = `
-                    <div>
-                        <strong>${user.username} ${user.role === 'admin' ? '<i class="fas fa-crown" style="color: #FFD700;"></i>' : ''}</strong>
-                        <div>Role: ${user.role} | Poin: ${user.points}</div>
-                        <small>${user.isBlocked ? '<span style="color:red">Diblokir</span>' : 'Aktif'}</small>
-                    </div>
-                    <div class="user-actions">
-                        <button onclick="editUser(${user.id})" class="btn btn-primary btn-sm">Edit</button>
-                        ${user.role !== 'admin' ? `
-                            <button onclick="toggleBlockUser(${user.id})" class="btn btn-warning btn-sm">
-                                ${user.isBlocked ? 'Buka' : 'Blokir'}
-                            </button>
-                            <button onclick="deleteUser(${user.id})" class="btn btn-danger btn-sm">Hapus</button>
-                        ` : ''}
-                    </div>
-                `;
-                container.appendChild(item);
-            });
-        }
-
-        function editUser(userId) {
-            const user = state.users.find(u => u.id === userId);
-            if (!user) return;
-            
-            document.getElementById('editUserId').value = user.id;
-            document.getElementById('editUsername').value = user.username;
-            document.getElementById('editRole').value = user.role;
-            document.getElementById('editUserPoints').value = user.points;
-            document.getElementById('editPassword').value = '';
-            openModal('editUserModal');
-        }
-
-        function saveUserEdit() {
-            const userId = parseInt(document.getElementById('editUserId').value);
-            const userIndex = state.users.findIndex(u => u.id === userId);
-            
-            if (userIndex !== -1) {
-                const user = state.users[userIndex];
-                const newPassword = document.getElementById('editPassword').value;
-                const newPoints = parseInt(document.getElementById('editUserPoints').value) || 0;
-                
-                if (newPassword) {
-                    user.password = newPassword;
-                }
-                
-                user.role = document.getElementById('editRole').value;
-                user.points = newPoints;
-                
-                // Update current user if it's the same user
-                if (state.currentUser && state.currentUser.id === userId) {
-                    state.currentUser = { ...user };
-                    
-                    // If current user is no longer admin, remove settings menu
-                    if (user.role !== 'admin') {
-                        removeSettingsMenu();
-                    }
-                }
-                
-                saveState();
-                updateUserInfo();
-                loadUsersList();
-                showToast('Perubahan disimpan', 'success');
-                closeModal('editUserModal');
-            }
-        }
-
-        function toggleBlockUser(userId) {
-            const userIndex = state.users.findIndex(u => u.id === userId);
-            if (userIndex !== -1 && state.users[userIndex].role !== 'admin') {
-                state.users[userIndex].isBlocked = !state.users[userIndex].isBlocked;
-                saveState();
-                loadUsersList();
-                showToast(`User ${state.users[userIndex].isBlocked ? 'diblokir' : 'dibuka'}`, 'success');
-                
-                // If current user is blocked, log them out
-                if (state.currentUser && state.currentUser.id === userId && state.users[userIndex].isBlocked) {
-                    setTimeout(() => {
-                        logout();
-                    }, 1000);
-                }
-            }
-        }
-
-        function deleteUser(userId) {
-            if (confirm('Apakah Anda yakin ingin menghapus user ini? Semua data user akan hilang.')) {
-                const userIndex = state.users.findIndex(u => u.id === userId);
-                if (userIndex !== -1 && state.users[userIndex].role !== 'admin') {
-                    // Delete user's withdrawals
-                    state.withdrawals = state.withdrawals.filter(w => w.userId !== userId);
-                    
-                    // Delete user
-                    state.users.splice(userIndex, 1);
-                    saveState();
-                    loadUsersList();
-                    showToast('User dihapus', 'success');
-                    
-                    // If current user is deleted, log them out
-                    if (state.currentUser && state.currentUser.id === userId) {
-                        setTimeout(() => {
-                            logout();
-                        }, 1000);
-                    }
-                }
-            }
-        }
-
-        function toggleMaintenance() {
-            const toggle = document.getElementById('maintenanceToggle');
-            if (!toggle) return;
-            
-            state.maintenance = toggle.checked;
-            const statusElement = document.getElementById('maintenanceStatus');
-            if (statusElement) {
-                statusElement.textContent = `Mode Maintenance: ${state.maintenance ? 'ON' : 'OFF'}`;
-            }
-            saveState();
-            
-            showToast(`Maintenance mode ${state.maintenance ? 'diaktifkan' : 'dinonaktifkan'}`, 'success');
-            
-            // Jika maintenance mode aktif, redirect semua user ke maintenance page
-            if (state.maintenance && state.currentUser) {
-                showMaintenancePage();
-            } else if (!state.maintenance && state.currentUser?.role === 'user') {
-                // Jika maintenance mode dimatikan, user kembali ke halaman quiz
-                if (document.getElementById('maintenancePage').style.display === 'block') {
-                    showPage('quiz');
-                }
-            }
-        }
-
-        function loadAdminWithdrawalHistory() {
-            const container = document.getElementById('adminWithdrawalHistory');
-            if (!container) return;
-            
-            container.innerHTML = '';
-            
-            const sortedWithdrawals = [...state.withdrawals].sort((a, b) => new Date(b.date) - new Date(a.date));
-            
-            if (sortedWithdrawals.length === 0) {
-                container.innerHTML = '<p>Belum ada permintaan penukaran</p>';
-                return;
-            }
-            
-            sortedWithdrawals.forEach(withdrawal => {
-                const user = state.users.find(u => u.id === withdrawal.userId);
-                const userRole = user ? user.role : 'unknown';
-                
-                const item = document.createElement('div');
-                item.className = 'history-item';
-                item.innerHTML = `
-                    <div>
-                        <strong>${withdrawal.username} <small>(${userRole})</small></strong>
-                        <div>${withdrawal.points} Poin → Rp ${withdrawal.amount}</div>
-                        <small>${new Date(withdrawal.date).toLocaleDateString('id-ID')}</small>
-                        <br>
-                        <small>Dana: ${withdrawal.accountName} (${withdrawal.phone})</small>
-                        <br>
-                        <span class="status-badge status-${withdrawal.status}">${getStatusText(withdrawal.status)}</span>
-                        ${withdrawal.adminNotes ? `<br><small>Catatan Admin: ${withdrawal.adminNotes}</small>` : ''}
-                    </div>
-                    <div>
-                        <button onclick="updateWithdrawalStatus(${withdrawal.id})" class="btn btn-primary btn-sm">Ubah Status</button>
-                        <button onclick="deleteWithdrawalAdmin(${withdrawal.id})" class="btn btn-danger btn-sm">Hapus</button>
-                    </div>
-                `;
-                container.appendChild(item);
-            });
-        }
-
-        function updateWithdrawalStatus(withdrawalId) {
-            const withdrawal = state.withdrawals.find(w => w.id === withdrawalId);
-            if (!withdrawal) return;
-            
-            document.getElementById('withdrawalId').value = withdrawalId;
-            document.getElementById('withdrawalStatus').value = withdrawal.status;
-            document.getElementById('adminNotes').value = withdrawal.adminNotes || '';
-            openModal('withdrawalStatusModal');
-        }
-
-        function saveWithdrawalStatus() {
-            const withdrawalId = parseInt(document.getElementById('withdrawalId').value);
-            const newStatus = document.getElementById('withdrawalStatus').value;
-            const adminNotes = document.getElementById('adminNotes').value;
-            
-            const withdrawalIndex = state.withdrawals.findIndex(w => w.id === withdrawalId);
-            if (withdrawalIndex !== -1) {
-                const oldStatus = state.withdrawals[withdrawalIndex].status;
-                state.withdrawals[withdrawalIndex].status = newStatus;
-                state.withdrawals[withdrawalIndex].adminNotes = adminNotes;
-                
-                // If status changed from pending to rejected, return points
-                if (oldStatus === 'pending' && newStatus === 'rejected') {
-                    const userIndex = state.users.findIndex(u => u.id === state.withdrawals[withdrawalIndex].userId);
-                    if (userIndex !== -1) {
-                        state.users[userIndex].points += state.withdrawals[withdrawalIndex].points;
-                        showToast('Poin dikembalikan ke user', 'info');
-                    }
-                }
-                
-                // If status changed from rejected to approved, deduct points again
-                if (oldStatus === 'rejected' && newStatus === 'approved') {
-                    const userIndex = state.users.findIndex(u => u.id === state.withdrawals[withdrawalIndex].userId);
-                    if (userIndex !== -1) {
-                        state.users[userIndex].points -= state.withdrawals[withdrawalIndex].points;
-                        showToast('Poin dipotong dari user', 'info');
-                    }
-                }
-                
-                saveState();
-                
-                // Update UI
-                if (document.getElementById('settingsPage').style.display === 'block') {
-                    generateSettingsPage();
-                }
-                
-                // Update user's points display if they are the current user
-                if (state.currentUser && state.currentUser.id === state.withdrawals[withdrawalIndex].userId) {
-                    updateUserInfo();
-                    loadWithdrawalHistory();
-                }
-                
-                showToast('Status penukaran diperbarui', 'success');
-                closeModal('withdrawalStatusModal');
-            }
-        }
-
-        function deleteWithdrawalAdmin(id) {
-            if (confirm('Hapus riwayat penukaran ini dari sistem?')) {
-                deleteWithdrawal(id);
-                if (document.getElementById('settingsPage').style.display === 'block') {
-                    generateSettingsPage();
-                }
+        // Update user info in UI
+        function updateUserInfo() {
+            if (state.currentUser) {
+                document.getElementById('userGreeting').textContent = `Halo, ${state.currentUser.username}!`;
+                document.getElementById('userPoints').textContent = state.currentUser.points;
             }
         }
 
@@ -1686,13 +1870,6 @@
             return statusMap[status] || status;
         }
 
-        function updateUserInfo() {
-            if (state.currentUser) {
-                document.getElementById('userGreeting').textContent = `Halo, ${state.currentUser.username}!`;
-                document.getElementById('userPoints').textContent = state.currentUser.points;
-            }
-        }
-
         function openModal(modalId) {
             document.getElementById(modalId).style.display = 'flex';
         }
@@ -1703,33 +1880,19 @@
 
         // Event Listeners
         document.addEventListener('DOMContentLoaded', function() {
-            // Check auto-logout every hour
-            setInterval(checkAutoLogout, 60 * 60 * 1000);
-            
-            // Check if user is already logged in
-            const savedUserId = localStorage.getItem('currentUserId');
-            if (savedUserId) {
-                const user = state.users.find(u => u.id === parseInt(savedUserId));
-                if (user) {
-                    if (login(user.username, user.password)) {
-                        return;
-                    }
-                }
-            }
-            
-            // Show login page by default
-            showLogin();
+            // Initialize app
+            initializeApp();
             
             // Login form
-            document.getElementById('loginForm').addEventListener('submit', function(e) {
+            document.getElementById('loginForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
                 const username = document.getElementById('loginUsername').value;
                 const password = document.getElementById('loginPassword').value;
-                login(username, password);
+                await login(username, password);
             });
             
             // Register form
-            document.getElementById('registerForm').addEventListener('submit', function(e) {
+            document.getElementById('registerForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
                 const username = document.getElementById('registerUsername').value;
                 const password = document.getElementById('registerPassword').value;
@@ -1740,33 +1903,21 @@
                     return;
                 }
                 
-                register(username, password);
+                await register(username, password);
             });
             
             // Withdrawal form
-            document.getElementById('withdrawalForm').addEventListener('submit', function(e) {
+            document.getElementById('withdrawalForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
                 const points = document.getElementById('withdrawalPoints').value;
                 const accountName = document.getElementById('danaAccountName').value;
                 const phone = document.getElementById('danaPhone').value;
                 
-                submitWithdrawal(points, accountName, phone);
+                await submitWithdrawal(points, accountName, phone);
             });
             
             // Reward button
             document.getElementById('rewardBtn').addEventListener('click', claimReward);
-            
-            // Edit user form
-            document.getElementById('editUserForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                saveUserEdit();
-            });
-            
-            // Withdrawal status form
-            document.getElementById('withdrawalStatusForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                saveWithdrawalStatus();
-            });
             
             // Close modals when clicking outside
             document.querySelectorAll('.modal').forEach(modal => {
@@ -1778,17 +1929,125 @@
             });
         });
 
-        function checkAutoLogout() {
-            if (!state.currentUser) return;
+        // Admin Functions
+        async function loadUsersList() {
+            const container = document.getElementById('usersList');
+            if (!container) return;
             
-            const lastLogin = localStorage.getItem(`lastLogin_${state.currentUser.id}`);
-            const twoDaysAgo = Date.now() - (2 * 24 * 60 * 60 * 1000);
+            container.innerHTML = '';
             
-            if (lastLogin && parseInt(lastLogin) < twoDaysAgo) {
-                logout();
-                showToast('Sesi telah habis karena tidak aktif selama 2 hari', 'info');
+            if (state.users.length === 0) {
+                container.innerHTML = '<p>Belum ada pengguna terdaftar</p>';
+                return;
+            }
+            
+            state.users.forEach(user => {
+                const item = document.createElement('div');
+                item.className = 'user-item';
+                item.innerHTML = `
+                    <div>
+                        <strong>${user.username} ${user.role === 'admin' ? '<i class="fas fa-crown" style="color: #FFD700;"></i>' : ''}</strong>
+                        <div>Role: ${user.role} | Poin: ${user.points}</div>
+                        <small>${user.isBlocked === 'true' ? '<span style="color:red">Diblokir</span>' : 'Aktif'}</small>
+                    </div>
+                    <div class="user-actions">
+                        <button onclick="editUser('${user.id}')" class="btn btn-primary btn-sm">Edit</button>
+                        ${user.role !== 'admin' ? `
+                            <button onclick="toggleBlockUser('${user.id}')" class="btn btn-warning btn-sm">
+                                ${user.isBlocked === 'true' ? 'Buka' : 'Blokir'}
+                            </button>
+                            <button onclick="deleteUser('${user.id}')" class="btn btn-danger btn-sm">Hapus</button>
+                        ` : ''}
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        async function loadAdminWithdrawalHistory() {
+            const container = document.getElementById('adminWithdrawalHistory');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            const sortedWithdrawals = [...state.withdrawals].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            if (sortedWithdrawals.length === 0) {
+                container.innerHTML = '<p>Belum ada permintaan penukaran</p>';
+                return;
+            }
+            
+            sortedWithdrawals.forEach(withdrawal => {
+                const user = state.users.find(u => u.id == withdrawal.userId);
+                const userRole = user ? user.role : 'unknown';
+                
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                item.innerHTML = `
+                    <div>
+                        <strong>${withdrawal.username} <small>(${userRole})</small></strong>
+                        <div>${withdrawal.points} Poin → Rp ${withdrawal.amount}</div>
+                        <small>${new Date(withdrawal.date).toLocaleDateString('id-ID')}</small>
+                        <br>
+                        <small>Dana: ${withdrawal.accountName} (${withdrawal.phone})</small>
+                        <br>
+                        <span class="status-badge status-${withdrawal.status}">${getStatusText(withdrawal.status)}</span>
+                        ${withdrawal.adminNotes ? `<br><small>Catatan Admin: ${withdrawal.adminNotes}</small>` : ''}
+                    </div>
+                    <div>
+                        <button onclick="updateWithdrawalStatus('${withdrawal.id}')" class="btn btn-primary btn-sm">Ubah Status</button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        async function toggleMaintenance() {
+            const toggle = document.getElementById('maintenanceToggle');
+            if (!toggle) return;
+            
+            state.maintenance = toggle.checked;
+            
+            // Update in settings
+            const settingsData = await fetchData(CONFIG.SHEETS.SETTINGS, false);
+            const maintenanceIndex = settingsData.findIndex(s => s.key === 'maintenance');
+            
+            if (maintenanceIndex !== -1) {
+                await updateData(CONFIG.SHEETS.SETTINGS, maintenanceIndex, {
+                    key: 'maintenance',
+                    value: state.maintenance.toString(),
+                    updatedAt: new Date().toISOString()
+                });
+            } else {
+                await saveData(CONFIG.SHEETS.SETTINGS, {
+                    key: 'maintenance',
+                    value: state.maintenance.toString(),
+                    updatedAt: new Date().toISOString()
+                });
+            }
+            
+            // Update local settings
+            state.settings.maintenance = state.maintenance.toString();
+            
+            const statusElement = document.getElementById('maintenanceStatus');
+            if (statusElement) {
+                statusElement.textContent = `Mode Maintenance: ${state.maintenance ? 'ON' : 'OFF'}`;
+            }
+            
+            showToast(`Maintenance mode ${state.maintenance ? 'diaktifkan' : 'dinonaktifkan'}`, 'success');
+            
+            if (state.maintenance && state.currentUser) {
+                showMaintenancePage();
+            } else if (!state.maintenance && state.currentUser?.role === 'user') {
+                if (document.getElementById('maintenancePage').style.display === 'block') {
+                    showPage('quiz');
+                }
             }
         }
+
+        // Note: Fungsi editUser, toggleBlockUser, deleteUser, dan updateWithdrawalStatus
+        // perlu diimplementasikan sesuai dengan struktur database Google Sheets
+
     </script>
 </body>
 </html>
