@@ -70,6 +70,10 @@
             background: linear-gradient(135deg, #2196F3, #1976D2);
         }
 
+        .toast.warning {
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+        }
+
         /* Loading Overlay */
         .loading-overlay {
             display: none;
@@ -240,7 +244,7 @@
             gap: 5px;
         }
 
-        /* Navigation - DIUBAH untuk satu baris di mobile */
+        /* Navigation - SATU BARIS DI MOBILE */
         .nav-container {
             background: white;
             border-radius: 20px;
@@ -328,7 +332,7 @@
             color: #667eea;
         }
 
-        /* OPTIONS CONTAINER - DIUBAH untuk 2 baris di mobile */
+        /* OPTIONS CONTAINER - 2 BARIS DI MOBILE */
         .options-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -634,7 +638,44 @@
             margin: 10px 0;
         }
 
-        /* Responsive Design - DIUBAH untuk 2 baris jawaban di mobile */
+        /* Debug Info */
+        .debug-info {
+            background: #e3f2fd;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 12px;
+            display: none;
+        }
+
+        .debug-info h4 {
+            margin-bottom: 5px;
+            color: #1976D2;
+        }
+
+        /* Sync Status */
+        .sync-status {
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .sync-status.syncing {
+            color: #2196F3;
+        }
+
+        .sync-status.synced {
+            color: #4CAF50;
+        }
+
+        .sync-status.error {
+            color: #f44336;
+        }
+
+        /* Responsive Design */
         @media (max-width: 768px) {
             .container {
                 padding: 10px;
@@ -706,6 +747,15 @@
                 padding: 12px;
                 font-size: 14px;
             }
+
+            /* Auth box adjustment */
+            .auth-box {
+                padding: 25px;
+            }
+
+            .auth-title {
+                font-size: 24px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -740,6 +790,10 @@
                 padding: 10px;
                 font-size: 13px;
             }
+
+            .auth-box {
+                padding: 20px;
+            }
         }
 
         /* Untuk layar sangat kecil, buat 2 baris dengan 2 kolom */
@@ -766,33 +820,40 @@
             text-align: center;
         }
 
+        .mt-10 {
+            margin-top: 10px;
+        }
+
         .mt-20 {
             margin-top: 20px;
+        }
+
+        .mb-10 {
+            margin-bottom: 10px;
         }
 
         .mb-20 {
             margin-bottom: 20px;
         }
 
-        .sync-status {
-            font-size: 12px;
-            color: #666;
-            margin-top: 5px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
+        .d-none {
+            display: none;
         }
 
-        .sync-status.syncing {
-            color: #2196F3;
+        .d-block {
+            display: block;
         }
 
-        .sync-status.synced {
+        .text-success {
             color: #4CAF50;
         }
 
-        .sync-status.error {
+        .text-error {
             color: #f44336;
+        }
+
+        .text-warning {
+            color: #FF9800;
         }
     </style>
 </head>
@@ -813,7 +874,7 @@
         <div id="loginPage" class="auth-container">
             <div class="auth-box">
                 <h2 class="auth-title">Login</h2>
-                <div id="noAccountMessage" style="display: none; background: #ffebee; color: #c62828; padding: 10px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
+                <div id="noAccountMessage" class="d-none" style="background: #ffebee; color: #c62828; padding: 10px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
                     <i class="fas fa-exclamation-circle"></i> Belum punya akun? Silakan daftar terlebih dahulu.
                 </div>
                 <form id="loginForm">
@@ -831,7 +892,7 @@
                     <a href="#" class="auth-link" onclick="showRegister()">Belum punya akun? Daftar</a>
                 </div>
                 <div class="sync-status" id="loginSyncStatus">
-                    <i class="fas fa-cloud"></i> <span>Menyiapkan database...</span>
+                    <i class="fas fa-cloud"></i> <span id="loginSyncText">Menyiapkan database...</span>
                 </div>
             </div>
         </div>
@@ -840,27 +901,43 @@
         <div id="registerPage" class="auth-container" style="display: none;">
             <div class="auth-box">
                 <h2 class="auth-title">Daftar Akun</h2>
+                
+                <!-- Debug Info -->
+                <div id="debugInfo" class="debug-info">
+                    <h4><i class="fas fa-bug"></i> Debug Info:</h4>
+                    <div id="debugText"></div>
+                </div>
+                
                 <form id="registerForm">
                     <div class="form-group">
                         <label for="registerUsername">Username</label>
                         <input type="text" id="registerUsername" class="form-control" placeholder="Buat username" required>
+                        <small class="text-muted">Minimal 3 karakter</small>
                     </div>
                     <div class="form-group">
                         <label for="registerPassword">Password</label>
                         <input type="password" id="registerPassword" class="form-control" placeholder="Buat password" required>
+                        <small class="text-muted">Minimal 4 karakter</small>
                     </div>
                     <div class="form-group">
                         <label for="registerConfirmPassword">Konfirmasi Password</label>
                         <input type="password" id="registerConfirmPassword" class="form-control" placeholder="Ulangi password" required>
                     </div>
-                    <button type="submit" class="btn btn-primary">Daftar</button>
+                    <button type="submit" id="registerSubmitBtn" class="btn btn-primary">
+                        <i class="fas fa-user-plus"></i> Daftar
+                    </button>
                 </form>
                 <div class="auth-links">
                     <a href="#" class="auth-link" onclick="showLogin()">Sudah punya akun? Login</a>
                 </div>
                 <div class="sync-status" id="registerSyncStatus">
-                    <i class="fas fa-cloud"></i> <span>Menyiapkan database...</span>
+                    <i class="fas fa-cloud"></i> <span id="registerSyncText">Menyiapkan database...</span>
                 </div>
+                
+                <!-- Test Connection Button -->
+                <button onclick="testDatabaseConnection()" class="btn btn-sm btn-secondary mt-20" style="width: 100%;">
+                    <i class="fas fa-plug"></i> Test Koneksi Database
+                </button>
             </div>
         </div>
 
@@ -879,16 +956,18 @@
                     <button onclick="syncWithGoogleSheets()" class="btn btn-sm btn-secondary" style="margin-bottom: 5px;">
                         <i class="fas fa-sync-alt"></i> Sync
                     </button>
-                    <button onclick="logout()" class="btn btn-danger">Logout</button>
+                    <button onclick="logout()" class="btn btn-danger">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
                 </div>
             </div>
 
             <!-- Sync Status -->
             <div class="sync-status" id="mainSyncStatus" style="background: white; padding: 10px; border-radius: 10px; margin-bottom: 10px;">
-                <i class="fas fa-cloud"></i> <span>Database: Menyiapkan...</span>
+                <i class="fas fa-cloud"></i> <span id="mainSyncText">Database: Menyiapkan...</span>
             </div>
 
-            <!-- Navigation - SEKARANG SATU BARIS DI MOBILE -->
+            <!-- Navigation -->
             <div class="nav-container">
                 <ul class="nav-menu" id="navMenu">
                     <li class="nav-item">
@@ -947,7 +1026,9 @@
                                 <label>Nomor HP Dana</label>
                                 <input type="tel" id="danaPhone" class="form-control" required>
                             </div>
-                            <button type="submit" class="btn btn-primary">Kirim Permintaan</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane"></i> Kirim Permintaan
+                            </button>
                         </form>
                     </div>
                     <div class="history-list" id="withdrawalHistory">
@@ -1074,24 +1155,20 @@
         // KONFIGURASI GOOGLE SHEETS
         // =============================================
         
-        // GANTI DENGAN SCRIPT ID GOOGLE APPS SCRIPT ANDA
+        // GANTI DENGAN SCRIPT ID ANDA
+        // Contoh: https://script.google.com/macros/s/AKfycbxxxxxx/exec
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzYNdozeE2hkaFNx5xmTvcPfiNEFWGDNCn8zzWpLa_DyJxEN64Lc4x_PkMZiCxW2M0JZA/exec';
         
-        // Nama sheet dalam Google Spreadsheet
-        const SHEET_NAMES = {
-            USERS: 'Users',
-            WITHDRAWALS: 'Withdrawals',
-            SETTINGS: 'Settings'
-        };
-
         // =============================================
         // INITIALIZATION
         // =============================================
         
         // Telegram Web App Initialization
         const tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.MainButton.hide();
+        if (tg && tg.initData) {
+            tg.expand();
+            tg.MainButton.hide();
+        }
 
         // Application State
         const state = {
@@ -1105,7 +1182,8 @@
             deviceId: generateDeviceId(),
             canClaimReward: false,
             syncInProgress: false,
-            lastSyncTime: null
+            lastSyncTime: null,
+            isOnline: navigator.onLine
         };
 
         // =============================================
@@ -1115,7 +1193,7 @@
         function generateDeviceId() {
             let deviceId = localStorage.getItem('deviceId');
             if (!deviceId) {
-                deviceId = 'DEV-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+                deviceId = 'DEV-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5).toUpperCase();
                 localStorage.setItem('deviceId', deviceId);
             }
             return deviceId;
@@ -1141,49 +1219,75 @@
             document.getElementById('loadingOverlay').style.display = 'none';
         }
 
-        function updateSyncStatus(status, message) {
-            const statusElements = [
-                document.getElementById('mainSyncStatus'),
-                document.getElementById('loginSyncStatus'),
-                document.getElementById('registerSyncStatus')
-            ];
+        function showDebugInfo(message) {
+            const debugDiv = document.getElementById('debugInfo');
+            const debugText = document.getElementById('debugText');
             
-            statusElements.forEach(element => {
-                if (element) {
-                    element.className = `sync-status ${status}`;
-                    const icon = element.querySelector('i');
-                    const text = element.querySelector('span');
-                    
-                    if (icon) {
-                        if (status === 'syncing') icon.className = 'fas fa-sync-alt fa-spin';
-                        else if (status === 'synced') icon.className = 'fas fa-cloud-check';
-                        else if (status === 'error') icon.className = 'fas fa-cloud-exclamation';
-                        else icon.className = 'fas fa-cloud';
-                    }
-                    
-                    if (text) {
-                        text.textContent = message;
-                    }
-                }
-            });
-            
-            // Update database status in profile
-            const dbStatusElement = document.getElementById('databaseStatus');
-            if (dbStatusElement) {
-                dbStatusElement.textContent = message;
-                dbStatusElement.style.color = 
-                    status === 'synced' ? '#4CAF50' : 
-                    status === 'syncing' ? '#2196F3' : 
-                    status === 'error' ? '#f44336' : '#666';
+            if (debugDiv && debugText) {
+                debugDiv.style.display = 'block';
+                debugText.innerHTML = message.replace(/\n/g, '<br>');
+                
+                // Auto hide after 10 seconds
+                setTimeout(() => {
+                    debugDiv.style.display = 'none';
+                }, 10000);
             }
+        }
+
+        function updateSyncStatus(elementId, status, message) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.className = `sync-status ${status}`;
+                const icon = element.querySelector('i');
+                const textElement = element.querySelector('span');
+                
+                if (icon) {
+                    icon.className = 
+                        status === 'syncing' ? 'fas fa-sync-alt fa-spin' :
+                        status === 'synced' ? 'fas fa-cloud-check' :
+                        status === 'error' ? 'fas fa-cloud-exclamation' : 'fas fa-cloud';
+                }
+                
+                if (textElement) {
+                    textElement.textContent = message;
+                }
+            }
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'pending': 'Pending',
+                'approved': 'Berhasil',
+                'rejected': 'Ditolak'
+            };
+            return statusMap[status] || status;
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
         }
 
         // =============================================
         // GOOGLE SHEETS API FUNCTIONS
         // =============================================
         
-        async function callGoogleScript(action, data = {}) {
+        async function callGoogleScriptPOST(action, data = {}) {
             try {
+                console.log(`POST to Google Script: ${action}`, data);
+                
+                // Create form data
                 const formData = new FormData();
                 formData.append('action', action);
                 formData.append('data', JSON.stringify(data));
@@ -1193,11 +1297,30 @@
                     body: formData
                 });
                 
-                const result = await response.json();
+                const text = await response.text();
+                console.log('POST Response text:', text);
+                
+                let result;
+                try {
+                    result = JSON.parse(text);
+                } catch (e) {
+                    console.error('Failed to parse JSON:', text);
+                    result = { 
+                        success: false, 
+                        message: 'Invalid JSON response',
+                        raw: text 
+                    };
+                }
+                
                 return result;
+                
             } catch (error) {
-                console.error('Error calling Google Script:', error);
-                throw error;
+                console.error('POST Error:', error);
+                return { 
+                    success: false, 
+                    message: 'Network error: ' + error.toString(),
+                    error: error 
+                };
             }
         }
 
@@ -1205,13 +1328,15 @@
             if (state.syncInProgress) return;
             
             state.syncInProgress = true;
-            updateSyncStatus('syncing', 'Menyinkronkan...');
+            updateSyncStatus('loginSyncStatus', 'syncing', 'Menyinkronkan...');
+            updateSyncStatus('registerSyncStatus', 'syncing', 'Menyinkronkan...');
+            updateSyncStatus('mainSyncStatus', 'syncing', 'Menyinkronkan...');
             
             try {
-                // Load all data from Google Sheets
-                const result = await callGoogleScript('getAllData');
+                const result = await callGoogleScriptPOST('getAllData');
+                console.log('Sync result:', result);
                 
-                if (result.success) {
+                if (result.success && result.data) {
                     state.users = result.data.users || [];
                     state.withdrawals = result.data.withdrawals || [];
                     state.maintenance = result.data.maintenance === 'true';
@@ -1224,74 +1349,62 @@
                     localStorage.setItem('rewardPoints', state.rewardPoints);
                     
                     state.lastSyncTime = new Date().toISOString();
-                    updateSyncStatus('synced', `Disinkronkan: ${new Date().toLocaleTimeString('id-ID')}`);
+                    const timeStr = new Date().toLocaleTimeString('id-ID', { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                    });
                     
-                    // Update UI if user is logged in
-                    if (state.currentUser) {
-                        updateUserInfo();
-                        updateRewardButton();
-                        loadWithdrawalHistory();
-                        
-                        if (document.getElementById('settingsPage').style.display === 'block') {
-                            generateSettingsPage();
-                        }
-                    }
+                    updateSyncStatus('loginSyncStatus', 'synced', `Disinkronkan ${timeStr}`);
+                    updateSyncStatus('registerSyncStatus', 'synced', `Disinkronkan ${timeStr}`);
+                    updateSyncStatus('mainSyncStatus', 'synced', `Database: Disinkronkan ${timeStr}`);
                     
+                    console.log('Sync successful. Users:', state.users.length);
                     return true;
+                    
                 } else {
-                    throw new Error(result.message || 'Gagal menyinkronkan');
+                    throw new Error(result.message || 'Format data tidak valid');
                 }
+                
             } catch (error) {
                 console.error('Sync error:', error);
-                updateSyncStatus('error', 'Gagal sinkron, menggunakan data lokal');
                 
                 // Fallback to local storage
-                state.users = JSON.parse(localStorage.getItem('users')) || [];
-                state.withdrawals = JSON.parse(localStorage.getItem('withdrawals')) || [];
-                state.maintenance = localStorage.getItem('maintenance') === 'true';
-                state.rewardPoints = parseInt(localStorage.getItem('rewardPoints')) || 50;
+                try {
+                    state.users = JSON.parse(localStorage.getItem('users')) || [];
+                    state.withdrawals = JSON.parse(localStorage.getItem('withdrawals')) || [];
+                    state.maintenance = localStorage.getItem('maintenance') === 'true';
+                    state.rewardPoints = parseInt(localStorage.getItem('rewardPoints')) || 50;
+                    
+                    updateSyncStatus('loginSyncStatus', 'synced', 'Menggunakan data lokal');
+                    updateSyncStatus('registerSyncStatus', 'synced', 'Menggunakan data lokal');
+                    updateSyncStatus('mainSyncStatus', 'synced', 'Database: Mode offline');
+                    
+                    console.log('Using local data. Users:', state.users.length);
+                    return true;
+                    
+                } catch (localError) {
+                    console.error('Local data error:', localError);
+                    updateSyncStatus('loginSyncStatus', 'error', 'Database offline');
+                    updateSyncStatus('registerSyncStatus', 'error', 'Database offline');
+                    updateSyncStatus('mainSyncStatus', 'error', 'Database: Error');
+                    return false;
+                }
                 
-                return false;
             } finally {
                 state.syncInProgress = false;
             }
         }
 
-        async function saveUserToGoogleSheets(user) {
-            try {
-                const result = await callGoogleScript('saveUser', { user });
-                return result.success;
-            } catch (error) {
-                console.error('Error saving user:', error);
-                return false;
-            }
-        }
-
-        async function saveWithdrawalToGoogleSheets(withdrawal) {
-            try {
-                const result = await callGoogleScript('saveWithdrawal', { withdrawal });
-                return result.success;
-            } catch (error) {
-                console.error('Error saving withdrawal:', error);
-                return false;
-            }
-        }
-
-        async function updateSettingsInGoogleSheets(settings) {
-            try {
-                const result = await callGoogleScript('updateSettings', { settings });
-                return result.success;
-            } catch (error) {
-                console.error('Error updating settings:', error);
-                return false;
-            }
-        }
-
         async function syncWithGoogleSheets() {
             showLoading('Menyinkronkan dengan database...');
-            await syncAllData();
+            const success = await syncAllData();
             hideLoading();
-            showToast('Data berhasil disinkronkan', 'success');
+            
+            if (success) {
+                showToast('Data berhasil disinkronkan', 'success');
+            } else {
+                showToast('Gagal menyinkronkan data', 'error');
+            }
         }
 
         // =============================================
@@ -1312,54 +1425,75 @@
         async function login(username, password) {
             showLoading('Memeriksa login...');
             
-            const user = state.users.find(u => 
-                u.username === username && u.password === password && !u.isBlocked
-            );
-            
-            if (user) {
-                // Check auto-logout (2 days)
-                const lastLogin = localStorage.getItem(`lastLogin_${user.id}`);
-                const twoDaysAgo = Date.now() - (2 * 24 * 60 * 60 * 1000);
+            try {
+                // First, try to sync to get latest data
+                await syncAllData();
                 
-                if (lastLogin && parseInt(lastLogin) < twoDaysAgo) {
+                // Find user (case insensitive)
+                const usernameLower = username.toLowerCase().trim();
+                const user = state.users.find(u => 
+                    u.username.toLowerCase().trim() === usernameLower && 
+                    u.password === password && 
+                    !u.isBlocked
+                );
+                
+                if (user) {
+                    // Check auto-logout (2 days)
+                    const lastLogin = localStorage.getItem(`lastLogin_${user.id}`);
+                    const twoDaysAgo = Date.now() - (2 * 24 * 60 * 60 * 1000);
+                    
+                    if (lastLogin && parseInt(lastLogin) < twoDaysAgo) {
+                        hideLoading();
+                        showToast('Sesi telah habis, silakan login kembali', 'info');
+                        return false;
+                    }
+                    
+                    state.currentUser = user;
+                    localStorage.setItem(`lastLogin_${user.id}`, Date.now().toString());
+                    localStorage.setItem('currentUserId', user.id.toString());
+                    
                     hideLoading();
-                    showToast('Sesi telah habis, silakan login kembali', 'info');
+                    showToast('Login berhasil!', 'success');
+                    
+                    if (state.maintenance) {
+                        showMaintenancePage();
+                    } else {
+                        showApp();
+                    }
+                    
+                    updateUserInfo();
+                    updateRewardButton();
+                    generateNewQuestion();
+                    
+                    if (state.currentUser.role === 'admin') {
+                        addSettingsMenu();
+                    } else {
+                        removeSettingsMenu();
+                    }
+                    
+                    return true;
+                    
+                } else {
+                    hideLoading();
+                    
+                    const userExists = state.users.find(u => 
+                        u.username.toLowerCase().trim() === usernameLower
+                    );
+                    
+                    if (userExists) {
+                        showToast('Password salah', 'error');
+                    } else {
+                        document.getElementById('noAccountMessage').style.display = 'block';
+                        showToast('Belum punya akun? Silakan daftar terlebih dahulu', 'info');
+                    }
+                    
                     return false;
                 }
                 
-                state.currentUser = user;
-                localStorage.setItem(`lastLogin_${user.id}`, Date.now().toString());
-                localStorage.setItem('currentUserId', user.id.toString());
-                
+            } catch (error) {
                 hideLoading();
-                showToast('Login berhasil!', 'success');
-                
-                if (state.maintenance) {
-                    showMaintenancePage();
-                } else {
-                    showApp();
-                }
-                
-                updateUserInfo();
-                updateRewardButton();
-                generateNewQuestion();
-                
-                if (state.currentUser.role === 'admin') {
-                    addSettingsMenu();
-                } else {
-                    removeSettingsMenu();
-                }
-                
-                return true;
-            } else {
-                hideLoading();
-                const userExists = state.users.find(u => u.username === username);
-                if (userExists) {
-                    showToast('Password salah', 'error');
-                } else {
-                    document.getElementById('noAccountMessage').style.display = 'block';
-                    showToast('Belum punya akun? Silakan daftar terlebih dahulu', 'info');
-                }
+                console.error('Login error:', error);
+                showToast('Error saat login', 'error');
                 return false;
             }
         }
@@ -1373,46 +1507,127 @@
         }
 
         async function register(username, password) {
-            showLoading('Mendaftarkan akun...');
+            // Validation
+            username = username.trim();
             
-            if (state.users.some(u => u.username === username)) {
-                hideLoading();
+            if (!username || username.length < 3) {
+                showToast('Username minimal 3 karakter', 'error');
+                return false;
+            }
+            
+            if (!password || password.length < 4) {
+                showToast('Password minimal 4 karakter', 'error');
+                return false;
+            }
+            
+            // Check if username exists (case insensitive)
+            const usernameLower = username.toLowerCase();
+            const existingUser = state.users.find(u => 
+                u.username.toLowerCase() === usernameLower
+            );
+            
+            if (existingUser) {
                 showToast('Username sudah digunakan', 'error');
                 return false;
             }
             
-            const role = state.users.length === 0 ? 'admin' : 'user';
-            const newUser = {
-                id: Date.now().toString(),
-                username,
-                password,
-                role: role,
-                points: 0,
-                joinDate: new Date().toISOString(),
-                deviceId: state.deviceId,
-                isBlocked: false
-            };
+            showLoading('Mendaftarkan akun...');
             
-            // Save to Google Sheets
-            const saved = await saveUserToGoogleSheets(newUser);
-            
-            if (saved) {
-                state.users.push(newUser);
-                localStorage.setItem('users', JSON.stringify(state.users));
+            try {
+                // Generate unique ID
+                const userId = 'USER-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5);
                 
-                hideLoading();
+                // Determine role (first user is admin)
+                const isFirstUser = state.users.length === 0;
+                const role = isFirstUser ? 'admin' : 'user';
                 
-                if (role === 'admin') {
-                    showToast('Pendaftaran berhasil! Anda adalah ADMIN pertama.', 'success');
+                // Create user object
+                const newUser = {
+                    id: userId,
+                    username: username,
+                    password: password,
+                    role: role,
+                    points: 0,
+                    joinDate: new Date().toISOString(),
+                    deviceId: state.deviceId,
+                    isBlocked: false
+                };
+                
+                console.log('Creating new user:', newUser);
+                
+                // Show debug info
+                showDebugInfo(`Mencoba menyimpan ke database...<br>
+                    ID: ${userId}<br>
+                    Username: ${username}<br>
+                    Role: ${role}<br>
+                    URL: ${GOOGLE_SCRIPT_URL}`);
+                
+                // Save to Google Sheets
+                const saveResult = await callGoogleScriptPOST('saveUser', { user: newUser });
+                console.log('Save user result:', saveResult);
+                
+                if (saveResult.success) {
+                    // Also save to local state
+                    state.users.push(newUser);
+                    localStorage.setItem('users', JSON.stringify(state.users));
+                    
+                    hideLoading();
+                    
+                    if (isFirstUser) {
+                        showToast('🎉 Pendaftaran berhasil! Anda adalah ADMIN pertama.', 'success');
+                    } else {
+                        showToast('✅ Pendaftaran berhasil! Silakan login.', 'success');
+                    }
+                    
+                    // Show success in debug
+                    showDebugInfo(`✅ User berhasil disimpan!<br>
+                        ID: ${userId}<br>
+                        Role: ${role}<br>
+                        Silakan login dengan username dan password Anda.`);
+                    
+                    // Auto switch to login page after 2 seconds
+                    setTimeout(() => {
+                        showLogin();
+                        // Auto fill login form
+                        document.getElementById('loginUsername').value = username;
+                        document.getElementById('loginPassword').value = password;
+                    }, 2000);
+                    
+                    return true;
+                    
                 } else {
-                    showToast('Pendaftaran berhasil! Silakan login.', 'success');
+                    hideLoading();
+                    
+                    const errorMsg = saveResult.message || 'Gagal menyimpan ke database';
+                    console.error('Save failed:', errorMsg);
+                    
+                    // Try alternative: save locally and sync later
+                    state.users.push(newUser);
+                    localStorage.setItem('users', JSON.stringify(state.users));
+                    
+                    showDebugInfo(`⚠️ Gagal ke database, disimpan lokal.<br>
+                        Error: ${errorMsg}<br>
+                        Data disimpan offline. Coba sync nanti.`);
+                    
+                    showToast('⚠️ Akun dibuat (offline mode). Coba login.', 'warning');
+                    
+                    setTimeout(() => {
+                        showLogin();
+                        document.getElementById('loginUsername').value = username;
+                        document.getElementById('loginPassword').value = password;
+                    }, 2000);
+                    
+                    return true;
                 }
                 
-                showLogin();
-                return true;
-            } else {
+            } catch (error) {
                 hideLoading();
-                showToast('Gagal menyimpan ke database', 'error');
+                console.error('Registration error:', error);
+                
+                showDebugInfo(`❌ Error: ${error.toString()}<br>
+                    Cek konsol browser untuk detail.`);
+                
+                showToast('Terjadi error saat pendaftaran', 'error');
                 return false;
             }
         }
@@ -1506,7 +1721,7 @@
                     state.users[userIndex].points = state.currentUser.points;
                     
                     // Save to Google Sheets
-                    await saveUserToGoogleSheets(state.currentUser);
+                    await callGoogleScriptPOST('saveUser', { user: state.currentUser });
                     localStorage.setItem('users', JSON.stringify(state.users));
                 }
                 
@@ -1527,12 +1742,18 @@
             }
         }
 
+        function updateRewardButton() {
+            document.getElementById('rewardPoints').textContent = state.rewardPoints;
+        }
+
         // =============================================
         // WITHDRAWAL FUNCTIONS
         // =============================================
         
         async function submitWithdrawal(points, accountName, phone) {
             if (!state.currentUser) return;
+            
+            points = parseInt(points);
             
             if (points < 50) {
                 showToast('Minimal penukaran 50 poin', 'error');
@@ -1544,15 +1765,20 @@
                 return;
             }
             
+            if (!accountName || !phone) {
+                showToast('Isi semua data dengan benar', 'error');
+                return;
+            }
+            
             showLoading('Mengirim permintaan penukaran...');
             
             const withdrawal = {
-                id: Date.now().toString(),
+                id: 'WD-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5),
                 userId: state.currentUser.id,
                 username: state.currentUser.username,
-                points: parseInt(points),
-                accountName,
-                phone,
+                points: points,
+                accountName: accountName.trim(),
+                phone: phone.trim(),
                 amount: points,
                 status: 'pending',
                 date: new Date().toISOString(),
@@ -1565,13 +1791,13 @@
                 const userIndex = state.users.findIndex(u => u.id === state.currentUser.id);
                 if (userIndex !== -1) {
                     state.users[userIndex].points = state.currentUser.points;
-                    await saveUserToGoogleSheets(state.currentUser);
+                    await callGoogleScriptPOST('saveUser', { user: state.currentUser });
                 }
                 
                 // Save withdrawal to Google Sheets
-                const saved = await saveWithdrawalToGoogleSheets(withdrawal);
+                const saveResult = await callGoogleScriptPOST('saveWithdrawal', { withdrawal: withdrawal });
                 
-                if (saved) {
+                if (saveResult.success) {
                     state.withdrawals.push(withdrawal);
                     localStorage.setItem('withdrawals', JSON.stringify(state.withdrawals));
                     
@@ -1595,10 +1821,113 @@
             }
         }
 
+        function loadWithdrawalHistory() {
+            if (!state.currentUser) return;
+            
+            const container = document.getElementById('withdrawalHistory');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            const userWithdrawals = state.withdrawals
+                .filter(w => w.userId === state.currentUser.id)
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            if (userWithdrawals.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666;">Belum ada riwayat penukaran</p>';
+                return;
+            }
+            
+            userWithdrawals.forEach(withdrawal => {
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                item.innerHTML = `
+                    <div>
+                        <strong>${withdrawal.points} Poin</strong>
+                        <div>Rp ${withdrawal.amount}</div>
+                        <small>${new Date(withdrawal.date).toLocaleDateString('id-ID')}</small>
+                        <br>
+                        <small>Status: </small>
+                        <span class="status-badge status-${withdrawal.status}">${getStatusText(withdrawal.status)}</span>
+                        ${withdrawal.adminNotes ? `<br><small>Catatan: ${withdrawal.adminNotes}</small>` : ''}
+                    </div>
+                    <div>
+                        ${withdrawal.status === 'pending' ? `<button onclick="deleteWithdrawal('${withdrawal.id}')" class="btn btn-danger btn-sm">Hapus</button>` : ''}
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        async function deleteWithdrawal(id) {
+            if (!confirm('Apakah Anda yakin ingin menghapus permintaan penukaran ini?')) return;
+            
+            showLoading('Menghapus permintaan...');
+            
+            try {
+                const withdrawalIndex = state.withdrawals.findIndex(w => w.id === id);
+                if (withdrawalIndex !== -1) {
+                    const withdrawal = state.withdrawals[withdrawalIndex];
+                    
+                    // Return points to user only if status is pending
+                    if (withdrawal.status === 'pending') {
+                        const userIndex = state.users.findIndex(u => u.id === withdrawal.userId);
+                        if (userIndex !== -1) {
+                            state.users[userIndex].points += withdrawal.points;
+                            if (state.currentUser && state.currentUser.id === withdrawal.userId) {
+                                state.currentUser.points = state.users[userIndex].points;
+                                await callGoogleScriptPOST('saveUser', { user: state.currentUser });
+                            }
+                        }
+                    }
+                    
+                    // Delete from Google Sheets
+                    await callGoogleScriptPOST('deleteWithdrawal', { id: id });
+                    
+                    state.withdrawals.splice(withdrawalIndex, 1);
+                    localStorage.setItem('withdrawals', JSON.stringify(state.withdrawals));
+                    
+                    hideLoading();
+                    updateUserInfo();
+                    loadWithdrawalHistory();
+                    
+                    if (state.currentUser?.role === 'admin' && document.getElementById('settingsPage').style.display === 'block') {
+                        generateSettingsPage();
+                    }
+                    
+                    showToast('Riwayat penukaran dihapus', 'success');
+                }
+            } catch (error) {
+                hideLoading();
+                showToast('Gagal menghapus permintaan', 'error');
+                console.error('Error deleting withdrawal:', error);
+            }
+        }
+
         // =============================================
-        // UI FUNCTIONS
+        // PROFILE FUNCTIONS
         // =============================================
         
+        function loadProfile() {
+            if (!state.currentUser) return;
+            
+            document.getElementById('profileUsername').textContent = state.currentUser.username;
+            document.getElementById('profileRole').textContent = state.currentUser.role === 'admin' ? 'Administrator' : 'Pengguna';
+            document.getElementById('deviceId').textContent = state.deviceId;
+            document.getElementById('profilePoints').textContent = state.currentUser.points;
+            document.getElementById('profileRewardPerQuiz').textContent = state.rewardPoints;
+            document.getElementById('joinDate').textContent = new Date(state.currentUser.joinDate).toLocaleDateString('id-ID');
+            
+            // Update database status
+            const syncElement = document.getElementById('mainSyncStatus');
+            if (syncElement) {
+                const text = syncElement.querySelector('span');
+                if (text) {
+                    document.getElementById('databaseStatus').textContent = text.textContent;
+                }
+            }
+        }
+
         function updateUserInfo() {
             if (state.currentUser) {
                 document.getElementById('userGreeting').textContent = `Halo, ${state.currentUser.username}!`;
@@ -1606,23 +1935,588 @@
             }
         }
 
-        function updateRewardButton() {
-            document.getElementById('rewardPoints').textContent = state.rewardPoints;
+        // =============================================
+        // ADMIN FUNCTIONS
+        // =============================================
+        
+        function addSettingsMenu() {
+            const navMenu = document.getElementById('navMenu');
+            
+            if (!document.getElementById('navSettingsItem')) {
+                const settingsItem = document.createElement('li');
+                settingsItem.className = 'nav-item';
+                settingsItem.id = 'navSettingsItem';
+                settingsItem.innerHTML = `
+                    <a href="#" class="nav-link" onclick="showPage('settings')" id="navSettings">
+                        <i class="fas fa-cog"></i>
+                        <span>Setting</span>
+                    </a>
+                `;
+                navMenu.appendChild(settingsItem);
+            }
         }
 
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
+        function removeSettingsMenu() {
+            const settingsItem = document.getElementById('navSettingsItem');
+            if (settingsItem) {
+                settingsItem.remove();
             }
-            return array;
+        }
+
+        function generateSettingsPage() {
+            if (state.currentUser?.role !== 'admin') {
+                document.getElementById('settingsPage').innerHTML = `
+                    <div class="settings-container">
+                        <h2>Akses Ditolak</h2>
+                        <p>Hanya admin yang dapat mengakses halaman ini.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Hitung statistik
+            const totalWithdrawals = state.withdrawals.length;
+            const pendingWithdrawals = state.withdrawals.filter(w => w.status === 'pending').length;
+            const approvedWithdrawals = state.withdrawals.filter(w => w.status === 'approved').length;
+            const rejectedWithdrawals = state.withdrawals.filter(w => w.status === 'rejected').length;
+            const totalPointsWithdrawn = state.withdrawals
+                .filter(w => w.status === 'approved')
+                .reduce((sum, w) => sum + w.points, 0);
+            const totalUsers = state.users.length;
+            const activeUsers = state.users.filter(u => !u.isBlocked).length;
+            const blockedUsers = state.users.filter(u => u.isBlocked).length;
+            
+            document.getElementById('settingsPage').innerHTML = `
+                <div class="settings-container">
+                    <h2><i class="fas fa-cog"></i> Admin Settings</h2>
+                    
+                    <!-- Maintenance Toggle -->
+                    <div class="admin-section">
+                        <h3><i class="fas fa-tools"></i> Maintenance Mode</h3>
+                        <label class="switch">
+                            <input type="checkbox" id="maintenanceToggle" ${state.maintenance ? 'checked' : ''} onchange="toggleMaintenance()">
+                            <span class="slider"></span>
+                        </label>
+                        <span id="maintenanceStatus">Mode Maintenance: ${state.maintenance ? 'ON' : 'OFF'}</span>
+                        <p><small>Jika aktif, user akan melihat halaman maintenance setelah login</small></p>
+                    </div>
+                    
+                    <!-- Reward Points Settings -->
+                    <div class="admin-section">
+                        <h3><i class="fas fa-coins"></i> Pengaturan Poin Reward</h3>
+                        <div class="reward-settings">
+                            <label>Poin per Reward:</label>
+                            <input type="number" id="rewardPointsInput" class="reward-input" value="${state.rewardPoints}" min="1">
+                            <button onclick="updateRewardPoints()" class="btn btn-primary btn-sm">Update</button>
+                        </div>
+                        <p><small>Jumlah poin yang didapat user setiap kali menyelesaikan quiz dengan benar</small></p>
+                    </div>
+                    
+                    <!-- User Statistics -->
+                    <div class="admin-section">
+                        <h3><i class="fas fa-users"></i> Statistik Pengguna</h3>
+                        <div class="withdrawal-stats">
+                            <div class="stat-card">
+                                <div>Total Pengguna</div>
+                                <div class="stat-value">${totalUsers}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div>Aktif</div>
+                                <div class="stat-value">${activeUsers}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div>Diblokir</div>
+                                <div class="stat-value">${blockedUsers}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Withdrawal Statistics -->
+                    <div class="admin-section">
+                        <h3><i class="fas fa-chart-bar"></i> Statistik Penarikan</h3>
+                        <div class="withdrawal-stats">
+                            <div class="stat-card">
+                                <div>Total Penarikan</div>
+                                <div class="stat-value">${totalWithdrawals}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div>Pending</div>
+                                <div class="stat-value">${pendingWithdrawals}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div>Berhasil</div>
+                                <div class="stat-value">${approvedWithdrawals}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div>Ditolak</div>
+                                <div class="stat-value">${rejectedWithdrawals}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div>Total Poin</div>
+                                <div class="stat-value">${totalPointsWithdrawn}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Users Management -->
+                    <div class="admin-section">
+                        <h3><i class="fas fa-users"></i> Manajemen Pengguna</h3>
+                        <div class="users-list" id="usersList">
+                            <!-- Daftar user akan dimuat di sini -->
+                        </div>
+                    </div>
+
+                    <!-- Withdrawal Requests -->
+                    <div class="admin-section">
+                        <h3><i class="fas fa-exchange-alt"></i> Permintaan Penukaran Poin</h3>
+                        <div class="history-list" id="adminWithdrawalHistory">
+                            <!-- Permintaan penukaran akan dimuat di sini -->
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            loadUsersList();
+            loadAdminWithdrawalHistory();
+        }
+
+        function loadUsersList() {
+            const container = document.getElementById('usersList');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            if (state.users.length === 0) {
+                container.innerHTML = '<p>Belum ada pengguna terdaftar</p>';
+                return;
+            }
+            
+            state.users.forEach(user => {
+                const item = document.createElement('div');
+                item.className = 'user-item';
+                item.innerHTML = `
+                    <div>
+                        <strong>${user.username} ${user.role === 'admin' ? '<i class="fas fa-crown" style="color: #FFD700;"></i>' : ''}</strong>
+                        <div>Role: ${user.role} | Poin: ${user.points}</div>
+                        <small>${user.isBlocked ? '<span style="color:red">Diblokir</span>' : 'Aktif'} | Bergabung: ${new Date(user.joinDate).toLocaleDateString('id-ID')}</small>
+                    </div>
+                    <div class="user-actions">
+                        <button onclick="editUser('${user.id}')" class="btn btn-primary btn-sm">Edit</button>
+                        ${user.role !== 'admin' ? `
+                            <button onclick="toggleBlockUser('${user.id}')" class="btn btn-warning btn-sm">
+                                ${user.isBlocked ? 'Buka' : 'Blokir'}
+                            </button>
+                            <button onclick="deleteUser('${user.id}')" class="btn btn-danger btn-sm">Hapus</button>
+                        ` : ''}
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function editUser(userId) {
+            const user = state.users.find(u => u.id === userId);
+            if (!user) return;
+            
+            document.getElementById('editUserId').value = user.id;
+            document.getElementById('editUsername').value = user.username;
+            document.getElementById('editRole').value = user.role;
+            document.getElementById('editUserPoints').value = user.points;
+            document.getElementById('editPassword').value = '';
+            openModal('editUserModal');
+        }
+
+        async function saveUserEdit() {
+            const userId = document.getElementById('editUserId').value;
+            const userIndex = state.users.findIndex(u => u.id === userId);
+            
+            if (userIndex !== -1) {
+                const user = state.users[userIndex];
+                const newPassword = document.getElementById('editPassword').value;
+                const newPoints = parseInt(document.getElementById('editUserPoints').value) || 0;
+                
+                if (newPassword) {
+                    user.password = newPassword;
+                }
+                
+                user.role = document.getElementById('editRole').value;
+                user.points = newPoints;
+                
+                // Update current user if it's the same user
+                if (state.currentUser && state.currentUser.id === userId) {
+                    state.currentUser = { ...user };
+                    
+                    // If current user is no longer admin, remove settings menu
+                    if (user.role !== 'admin') {
+                        removeSettingsMenu();
+                    }
+                }
+                
+                // Save to Google Sheets
+                await callGoogleScriptPOST('saveUser', { user: user });
+                localStorage.setItem('users', JSON.stringify(state.users));
+                
+                updateUserInfo();
+                loadUsersList();
+                showToast('Perubahan disimpan', 'success');
+                closeModal('editUserModal');
+            }
+        }
+
+        async function toggleBlockUser(userId) {
+            const userIndex = state.users.findIndex(u => u.id === userId);
+            if (userIndex !== -1 && state.users[userIndex].role !== 'admin') {
+                state.users[userIndex].isBlocked = !state.users[userIndex].isBlocked;
+                
+                // Save to Google Sheets
+                await callGoogleScriptPOST('saveUser', { user: state.users[userIndex] });
+                localStorage.setItem('users', JSON.stringify(state.users));
+                
+                loadUsersList();
+                showToast(`User ${state.users[userIndex].isBlocked ? 'diblokir' : 'dibuka'}`, 'success');
+                
+                // If current user is blocked, log them out
+                if (state.currentUser && state.currentUser.id === userId && state.users[userIndex].isBlocked) {
+                    setTimeout(() => {
+                        logout();
+                    }, 1000);
+                }
+            }
+        }
+
+        async function deleteUser(userId) {
+            if (!confirm('Apakah Anda yakin ingin menghapus user ini? Semua data user akan hilang.')) return;
+            
+            const userIndex = state.users.findIndex(u => u.id === userId);
+            if (userIndex !== -1 && state.users[userIndex].role !== 'admin') {
+                // Delete user's withdrawals
+                const userWithdrawals = state.withdrawals.filter(w => w.userId === userId);
+                for (const withdrawal of userWithdrawals) {
+                    await callGoogleScriptPOST('deleteWithdrawal', { id: withdrawal.id });
+                }
+                state.withdrawals = state.withdrawals.filter(w => w.userId !== userId);
+                
+                // Delete user (we'll just mark as deleted in real app)
+                state.users.splice(userIndex, 1);
+                localStorage.setItem('users', JSON.stringify(state.users));
+                localStorage.setItem('withdrawals', JSON.stringify(state.withdrawals));
+                
+                loadUsersList();
+                showToast('User dihapus', 'success');
+                
+                // If current user is deleted, log them out
+                if (state.currentUser && state.currentUser.id === userId) {
+                    setTimeout(() => {
+                        logout();
+                    }, 1000);
+                }
+            }
+        }
+
+        async function toggleMaintenance() {
+            const toggle = document.getElementById('maintenanceToggle');
+            if (!toggle) return;
+            
+            state.maintenance = toggle.checked;
+            const statusElement = document.getElementById('maintenanceStatus');
+            if (statusElement) {
+                statusElement.textContent = `Mode Maintenance: ${state.maintenance ? 'ON' : 'OFF'}`;
+            }
+            
+            // Save to Google Sheets
+            await callGoogleScriptPOST('updateSettings', { 
+                settings: { 
+                    maintenance: state.maintenance.toString(),
+                    rewardPoints: state.rewardPoints.toString()
+                } 
+            });
+            
+            localStorage.setItem('maintenance', state.maintenance);
+            
+            showToast(`Maintenance mode ${state.maintenance ? 'diaktifkan' : 'dinonaktifkan'}`, 'success');
+            
+            if (state.maintenance && state.currentUser) {
+                showMaintenancePage();
+            } else if (!state.maintenance && state.currentUser?.role === 'user') {
+                if (document.getElementById('maintenancePage').style.display === 'block') {
+                    showPage('quiz');
+                }
+            }
+        }
+
+        async function updateRewardPoints() {
+            const newPoints = parseInt(document.getElementById('rewardPointsInput').value);
+            if (newPoints && newPoints > 0) {
+                state.rewardPoints = newPoints;
+                
+                // Save to Google Sheets
+                await callGoogleScriptPOST('updateSettings', { 
+                    settings: { 
+                        maintenance: state.maintenance.toString(),
+                        rewardPoints: state.rewardPoints.toString()
+                    } 
+                });
+                
+                localStorage.setItem('rewardPoints', state.rewardPoints);
+                updateRewardButton();
+                showToast(`Poin reward diubah menjadi ${newPoints}`, 'success');
+                
+                if (state.currentUser && document.getElementById('profilePage').style.display === 'block') {
+                    document.getElementById('profileRewardPerQuiz').textContent = state.rewardPoints;
+                }
+            } else {
+                showToast('Masukkan jumlah poin yang valid', 'error');
+            }
+        }
+
+        function loadAdminWithdrawalHistory() {
+            const container = document.getElementById('adminWithdrawalHistory');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            const sortedWithdrawals = [...state.withdrawals].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            if (sortedWithdrawals.length === 0) {
+                container.innerHTML = '<p>Belum ada permintaan penukaran</p>';
+                return;
+            }
+            
+            sortedWithdrawals.forEach(withdrawal => {
+                const user = state.users.find(u => u.id === withdrawal.userId);
+                const userRole = user ? user.role : 'unknown';
+                
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                item.innerHTML = `
+                    <div>
+                        <strong>${withdrawal.username} <small>(${userRole})</small></strong>
+                        <div>${withdrawal.points} Poin → Rp ${withdrawal.amount}</div>
+                        <small>${new Date(withdrawal.date).toLocaleDateString('id-ID')}</small>
+                        <br>
+                        <small>Dana: ${withdrawal.accountName} (${withdrawal.phone})</small>
+                        <br>
+                        <span class="status-badge status-${withdrawal.status}">${getStatusText(withdrawal.status)}</span>
+                        ${withdrawal.adminNotes ? `<br><small>Catatan Admin: ${withdrawal.adminNotes}</small>` : ''}
+                    </div>
+                    <div>
+                        <button onclick="updateWithdrawalStatus('${withdrawal.id}')" class="btn btn-primary btn-sm">Ubah Status</button>
+                        <button onclick="deleteWithdrawalAdmin('${withdrawal.id}')" class="btn btn-danger btn-sm">Hapus</button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function updateWithdrawalStatus(withdrawalId) {
+            const withdrawal = state.withdrawals.find(w => w.id === withdrawalId);
+            if (!withdrawal) return;
+            
+            document.getElementById('withdrawalId').value = withdrawalId;
+            document.getElementById('withdrawalStatus').value = withdrawal.status;
+            document.getElementById('adminNotes').value = withdrawal.adminNotes || '';
+            openModal('withdrawalStatusModal');
+        }
+
+        async function saveWithdrawalStatus() {
+            const withdrawalId = document.getElementById('withdrawalId').value;
+            const newStatus = document.getElementById('withdrawalStatus').value;
+            const adminNotes = document.getElementById('adminNotes').value;
+            
+            const withdrawalIndex = state.withdrawals.findIndex(w => w.id === withdrawalId);
+            if (withdrawalIndex !== -1) {
+                const oldStatus = state.withdrawals[withdrawalIndex].status;
+                state.withdrawals[withdrawalIndex].status = newStatus;
+                state.withdrawals[withdrawalIndex].adminNotes = adminNotes;
+                
+                // If status changed from pending to rejected, return points
+                if (oldStatus === 'pending' && newStatus === 'rejected') {
+                    const userIndex = state.users.findIndex(u => u.id === state.withdrawals[withdrawalIndex].userId);
+                    if (userIndex !== -1) {
+                        state.users[userIndex].points += state.withdrawals[withdrawalIndex].points;
+                        await callGoogleScriptPOST('saveUser', { user: state.users[userIndex] });
+                        showToast('Poin dikembalikan ke user', 'info');
+                    }
+                }
+                
+                // If status changed from rejected to approved, deduct points again
+                if (oldStatus === 'rejected' && newStatus === 'approved') {
+                    const userIndex = state.users.findIndex(u => u.id === state.withdrawals[withdrawalIndex].userId);
+                    if (userIndex !== -1) {
+                        state.users[userIndex].points -= state.withdrawals[withdrawalIndex].points;
+                        await callGoogleScriptPOST('saveUser', { user: state.users[userIndex] });
+                        showToast('Poin dipotong dari user', 'info');
+                    }
+                }
+                
+                // Save to Google Sheets
+                await callGoogleScriptPOST('saveWithdrawal', { withdrawal: state.withdrawals[withdrawalIndex] });
+                localStorage.setItem('withdrawals', JSON.stringify(state.withdrawals));
+                
+                // Update UI
+                if (document.getElementById('settingsPage').style.display === 'block') {
+                    generateSettingsPage();
+                }
+                
+                // Update user's points display if they are the current user
+                if (state.currentUser && state.currentUser.id === state.withdrawals[withdrawalIndex].userId) {
+                    updateUserInfo();
+                    loadWithdrawalHistory();
+                }
+                
+                showToast('Status penukaran diperbarui', 'success');
+                closeModal('withdrawalStatusModal');
+            }
+        }
+
+        async function deleteWithdrawalAdmin(id) {
+            if (!confirm('Hapus riwayat penukaran ini dari sistem?')) return;
+            
+            showLoading('Menghapus data...');
+            
+            try {
+                await callGoogleScriptPOST('deleteWithdrawal', { id: id });
+                
+                const withdrawalIndex = state.withdrawals.findIndex(w => w.id === id);
+                if (withdrawalIndex !== -1) {
+                    state.withdrawals.splice(withdrawalIndex, 1);
+                    localStorage.setItem('withdrawals', JSON.stringify(state.withdrawals));
+                }
+                
+                hideLoading();
+                
+                if (document.getElementById('settingsPage').style.display === 'block') {
+                    generateSettingsPage();
+                }
+                
+                showToast('Data penukaran dihapus', 'success');
+            } catch (error) {
+                hideLoading();
+                showToast('Gagal menghapus data', 'error');
+                console.error('Error deleting withdrawal:', error);
+            }
         }
 
         // =============================================
-        // INITIALIZATION
+        // PAGE NAVIGATION
+        // =============================================
+        
+        function showPage(pageName) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.style.display = 'none';
+            });
+            
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            if (pageName === 'settings') {
+                generateSettingsPage();
+            }
+            
+            const pageElement = document.getElementById(`${pageName}Page`);
+            if (pageElement) {
+                pageElement.style.display = 'block';
+            }
+            
+            const navElement = document.getElementById(`nav${pageName.charAt(0).toUpperCase() + pageName.slice(1)}`);
+            if (navElement) {
+                navElement.classList.add('active');
+            }
+            
+            switch(pageName) {
+                case 'history':
+                    loadWithdrawalHistory();
+                    break;
+                case 'profile':
+                    loadProfile();
+                    break;
+                case 'quiz':
+                    if (!state.currentQuestion) {
+                        generateNewQuestion();
+                    }
+                    break;
+            }
+        }
+
+        function showApp() {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('registerPage').style.display = 'none';
+            document.getElementById('appContainer').style.display = 'block';
+            showPage('quiz');
+        }
+
+        function showMaintenancePage() {
+            document.getElementById('appContainer').style.display = 'block';
+            document.querySelectorAll('.page').forEach(page => {
+                page.style.display = 'none';
+            });
+            document.getElementById('maintenancePage').style.display = 'block';
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+        }
+
+        // =============================================
+        // TEST FUNCTIONS
+        // =============================================
+        
+        async function testDatabaseConnection() {
+            showLoading('Testing koneksi database...');
+            
+            try {
+                const testResult = await callGoogleScriptPOST('getAllData');
+                console.log('Connection test result:', testResult);
+                
+                if (testResult.success) {
+                    hideLoading();
+                    
+                    const userCount = testResult.data?.users?.length || 0;
+                    const withdrawalCount = testResult.data?.withdrawals?.length || 0;
+                    
+                    showDebugInfo(`✅ Koneksi database BERHASIL!<br>
+                        Total users: ${userCount}<br>
+                        Total withdrawals: ${withdrawalCount}<br>
+                        Maintenance mode: ${testResult.data?.maintenance || 'false'}<br>
+                        Reward points: ${testResult.data?.rewardPoints || '50'}<br>
+                        URL: ${GOOGLE_SCRIPT_URL}`);
+                    
+                    showToast('✅ Koneksi database berhasil!', 'success');
+                    
+                } else {
+                    hideLoading();
+                    showDebugInfo(`❌ Koneksi database GAGAL!<br>
+                        Error: ${testResult.message || 'Tidak diketahui'}<br>
+                        URL: ${GOOGLE_SCRIPT_URL}<br>
+                        Pastikan:<br>
+                        1. URL Web App benar<br>
+                        2. Spreadsheet ada<br>
+                        3. Sheet sudah dibuat<br>
+                        4. Deployment "Anyone"`);
+                    
+                    showToast('❌ Koneksi database gagal', 'error');
+                }
+                
+            } catch (error) {
+                hideLoading();
+                console.error('Connection test error:', error);
+                
+                showDebugInfo(`❌ Error koneksi:<br>
+                    ${error.toString()}<br>
+                    URL: ${GOOGLE_SCRIPT_URL}<br>
+                    Cek konsol untuk detail.`);
+                
+                showToast('❌ Error testing koneksi', 'error');
+            }
+        }
+
+        // =============================================
+        // EVENT LISTENERS
         // =============================================
         
         document.addEventListener('DOMContentLoaded', async function() {
+            console.log('App loading...');
+            
             // Initial sync
             showLoading('Menyiapkan aplikasi...');
             await syncAllData();
@@ -1633,6 +2527,7 @@
             if (savedUserId) {
                 const user = state.users.find(u => u.id === savedUserId);
                 if (user) {
+                    console.log('Found saved user:', user.username);
                     if (await login(user.username, user.password)) {
                         return;
                     }
@@ -1641,28 +2536,60 @@
             
             showLogin();
             
-            // Event listeners
+            // Login form
             document.getElementById('loginForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
-                const username = document.getElementById('loginUsername').value;
+                const username = document.getElementById('loginUsername').value.trim();
                 const password = document.getElementById('loginPassword').value;
+                
+                if (!username || !password) {
+                    showToast('Isi username dan password', 'error');
+                    return;
+                }
+                
                 await login(username, password);
             });
             
+            // Register form
             document.getElementById('registerForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
-                const username = document.getElementById('registerUsername').value;
+                e.stopPropagation();
+                
+                const username = document.getElementById('registerUsername').value.trim();
                 const password = document.getElementById('registerPassword').value;
                 const confirmPassword = document.getElementById('registerConfirmPassword').value;
+                
+                // Validation
+                if (!username || username.length < 3) {
+                    showToast('Username minimal 3 karakter', 'error');
+                    return;
+                }
+                
+                if (!password || password.length < 4) {
+                    showToast('Password minimal 4 karakter', 'error');
+                    return;
+                }
                 
                 if (password !== confirmPassword) {
                     showToast('Password tidak cocok', 'error');
                     return;
                 }
                 
-                await register(username, password);
+                // Disable submit button to prevent double click
+                const submitBtn = document.getElementById('registerSubmitBtn');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mendaftarkan...';
+                
+                try {
+                    await register(username, password);
+                } finally {
+                    // Re-enable button
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Daftar';
+                }
             });
             
+            // Withdrawal form
             document.getElementById('withdrawalForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
                 const points = document.getElementById('withdrawalPoints').value;
@@ -1672,15 +2599,66 @@
                 await submitWithdrawal(points, accountName, phone);
             });
             
+            // Reward button
             document.getElementById('rewardBtn').addEventListener('click', function(e) {
                 e.preventDefault();
                 claimReward();
             });
+            
+            // Edit user form
+            document.getElementById('editUserForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                await saveUserEdit();
+            });
+            
+            // Withdrawal status form
+            document.getElementById('withdrawalStatusForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                await saveWithdrawalStatus();
+            });
+            
+            // Close modals when clicking outside
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        this.style.display = 'none';
+                    }
+                });
+            });
+            
+            // Auto sync every 5 minutes
+            setInterval(async () => {
+                if (state.currentUser && !state.syncInProgress) {
+                    console.log('Auto-syncing...');
+                    await syncAllData();
+                }
+            }, 5 * 60 * 1000);
+            
+            // Online/offline detection
+            window.addEventListener('online', () => {
+                state.isOnline = true;
+                showToast('Koneksi internet pulih', 'success');
+                syncAllData();
+            });
+            
+            window.addEventListener('offline', () => {
+                state.isOnline = false;
+                showToast('Tidak ada koneksi internet', 'warning');
+            });
         });
 
-        // Other existing functions remain the same...
-        // (showPage, showApp, showMaintenancePage, addSettingsMenu, removeSettingsMenu, etc.)
-
+        // Auto-logout check every hour
+        setInterval(() => {
+            if (!state.currentUser) return;
+            
+            const lastLogin = localStorage.getItem(`lastLogin_${state.currentUser.id}`);
+            const twoDaysAgo = Date.now() - (2 * 24 * 60 * 60 * 1000);
+            
+            if (lastLogin && parseInt(lastLogin) < twoDaysAgo) {
+                logout();
+                showToast('Sesi telah habis karena tidak aktif selama 2 hari', 'info');
+            }
+        }, 60 * 60 * 1000);
     </script>
 </body>
 </html>
