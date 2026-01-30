@@ -1010,45 +1010,47 @@
         // ==================== API FUNCTIONS ====================
 
         // Generic API call function
-        async function callAPI(action, data = {}) {
-            updateConnectionStatus('syncing');
-            
-            try {
-                const response = await fetch(BACKEND_URL, {
-                    method: 'POST',
-                    mode: 'no-cors', // Important for Google Apps Script
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        action: action,
-                        ...data
-                    })
-                });
+async function callAPI(action, data = {}) {
+    updateConnectionStatus('syncing');
+    
+    try {
+        const response = await fetch(BACKEND_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                action: action,
+                ...data
+            })
+        });
 
-                // For Google Apps Script, we need to handle no-cors differently
-                // Since we can't read the response with no-cors, we'll use a different approach
-                updateConnectionStatus('online');
-                showToast('Permintaan berhasil', 'success');
-                return { success: true };
-                
-            } catch (error) {
-                console.error('API Error:', error);
-                updateConnectionStatus('offline');
-                
-                // Fallback untuk demo jika API tidak tersedia
-                if (action === 'login') {
-                    return simulateLogin(data);
-                } else if (action === 'register') {
-                    return simulateRegister(data);
-                }
-                
-                return { 
-                    success: false, 
-                    message: 'Gagal terhubung ke server. Mode offline aktif.' 
-                };
-            }
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
+
+        const result = await response.json();
+        updateConnectionStatus('online');
+        
+        return result;
+        
+    } catch (error) {
+        console.error('API Error:', error);
+        updateConnectionStatus('offline');
+        
+        // Fallback untuk demo jika API tidak tersedia
+        if (action === 'login') {
+            return simulateLogin(data);
+        } else if (action === 'register') {
+            return simulateRegister(data);
+        }
+        
+        return { 
+            success: false, 
+            message: 'Gagal terhubung ke server. Coba lagi nanti.' 
+        };
+    }
+}
 
         // Simulasi login untuk demo
         function simulateLogin(data) {
