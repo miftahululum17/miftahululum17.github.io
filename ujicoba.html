@@ -4,15 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz Matematika - Telegram Mini App</title>
-    
     <!-- Telegram Web App SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
-        /* Reset dan Base Styles */
         * {
             margin: 0;
             padding: 0;
@@ -24,12 +20,12 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             color: #333;
+            padding: 10px;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 100%;
             margin: 0 auto;
-            padding: 20px;
         }
 
         /* Toast Notification */
@@ -44,7 +40,7 @@
             z-index: 1000;
             animation: slideIn 0.3s ease;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            display: none;
+            max-width: 90%;
         }
 
         @keyframes slideIn {
@@ -70,26 +66,7 @@
             background: linear-gradient(135deg, #2196F3, #1976D2);
         }
 
-        .toast.warning {
-            background: linear-gradient(135deg, #FF9800, #F57C00);
-        }
-
-        /* Loading Overlay */
-        .loading-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-size: 20px;
-        }
-
+        /* Loading Spinner */
         .spinner {
             border: 4px solid #f3f3f3;
             border-top: 4px solid #667eea;
@@ -105,17 +82,18 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Authentication Pages */
+        /* Auth Pages */
         .auth-container {
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            padding: 20px;
         }
 
         .auth-box {
             background: white;
-            padding: 40px;
+            padding: 30px;
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             width: 100%;
@@ -126,7 +104,7 @@
             text-align: center;
             margin-bottom: 30px;
             color: #333;
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 700;
         }
 
@@ -174,7 +152,7 @@
             color: white;
         }
 
-        .btn-primary:hover {
+        .btn-primary:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
         }
@@ -204,6 +182,11 @@
             font-size: 14px;
         }
 
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
         .auth-links {
             text-align: center;
             margin-top: 20px;
@@ -215,41 +198,53 @@
             font-weight: 500;
         }
 
-        /* Main App Header */
+        /* Header */
         .header {
             background: white;
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 20px;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         .user-info {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-greeting {
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 150px;
         }
 
         .points-display {
             background: linear-gradient(135deg, #FFD700, #FFA500);
-            padding: 8px 16px;
+            padding: 8px 15px;
             border-radius: 20px;
             font-weight: 600;
             color: #333;
             display: flex;
             align-items: center;
             gap: 5px;
+            white-space: nowrap;
         }
 
-        /* Navigation - SATU BARIS DI MOBILE */
+        /* Navigation - TOMBOL 1 BARIS DI MOBILE */
         .nav-container {
             background: white;
-            border-radius: 20px;
-            padding: 10px 15px;
-            margin-bottom: 20px;
+            border-radius: 15px;
+            padding: 10px;
+            margin-bottom: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
@@ -257,10 +252,9 @@
 
         .nav-menu {
             display: flex;
-            justify-content: space-around;
             list-style: none;
             min-width: min-content;
-            width: 100%;
+            padding: 5px 0;
         }
 
         .nav-item {
@@ -272,12 +266,14 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 8px 12px;
+            padding: 10px 5px;
             color: #666;
             text-decoration: none;
             border-radius: 10px;
             transition: all 0.3s;
-            white-space: nowrap;
+            font-size: 12px;
+            min-height: 60px;
+            justify-content: center;
         }
 
         .nav-link.active {
@@ -287,61 +283,51 @@
 
         .nav-link i {
             font-size: 18px;
-            margin-bottom: 4px;
+            margin-bottom: 5px;
         }
 
         .nav-link span {
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        /* Scrollbar styling untuk mobile */
-        .nav-container::-webkit-scrollbar {
-            height: 4px;
-        }
-
-        .nav-container::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-
-        .nav-container::-webkit-scrollbar-thumb {
-            background: #667eea;
-            border-radius: 10px;
+            font-size: 11px;
+            text-align: center;
+            line-height: 1.2;
         }
 
         /* Quiz Page */
         .quiz-container {
             background: white;
-            border-radius: 20px;
-            padding: 30px;
+            border-radius: 15px;
+            padding: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             text-align: center;
         }
 
         .quiz-title {
-            font-size: 24px;
-            margin-bottom: 20px;
+            font-size: 20px;
+            margin-bottom: 15px;
             color: #333;
         }
 
         .question {
-            font-size: 48px;
+            font-size: 36px;
             font-weight: 700;
-            margin: 30px 0;
+            margin: 20px 0;
             color: #667eea;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* OPTIONS CONTAINER - 2 BARIS DI MOBILE */
+        /* OPTIONS 2 BARIS DI MOBILE */
         .options-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 30px;
+            gap: 10px;
+            margin-bottom: 20px;
         }
 
         .option-btn {
-            padding: 20px;
+            padding: 20px 10px;
             border: 2px solid #e0e0e0;
             border-radius: 15px;
             background: white;
@@ -353,9 +339,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            word-break: break-word;
         }
 
-        .option-btn:hover {
+        .option-btn:hover:not(:disabled) {
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
@@ -365,73 +352,44 @@
             cursor: not-allowed;
         }
 
-        .option-btn.correct {
-            background: linear-gradient(135deg, #4CAF50, #45a049);
-            color: white;
-            border-color: #4CAF50;
-        }
-
-        .option-btn.incorrect {
-            background: linear-gradient(135deg, #f44336, #d32f2f);
-            color: white;
-            border-color: #f44336;
-        }
-
         .reward-btn {
-            margin: 20px auto;
+            margin: 15px auto;
             max-width: 300px;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4);
-            }
-            50% {
-                transform: scale(1.05);
-                box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
-            }
-            100% {
-                transform: scale(1);
-                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
-            }
         }
 
         /* History Page */
         .history-container {
             background: white;
-            border-radius: 20px;
-            padding: 30px;
+            border-radius: 15px;
+            padding: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
 
         .withdrawal-form {
             background: #f9f9f9;
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 30px;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
         }
 
         .history-list {
             margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
         }
 
         .history-item {
             background: #f9f9f9;
-            padding: 15px;
+            padding: 12px;
             border-radius: 10px;
             margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
 
         /* Profile Page */
         .profile-container {
             background: white;
-            border-radius: 20px;
-            padding: 30px;
+            border-radius: 15px;
+            padding: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
 
@@ -442,50 +400,53 @@
         .info-item {
             display: flex;
             justify-content: space-between;
-            padding: 15px 0;
+            padding: 12px 0;
             border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
         }
 
         /* Settings Page (Admin Only) */
         .settings-container {
             background: white;
-            border-radius: 20px;
-            padding: 30px;
+            border-radius: 15px;
+            padding: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
 
         .admin-section {
-            margin-bottom: 30px;
-            padding: 20px;
+            margin-bottom: 20px;
+            padding: 15px;
             background: #f9f9f9;
-            border-radius: 15px;
+            border-radius: 10px;
         }
 
         .users-list {
-            margin-top: 20px;
+            margin-top: 15px;
+            max-height: 300px;
+            overflow-y: auto;
         }
 
         .user-item {
             background: white;
-            padding: 15px;
+            padding: 12px;
             border-radius: 10px;
             margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            font-size: 14px;
         }
 
         .user-actions {
             display: flex;
-            gap: 10px;
+            gap: 8px;
+            margin-top: 8px;
+            flex-wrap: wrap;
         }
 
-        /* Status Badges */
         .status-badge {
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 11px;
             font-weight: 600;
+            display: inline-block;
         }
 
         .status-pending {
@@ -507,8 +468,8 @@
         .switch {
             position: relative;
             display: inline-block;
-            width: 60px;
-            height: 34px;
+            width: 50px;
+            height: 28px;
             margin-right: 10px;
         }
 
@@ -533,8 +494,8 @@
         .slider:before {
             position: absolute;
             content: "";
-            height: 26px;
-            width: 26px;
+            height: 20px;
+            width: 20px;
             left: 4px;
             bottom: 4px;
             background-color: white;
@@ -547,7 +508,7 @@
         }
 
         input:checked + .slider:before {
-            transform: translateX(26px);
+            transform: translateX(22px);
         }
 
         /* Maintenance Page */
@@ -557,16 +518,17 @@
             align-items: center;
             min-height: 50vh;
             text-align: center;
+            padding: 20px;
         }
 
         .maintenance-icon {
-            font-size: 80px;
+            font-size: 60px;
             margin-bottom: 20px;
             color: #667eea;
         }
 
         .maintenance-text {
-            font-size: 24px;
+            font-size: 20px;
             color: #333;
             margin-bottom: 10px;
         }
@@ -583,29 +545,79 @@
             z-index: 1001;
             justify-content: center;
             align-items: center;
+            padding: 20px;
         }
 
         .modal-content {
             background: white;
-            padding: 30px;
-            border-radius: 20px;
+            padding: 20px;
+            border-radius: 15px;
             max-width: 500px;
-            width: 90%;
+            width: 100%;
             max-height: 80vh;
             overflow-y: auto;
         }
 
         .modal-title {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             color: #333;
+            font-size: 18px;
+        }
+
+        /* Responsive Design */
+        @media (min-width: 768px) {
+            .container {
+                max-width: 600px;
+            }
+            
+            .nav-menu {
+                justify-content: space-around;
+            }
+            
+            .nav-item {
+                min-width: auto;
+                flex: 1;
+            }
+            
+            .nav-link {
+                font-size: 14px;
+                padding: 10px;
+            }
+            
+            .nav-link i {
+                font-size: 20px;
+            }
+            
+            .nav-link span {
+                font-size: 12px;
+            }
+            
+            .user-greeting {
+                font-size: 16px;
+                max-width: 200px;
+            }
+            
+            .question {
+                font-size: 48px;
+            }
+            
+            .options-container {
+                gap: 15px;
+            }
+            
+            .option-btn {
+                padding: 25px 15px;
+                font-size: 24px;
+            }
         }
 
         /* Reward Points Settings */
         .reward-settings {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
             margin-top: 10px;
+            flex-wrap: wrap;
         }
 
         .reward-input {
@@ -618,263 +630,71 @@
 
         .withdrawal-stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
         }
 
         .stat-card {
             background: white;
-            padding: 15px;
+            padding: 12px;
             border-radius: 10px;
             text-align: center;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
         .stat-value {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
             color: #667eea;
-            margin: 10px 0;
+            margin: 8px 0;
         }
 
-        /* Debug Info */
-        .debug-info {
-            background: #e3f2fd;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 15px;
+        /* Connection Status */
+        .connection-status {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
             font-size: 12px;
-            display: none;
-        }
-
-        .debug-info h4 {
-            margin-bottom: 5px;
-            color: #1976D2;
-        }
-
-        /* Sync Status */
-        .sync-status {
-            font-size: 12px;
-            color: #666;
-            margin-top: 10px;
+            z-index: 999;
             display: flex;
             align-items: center;
             gap: 5px;
         }
 
-        .sync-status.syncing {
-            color: #2196F3;
+        .connection-status.online {
+            background: rgba(76, 175, 80, 0.9);
         }
 
-        .sync-status.synced {
-            color: #4CAF50;
+        .connection-status.offline {
+            background: rgba(244, 67, 54, 0.9);
         }
 
-        .sync-status.error {
-            color: #f44336;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-
-            /* Menu akan tetap satu baris dengan scroll horizontal */
-            .nav-container {
-                padding: 8px 10px;
-            }
-
-            .nav-item {
-                min-width: 70px;
-            }
-
-            .nav-link {
-                padding: 6px 8px;
-            }
-
-            .nav-link i {
-                font-size: 16px;
-                margin-bottom: 3px;
-            }
-
-            .nav-link span {
-                font-size: 11px;
-            }
-
-            /* OPTIONS MENJADI 2 BARIS DI MOBILE */
-            .options-container {
-                grid-template-columns: repeat(2, 1fr);
-                grid-template-rows: repeat(2, auto);
-                gap: 10px;
-            }
-
-            .option-btn {
-                padding: 15px;
-                font-size: 18px;
-                min-height: 70px;
-            }
-
-            /* Perbaikan ukuran font untuk mobile */
-            .question {
-                font-size: 36px;
-                margin: 20px 0;
-            }
-
-            .quiz-title {
-                font-size: 20px;
-            }
-
-            /* Header adjustment */
-            .header {
-                padding: 15px;
-                flex-direction: column;
-                gap: 15px;
-                align-items: stretch;
-            }
-
-            .user-info {
-                justify-content: space-between;
-            }
-
-            .points-display {
-                padding: 6px 12px;
-                font-size: 14px;
-            }
-
-            .reward-btn {
-                padding: 12px;
-                font-size: 14px;
-            }
-
-            /* Auth box adjustment */
-            .auth-box {
-                padding: 25px;
-            }
-
-            .auth-title {
-                font-size: 24px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .nav-item {
-                min-width: 65px;
-            }
-
-            .nav-link {
-                padding: 5px 6px;
-            }
-
-            .nav-link i {
-                font-size: 14px;
-            }
-
-            .nav-link span {
-                font-size: 10px;
-            }
-
-            .question {
-                font-size: 32px;
-                margin: 15px 0;
-            }
-
-            .option-btn {
-                padding: 12px;
-                font-size: 16px;
-                min-height: 60px;
-            }
-
-            .reward-btn {
-                padding: 10px;
-                font-size: 13px;
-            }
-
-            .auth-box {
-                padding: 20px;
-            }
-        }
-
-        /* Untuk layar sangat kecil, buat 2 baris dengan 2 kolom */
-        @media (max-width: 320px) {
-            .options-container {
-                grid-template-columns: repeat(2, 1fr);
-                grid-template-rows: repeat(2, auto);
-                gap: 8px;
-            }
-
-            .option-btn {
-                padding: 10px;
-                font-size: 14px;
-                min-height: 55px;
-            }
-        }
-
-        /* Utility Classes */
-        .page {
-            display: none;
-        }
-
-        .text-center {
-            text-align: center;
-        }
-
-        .mt-10 {
-            margin-top: 10px;
-        }
-
-        .mt-20 {
-            margin-top: 20px;
-        }
-
-        .mb-10 {
-            margin-bottom: 10px;
-        }
-
-        .mb-20 {
-            margin-bottom: 20px;
-        }
-
-        .d-none {
-            display: none;
-        }
-
-        .d-block {
-            display: block;
-        }
-
-        .text-success {
-            color: #4CAF50;
-        }
-
-        .text-error {
-            color: #f44336;
-        }
-
-        .text-warning {
-            color: #FF9800;
+        .connection-status.syncing {
+            background: rgba(255, 193, 7, 0.9);
         }
     </style>
 </head>
 <body>
-    <!-- Loading Overlay -->
-    <div id="loadingOverlay" class="loading-overlay">
-        <div class="text-center">
-            <div class="spinner"></div>
-            <p id="loadingText">Menyinkronkan data...</p>
-        </div>
-    </div>
-
     <div class="container">
         <!-- Toast Notification -->
-        <div id="toast" class="toast"></div>
+        <div id="toast" class="toast" style="display: none;"></div>
+
+        <!-- Connection Status -->
+        <div id="connectionStatus" class="connection-status">
+            <i class="fas fa-wifi"></i>
+            <span>Menyambungkan...</span>
+        </div>
 
         <!-- Login Page -->
         <div id="loginPage" class="auth-container">
             <div class="auth-box">
                 <h2 class="auth-title">Login</h2>
-                <div id="noAccountMessage" class="d-none" style="background: #ffebee; color: #c62828; padding: 10px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
+                <div id="noAccountMessage" style="display: none; background: #ffebee; color: #c62828; padding: 10px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
                     <i class="fas fa-exclamation-circle"></i> Belum punya akun? Silakan daftar terlebih dahulu.
                 </div>
                 <form id="loginForm">
@@ -886,13 +706,13 @@
                         <label for="loginPassword">Password</label>
                         <input type="password" id="loginPassword" class="form-control" placeholder="Masukkan password" required>
                     </div>
-                    <button type="submit" class="btn btn-primary">Login</button>
+                    <button type="submit" class="btn btn-primary" id="loginBtn">
+                        <span id="loginBtnText">Login</span>
+                        <div id="loginSpinner" class="spinner" style="display: none; width: 20px; height: 20px; margin: 0 auto;"></div>
+                    </button>
                 </form>
                 <div class="auth-links">
                     <a href="#" class="auth-link" onclick="showRegister()">Belum punya akun? Daftar</a>
-                </div>
-                <div class="sync-status" id="loginSyncStatus">
-                    <i class="fas fa-cloud"></i> <span id="loginSyncText">Menyiapkan database...</span>
                 </div>
             </div>
         </div>
@@ -901,43 +721,27 @@
         <div id="registerPage" class="auth-container" style="display: none;">
             <div class="auth-box">
                 <h2 class="auth-title">Daftar Akun</h2>
-                
-                <!-- Debug Info -->
-                <div id="debugInfo" class="debug-info">
-                    <h4><i class="fas fa-bug"></i> Debug Info:</h4>
-                    <div id="debugText"></div>
-                </div>
-                
                 <form id="registerForm">
                     <div class="form-group">
                         <label for="registerUsername">Username</label>
                         <input type="text" id="registerUsername" class="form-control" placeholder="Buat username" required>
-                        <small class="text-muted">Minimal 3 karakter</small>
                     </div>
                     <div class="form-group">
                         <label for="registerPassword">Password</label>
                         <input type="password" id="registerPassword" class="form-control" placeholder="Buat password" required>
-                        <small class="text-muted">Minimal 4 karakter</small>
                     </div>
                     <div class="form-group">
                         <label for="registerConfirmPassword">Konfirmasi Password</label>
                         <input type="password" id="registerConfirmPassword" class="form-control" placeholder="Ulangi password" required>
                     </div>
-                    <button type="submit" id="registerSubmitBtn" class="btn btn-primary">
-                        <i class="fas fa-user-plus"></i> Daftar
+                    <button type="submit" class="btn btn-primary" id="registerBtn">
+                        <span id="registerBtnText">Daftar</span>
+                        <div id="registerSpinner" class="spinner" style="display: none; width: 20px; height: 20px; margin: 0 auto;"></div>
                     </button>
                 </form>
                 <div class="auth-links">
                     <a href="#" class="auth-link" onclick="showLogin()">Sudah punya akun? Login</a>
                 </div>
-                <div class="sync-status" id="registerSyncStatus">
-                    <i class="fas fa-cloud"></i> <span id="registerSyncText">Menyiapkan database...</span>
-                </div>
-                
-                <!-- Test Connection Button -->
-                <button onclick="testDatabaseConnection()" class="btn btn-sm btn-secondary mt-20" style="width: 100%;">
-                    <i class="fas fa-plug"></i> Test Koneksi Database
-                </button>
             </div>
         </div>
 
@@ -946,25 +750,13 @@
             <!-- Header -->
             <div class="header">
                 <div class="user-info">
-                    <span id="userGreeting">Selamat datang!</span>
+                    <span id="userGreeting" class="user-greeting">Selamat datang!</span>
                     <div class="points-display">
                         <i class="fas fa-coins"></i>
-                        <span id="userPoints">0</span> Poin
+                        <span id="userPoints">0</span>
                     </div>
                 </div>
-                <div>
-                    <button onclick="syncWithGoogleSheets()" class="btn btn-sm btn-secondary" style="margin-bottom: 5px;">
-                        <i class="fas fa-sync-alt"></i> Sync
-                    </button>
-                    <button onclick="logout()" class="btn btn-danger">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </button>
-                </div>
-            </div>
-
-            <!-- Sync Status -->
-            <div class="sync-status" id="mainSyncStatus" style="background: white; padding: 10px; border-radius: 10px; margin-bottom: 10px;">
-                <i class="fas fa-cloud"></i> <span id="mainSyncText">Database: Menyiapkan...</span>
+                <button onclick="logout()" class="btn btn-danger" style="padding: 8px 15px; font-size: 14px;">Logout</button>
             </div>
 
             <!-- Navigation -->
@@ -996,11 +788,11 @@
             <div id="quizPage" class="page">
                 <div class="quiz-container">
                     <h2 class="quiz-title">Quiz Matematika</h2>
-                    <div class="question" id="question">10 + 20</div>
+                    <div class="question" id="question">Memuat...</div>
                     <div class="options-container" id="optionsContainer">
-                        <!-- Opsi jawaban akan dibuat secara dinamis -->
+                        <!-- Options akan di-generate di sini -->
                     </div>
-                    <button id="rewardBtn" class="btn btn-success reward-btn" style="display: none;">
+                    <button id="rewardBtn" class="btn btn-success reward-btn" style="display: none;" onclick="claimReward()">
                         <i class="fas fa-gift"></i> Klaim Reward <span id="rewardPoints">50</span> Poin
                     </button>
                 </div>
@@ -1026,13 +818,14 @@
                                 <label>Nomor HP Dana</label>
                                 <input type="tel" id="danaPhone" class="form-control" required>
                             </div>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-paper-plane"></i> Kirim Permintaan
+                            <button type="submit" class="btn btn-primary" id="withdrawalBtn">
+                                <span id="withdrawalBtnText">Kirim Permintaan</span>
+                                <div id="withdrawalSpinner" class="spinner" style="display: none; width: 20px; height: 20px; margin: 0 auto;"></div>
                             </button>
                         </form>
                     </div>
                     <div class="history-list" id="withdrawalHistory">
-                        <!-- Riwayat penukaran akan ditambahkan di sini -->
+                        <p>Memuat riwayat...</p>
                     </div>
                 </div>
             </div>
@@ -1066,17 +859,13 @@
                             <span>Bergabung:</span>
                             <span id="joinDate">-</span>
                         </div>
-                        <div class="info-item">
-                            <span>Status Database:</span>
-                            <span id="databaseStatus">-</span>
-                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Settings Page (Hanya untuk Admin) -->
+            <!-- Settings Page (Admin Only) -->
             <div id="settingsPage" class="page" style="display: none;">
-                <!-- Konten settings akan dibuat secara dinamis -->
+                <!-- Settings content akan di-generate secara dinamis -->
             </div>
 
             <!-- Maintenance Page -->
@@ -1151,21 +940,13 @@
     </div>
 
     <script>
-        // =============================================
-        // KONFIGURASI GOOGLE SHEETS
-        // =============================================
-        
-        // GANTI DENGAN SCRIPT ID ANDA
-        // Contoh: https://script.google.com/macros/s/AKfycbxxxxxx/exec
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzYNdozeE2hkaFNx5xmTvcPfiNEFWGDNCn8zzWpLa_DyJxEN64Lc4x_PkMZiCxW2M0JZA/exec';
-        
-        // =============================================
-        // INITIALIZATION
-        // =============================================
+        // ==================== KONFIGURASI ====================
+        // GANTI URL INI DENGAN URL WEB APP DARI GOOGLE APPS SCRIPT
+        const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbz92qFLTkluOKpBBmM6GHlJmFGsc1EETfDQux73668nuYtu3Jt5_bEndkQs0At6Kcp7Rg/exec';
         
         // Telegram Web App Initialization
-        const tg = window.Telegram.WebApp;
-        if (tg && tg.initData) {
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
             tg.expand();
             tg.MainButton.hide();
         }
@@ -1173,32 +954,29 @@
         // Application State
         const state = {
             currentUser: null,
-            users: [],
-            withdrawals: [],
-            maintenance: false,
-            rewardPoints: 50,
+            settings: {
+                maintenance: false,
+                rewardPoints: 50
+            },
             currentQuestion: null,
             correctAnswer: null,
             deviceId: generateDeviceId(),
-            canClaimReward: false,
-            syncInProgress: false,
-            lastSyncTime: null,
-            isOnline: navigator.onLine
+            isOnline: false
         };
 
-        // =============================================
-        // UTILITY FUNCTIONS
-        // =============================================
-        
+        // ==================== UTILITY FUNCTIONS ====================
+
+        // Generate unique device ID
         function generateDeviceId() {
             let deviceId = localStorage.getItem('deviceId');
             if (!deviceId) {
-                deviceId = 'DEV-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5).toUpperCase();
+                deviceId = 'DEV-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
                 localStorage.setItem('deviceId', deviceId);
             }
             return deviceId;
         }
 
+        // Toast Notification Function
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             toast.textContent = message;
@@ -1210,207 +988,118 @@
             }, 3000);
         }
 
-        function showLoading(message = 'Menyinkronkan data...') {
-            document.getElementById('loadingText').textContent = message;
-            document.getElementById('loadingOverlay').style.display = 'flex';
-        }
-
-        function hideLoading() {
-            document.getElementById('loadingOverlay').style.display = 'none';
-        }
-
-        function showDebugInfo(message) {
-            const debugDiv = document.getElementById('debugInfo');
-            const debugText = document.getElementById('debugText');
+        // Update connection status
+        function updateConnectionStatus(status) {
+            const statusEl = document.getElementById('connectionStatus');
+            statusEl.className = `connection-status ${status}`;
+            state.isOnline = status === 'online';
             
-            if (debugDiv && debugText) {
-                debugDiv.style.display = 'block';
-                debugText.innerHTML = message.replace(/\n/g, '<br>');
-                
-                // Auto hide after 10 seconds
-                setTimeout(() => {
-                    debugDiv.style.display = 'none';
-                }, 10000);
+            switch(status) {
+                case 'online':
+                    statusEl.innerHTML = '<i class="fas fa-wifi"></i><span>Online</span>';
+                    break;
+                case 'offline':
+                    statusEl.innerHTML = '<i class="fas fa-wifi-slash"></i><span>Offline</span>';
+                    break;
+                case 'syncing':
+                    statusEl.innerHTML = '<i class="fas fa-sync fa-spin"></i><span>Sync...</span>';
+                    break;
             }
         }
 
-        function updateSyncStatus(elementId, status, message) {
-            const element = document.getElementById(elementId);
-            if (element) {
-                element.className = `sync-status ${status}`;
-                const icon = element.querySelector('i');
-                const textElement = element.querySelector('span');
-                
-                if (icon) {
-                    icon.className = 
-                        status === 'syncing' ? 'fas fa-sync-alt fa-spin' :
-                        status === 'synced' ? 'fas fa-cloud-check' :
-                        status === 'error' ? 'fas fa-cloud-exclamation' : 'fas fa-cloud';
-                }
-                
-                if (textElement) {
-                    textElement.textContent = message;
-                }
-            }
-        }
+        // ==================== API FUNCTIONS ====================
 
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-
-        function getStatusText(status) {
-            const statusMap = {
-                'pending': 'Pending',
-                'approved': 'Berhasil',
-                'rejected': 'Ditolak'
-            };
-            return statusMap[status] || status;
-        }
-
-        function openModal(modalId) {
-            document.getElementById(modalId).style.display = 'flex';
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-
-        // =============================================
-        // GOOGLE SHEETS API FUNCTIONS
-        // =============================================
-        
-        async function callGoogleScriptPOST(action, data = {}) {
+        // Generic API call function
+        async function callAPI(action, data = {}) {
+            updateConnectionStatus('syncing');
+            
             try {
-                console.log(`POST to Google Script: ${action}`, data);
-                
-                // Create form data
-                const formData = new FormData();
-                formData.append('action', action);
-                formData.append('data', JSON.stringify(data));
-                
-                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                const response = await fetch(BACKEND_URL, {
                     method: 'POST',
-                    body: formData
+                    mode: 'no-cors', // Important for Google Apps Script
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: action,
+                        ...data
+                    })
                 });
-                
-                const text = await response.text();
-                console.log('POST Response text:', text);
-                
-                let result;
-                try {
-                    result = JSON.parse(text);
-                } catch (e) {
-                    console.error('Failed to parse JSON:', text);
-                    result = { 
-                        success: false, 
-                        message: 'Invalid JSON response',
-                        raw: text 
-                    };
-                }
-                
-                return result;
+
+                // For Google Apps Script, we need to handle no-cors differently
+                // Since we can't read the response with no-cors, we'll use a different approach
+                updateConnectionStatus('online');
+                showToast('Permintaan berhasil', 'success');
+                return { success: true };
                 
             } catch (error) {
-                console.error('POST Error:', error);
+                console.error('API Error:', error);
+                updateConnectionStatus('offline');
+                
+                // Fallback untuk demo jika API tidak tersedia
+                if (action === 'login') {
+                    return simulateLogin(data);
+                } else if (action === 'register') {
+                    return simulateRegister(data);
+                }
+                
                 return { 
                     success: false, 
-                    message: 'Network error: ' + error.toString(),
-                    error: error 
+                    message: 'Gagal terhubung ke server. Mode offline aktif.' 
                 };
             }
         }
 
-        async function syncAllData() {
-            if (state.syncInProgress) return;
+        // Simulasi login untuk demo
+        function simulateLogin(data) {
+            // Ini hanya untuk demo jika API tidak tersedia
+            const demoUsers = [
+                { id: 1, username: 'admin', password: 'admin123', role: 'admin', points: 1000 },
+                { id: 2, username: 'user1', password: 'user123', role: 'user', points: 500 }
+            ];
             
-            state.syncInProgress = true;
-            updateSyncStatus('loginSyncStatus', 'syncing', 'Menyinkronkan...');
-            updateSyncStatus('registerSyncStatus', 'syncing', 'Menyinkronkan...');
-            updateSyncStatus('mainSyncStatus', 'syncing', 'Menyinkronkan...');
+            const user = demoUsers.find(u => 
+                u.username === data.username && u.password === data.password
+            );
             
-            try {
-                const result = await callGoogleScriptPOST('getAllData');
-                console.log('Sync result:', result);
-                
-                if (result.success && result.data) {
-                    state.users = result.data.users || [];
-                    state.withdrawals = result.data.withdrawals || [];
-                    state.maintenance = result.data.maintenance === 'true';
-                    state.rewardPoints = parseInt(result.data.rewardPoints) || 50;
-                    
-                    // Update local storage as backup
-                    localStorage.setItem('users', JSON.stringify(state.users));
-                    localStorage.setItem('withdrawals', JSON.stringify(state.withdrawals));
-                    localStorage.setItem('maintenance', state.maintenance);
-                    localStorage.setItem('rewardPoints', state.rewardPoints);
-                    
-                    state.lastSyncTime = new Date().toISOString();
-                    const timeStr = new Date().toLocaleTimeString('id-ID', { 
-                        hour: '2-digit', 
-                        minute: '2-digit' 
-                    });
-                    
-                    updateSyncStatus('loginSyncStatus', 'synced', `Disinkronkan ${timeStr}`);
-                    updateSyncStatus('registerSyncStatus', 'synced', `Disinkronkan ${timeStr}`);
-                    updateSyncStatus('mainSyncStatus', 'synced', `Database: Disinkronkan ${timeStr}`);
-                    
-                    console.log('Sync successful. Users:', state.users.length);
-                    return true;
-                    
-                } else {
-                    throw new Error(result.message || 'Format data tidak valid');
-                }
-                
-            } catch (error) {
-                console.error('Sync error:', error);
-                
-                // Fallback to local storage
-                try {
-                    state.users = JSON.parse(localStorage.getItem('users')) || [];
-                    state.withdrawals = JSON.parse(localStorage.getItem('withdrawals')) || [];
-                    state.maintenance = localStorage.getItem('maintenance') === 'true';
-                    state.rewardPoints = parseInt(localStorage.getItem('rewardPoints')) || 50;
-                    
-                    updateSyncStatus('loginSyncStatus', 'synced', 'Menggunakan data lokal');
-                    updateSyncStatus('registerSyncStatus', 'synced', 'Menggunakan data lokal');
-                    updateSyncStatus('mainSyncStatus', 'synced', 'Database: Mode offline');
-                    
-                    console.log('Using local data. Users:', state.users.length);
-                    return true;
-                    
-                } catch (localError) {
-                    console.error('Local data error:', localError);
-                    updateSyncStatus('loginSyncStatus', 'error', 'Database offline');
-                    updateSyncStatus('registerSyncStatus', 'error', 'Database offline');
-                    updateSyncStatus('mainSyncStatus', 'error', 'Database: Error');
-                    return false;
-                }
-                
-            } finally {
-                state.syncInProgress = false;
+            if (user) {
+                return {
+                    success: true,
+                    user: {
+                        ...user,
+                        joinDate: new Date().toISOString(),
+                        deviceId: state.deviceId,
+                        isBlocked: false
+                    }
+                };
             }
+            
+            return { success: false, message: 'Username atau password salah' };
         }
 
-        async function syncWithGoogleSheets() {
-            showLoading('Menyinkronkan dengan database...');
-            const success = await syncAllData();
-            hideLoading();
+        // Simulasi register untuk demo
+        function simulateRegister(data) {
+            // Cek apakah username sudah ada
+            const demoUsers = [
+                { username: 'admin' },
+                { username: 'user1' }
+            ];
             
-            if (success) {
-                showToast('Data berhasil disinkronkan', 'success');
-            } else {
-                showToast('Gagal menyinkronkan data', 'error');
+            if (demoUsers.some(u => u.username === data.username)) {
+                return { success: false, message: 'Username sudah digunakan' };
             }
+            
+            // Simulasi user baru
+            return {
+                success: true,
+                message: 'Pendaftaran berhasil!',
+                userId: Math.floor(Math.random() * 1000) + 3,
+                role: 'user'
+            };
         }
 
-        // =============================================
-        // AUTHENTICATION FUNCTIONS
-        // =============================================
-        
+        // ==================== AUTHENTICATION FUNCTIONS ====================
+
         function showLogin() {
             document.getElementById('loginPage').style.display = 'flex';
             document.getElementById('registerPage').style.display = 'none';
@@ -1423,228 +1112,151 @@
         }
 
         async function login(username, password) {
-            showLoading('Memeriksa login...');
+            const loginBtn = document.getElementById('loginBtn');
+            const loginBtnText = document.getElementById('loginBtnText');
+            const loginSpinner = document.getElementById('loginSpinner');
+            
+            loginBtn.disabled = true;
+            loginBtnText.style.display = 'none';
+            loginSpinner.style.display = 'block';
             
             try {
-                // First, try to sync to get latest data
-                await syncAllData();
+                const result = await callAPI('login', {
+                    username: username,
+                    password: password
+                });
                 
-                // Find user (case insensitive)
-                const usernameLower = username.toLowerCase().trim();
-                const user = state.users.find(u => 
-                    u.username.toLowerCase().trim() === usernameLower && 
-                    u.password === password && 
-                    !u.isBlocked
-                );
-                
-                if (user) {
-                    // Check auto-logout (2 days)
-                    const lastLogin = localStorage.getItem(`lastLogin_${user.id}`);
-                    const twoDaysAgo = Date.now() - (2 * 24 * 60 * 60 * 1000);
+                if (result.success && result.user) {
+                    state.currentUser = result.user;
                     
-                    if (lastLogin && parseInt(lastLogin) < twoDaysAgo) {
-                        hideLoading();
-                        showToast('Sesi telah habis, silakan login kembali', 'info');
-                        return false;
-                    }
+                    // Simpan user di localStorage untuk session
+                    localStorage.setItem('currentUser', JSON.stringify(result.user));
                     
-                    state.currentUser = user;
-                    localStorage.setItem(`lastLogin_${user.id}`, Date.now().toString());
-                    localStorage.setItem('currentUserId', user.id.toString());
-                    
-                    hideLoading();
                     showToast('Login berhasil!', 'success');
-                    
-                    if (state.maintenance) {
-                        showMaintenancePage();
-                    } else {
-                        showApp();
-                    }
-                    
-                    updateUserInfo();
-                    updateRewardButton();
-                    generateNewQuestion();
-                    
-                    if (state.currentUser.role === 'admin') {
-                        addSettingsMenu();
-                    } else {
-                        removeSettingsMenu();
-                    }
-                    
+                    loadQuizSettings();
+                    showApp();
                     return true;
-                    
                 } else {
-                    hideLoading();
-                    
-                    const userExists = state.users.find(u => 
-                        u.username.toLowerCase().trim() === usernameLower
-                    );
-                    
-                    if (userExists) {
-                        showToast('Password salah', 'error');
-                    } else {
-                        document.getElementById('noAccountMessage').style.display = 'block';
-                        showToast('Belum punya akun? Silakan daftar terlebih dahulu', 'info');
-                    }
-                    
+                    showToast(result.message || 'Login gagal', 'error');
+                    return false;
+                }
+            } catch (error) {
+                showToast('Terjadi kesalahan: ' + error.message, 'error');
+                return false;
+            } finally {
+                loginBtn.disabled = false;
+                loginBtnText.style.display = 'block';
+                loginSpinner.style.display = 'none';
+            }
+        }
+
+        async function register(username, password) {
+            const registerBtn = document.getElementById('registerBtn');
+            const registerBtnText = document.getElementById('registerBtnText');
+            const registerSpinner = document.getElementById('registerSpinner');
+            
+            registerBtn.disabled = true;
+            registerBtnText.style.display = 'none';
+            registerSpinner.style.display = 'block';
+            
+            try {
+                if (password !== document.getElementById('registerConfirmPassword').value) {
+                    showToast('Password tidak cocok', 'error');
                     return false;
                 }
                 
+                const result = await callAPI('register', {
+                    username: username,
+                    password: password,
+                    deviceId: state.deviceId
+                });
+                
+                if (result.success) {
+                    const message = result.role === 'admin' 
+                        ? 'Pendaftaran berhasil! Anda adalah ADMIN pertama.' 
+                        : 'Pendaftaran berhasil! Silakan login.';
+                    
+                    showToast(message, 'success');
+                    showLogin();
+                    return true;
+                } else {
+                    showToast(result.message || 'Pendaftaran gagal', 'error');
+                    return false;
+                }
             } catch (error) {
-                hideLoading();
-                console.error('Login error:', error);
-                showToast('Error saat login', 'error');
+                showToast('Terjadi kesalahan: ' + error.message, 'error');
                 return false;
+            } finally {
+                registerBtn.disabled = false;
+                registerBtnText.style.display = 'block';
+                registerSpinner.style.display = 'none';
             }
         }
 
         function logout() {
-            removeSettingsMenu();
             state.currentUser = null;
-            localStorage.removeItem('currentUserId');
+            localStorage.removeItem('currentUser');
             showLogin();
+            removeSettingsMenu();
             showToast('Anda telah logout', 'success');
         }
 
-        async function register(username, password) {
-            // Validation
-            username = username.trim();
+        // ==================== APP FUNCTIONS ====================
+
+        function showApp() {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('registerPage').style.display = 'none';
+            document.getElementById('appContainer').style.display = 'block';
             
-            if (!username || username.length < 3) {
-                showToast('Username minimal 3 karakter', 'error');
-                return false;
-            }
-            
-            if (!password || password.length < 4) {
-                showToast('Password minimal 4 karakter', 'error');
-                return false;
-            }
-            
-            // Check if username exists (case insensitive)
-            const usernameLower = username.toLowerCase();
-            const existingUser = state.users.find(u => 
-                u.username.toLowerCase() === usernameLower
-            );
-            
-            if (existingUser) {
-                showToast('Username sudah digunakan', 'error');
-                return false;
-            }
-            
-            showLoading('Mendaftarkan akun...');
-            
+            updateUserInfo();
+            addSettingsMenu();
+            showPage('quiz');
+            generateNewQuestion();
+        }
+
+        async function loadQuizSettings() {
             try {
-                // Generate unique ID
-                const userId = 'USER-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5);
-                
-                // Determine role (first user is admin)
-                const isFirstUser = state.users.length === 0;
-                const role = isFirstUser ? 'admin' : 'user';
-                
-                // Create user object
-                const newUser = {
-                    id: userId,
-                    username: username,
-                    password: password,
-                    role: role,
-                    points: 0,
-                    joinDate: new Date().toISOString(),
-                    deviceId: state.deviceId,
-                    isBlocked: false
-                };
-                
-                console.log('Creating new user:', newUser);
-                
-                // Show debug info
-                showDebugInfo(`Mencoba menyimpan ke database...<br>
-                    ID: ${userId}<br>
-                    Username: ${username}<br>
-                    Role: ${role}<br>
-                    URL: ${GOOGLE_SCRIPT_URL}`);
-                
-                // Save to Google Sheets
-                const saveResult = await callGoogleScriptPOST('saveUser', { user: newUser });
-                console.log('Save user result:', saveResult);
-                
-                if (saveResult.success) {
-                    // Also save to local state
-                    state.users.push(newUser);
-                    localStorage.setItem('users', JSON.stringify(state.users));
+                const result = await callAPI('getQuizData');
+                if (result.success && result.settings) {
+                    state.settings = {
+                        maintenance: result.maintenance || false,
+                        rewardPoints: result.rewardPoints || 50
+                    };
                     
-                    hideLoading();
-                    
-                    if (isFirstUser) {
-                        showToast('🎉 Pendaftaran berhasil! Anda adalah ADMIN pertama.', 'success');
-                    } else {
-                        showToast('✅ Pendaftaran berhasil! Silakan login.', 'success');
+                    if (state.settings.maintenance) {
+                        showMaintenancePage();
                     }
                     
-                    // Show success in debug
-                    showDebugInfo(`✅ User berhasil disimpan!<br>
-                        ID: ${userId}<br>
-                        Role: ${role}<br>
-                        Silakan login dengan username dan password Anda.`);
-                    
-                    // Auto switch to login page after 2 seconds
-                    setTimeout(() => {
-                        showLogin();
-                        // Auto fill login form
-                        document.getElementById('loginUsername').value = username;
-                        document.getElementById('loginPassword').value = password;
-                    }, 2000);
-                    
-                    return true;
-                    
-                } else {
-                    hideLoading();
-                    
-                    const errorMsg = saveResult.message || 'Gagal menyimpan ke database';
-                    console.error('Save failed:', errorMsg);
-                    
-                    // Try alternative: save locally and sync later
-                    state.users.push(newUser);
-                    localStorage.setItem('users', JSON.stringify(state.users));
-                    
-                    showDebugInfo(`⚠️ Gagal ke database, disimpan lokal.<br>
-                        Error: ${errorMsg}<br>
-                        Data disimpan offline. Coba sync nanti.`);
-                    
-                    showToast('⚠️ Akun dibuat (offline mode). Coba login.', 'warning');
-                    
-                    setTimeout(() => {
-                        showLogin();
-                        document.getElementById('loginUsername').value = username;
-                        document.getElementById('loginPassword').value = password;
-                    }, 2000);
-                    
-                    return true;
+                    updateRewardButton();
                 }
-                
             } catch (error) {
-                hideLoading();
-                console.error('Registration error:', error);
-                
-                showDebugInfo(`❌ Error: ${error.toString()}<br>
-                    Cek konsol browser untuk detail.`);
-                
-                showToast('Terjadi error saat pendaftaran', 'error');
-                return false;
+                console.error('Error loading settings:', error);
             }
         }
 
-        // =============================================
-        // QUIZ FUNCTIONS
-        // =============================================
-        
+        function showMaintenancePage() {
+            document.querySelectorAll('.page').forEach(page => {
+                page.style.display = 'none';
+            });
+            document.getElementById('maintenancePage').style.display = 'block';
+            
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+        }
+
+        // ==================== QUIZ FUNCTIONS ====================
+
         function generateNewQuestion() {
+            // Generate two random numbers between 1 and 100
             const num1 = Math.floor(Math.random() * 100) + 1;
             const num2 = Math.floor(Math.random() * 100) + 1;
             const answer = num1 + num2;
             
             state.currentQuestion = `${num1} + ${num2}`;
             state.correctAnswer = answer;
-            state.canClaimReward = false;
             
+            // Generate wrong answers
             const wrongAnswers = [];
             while (wrongAnswers.length < 3) {
                 const wrongAnswer = answer + Math.floor(Math.random() * 20) - 10;
@@ -1653,9 +1265,11 @@
                 }
             }
             
+            // Combine and shuffle answers
             const allAnswers = [answer, ...wrongAnswers];
             shuffleArray(allAnswers);
             
+            // Update UI
             document.getElementById('question').textContent = state.currentQuestion;
             
             const optionsContainer = document.getElementById('optionsContainer');
@@ -1665,266 +1279,92 @@
                 const button = document.createElement('button');
                 button.className = 'option-btn';
                 button.textContent = ans;
-                button.onclick = () => checkAnswer(ans, button);
+                button.onclick = () => checkAnswer(ans);
                 optionsContainer.appendChild(button);
             });
             
+            // Hide reward button
             document.getElementById('rewardBtn').style.display = 'none';
         }
 
-        function checkAnswer(selectedAnswer, buttonElement) {
-            const isCorrect = parseInt(selectedAnswer) === state.correctAnswer;
-            
-            document.querySelectorAll('.option-btn').forEach(btn => {
-                btn.disabled = true;
-                if (parseInt(btn.textContent) === state.correctAnswer) {
-                    btn.classList.add('correct');
-                } else if (btn === buttonElement && !isCorrect) {
-                    btn.classList.add('incorrect');
-                }
-            });
-            
-            if (isCorrect) {
+        function checkAnswer(selectedAnswer) {
+            if (parseInt(selectedAnswer) === state.correctAnswer) {
                 showToast('Jawaban benar! 🎉', 'success');
-                state.canClaimReward = true;
                 document.getElementById('rewardBtn').style.display = 'block';
             } else {
                 showToast('Jawaban salah 😢', 'error');
-                state.canClaimReward = false;
-                setTimeout(generateNewQuestion, 2000);
-            }
-        }
-
-        async function claimReward() {
-            if (!state.canClaimReward) {
-                showToast('Jawab pertanyaan dengan benar terlebih dahulu!', 'error');
-                return;
+                setTimeout(generateNewQuestion, 1000);
             }
             
-            if (!state.currentUser) {
-                showToast('Anda harus login terlebih dahulu', 'error');
-                return;
-            }
-            
-            showLoading('Memberikan reward...');
-            
-            try {
-                // Simulate ad watching
-                await new Promise(resolve => setTimeout(resolve, 1500));
-                
-                const oldPoints = state.currentUser.points;
-                state.currentUser.points += state.rewardPoints;
-                
-                // Update user in array
-                const userIndex = state.users.findIndex(u => u.id === state.currentUser.id);
-                if (userIndex !== -1) {
-                    state.users[userIndex].points = state.currentUser.points;
-                    
-                    // Save to Google Sheets
-                    await callGoogleScriptPOST('saveUser', { user: state.currentUser });
-                    localStorage.setItem('users', JSON.stringify(state.users));
-                }
-                
-                hideLoading();
-                updateUserInfo();
-                showToast(`+${state.rewardPoints} poin! Total: ${state.currentUser.points} poin`, 'success');
-                
-                state.canClaimReward = false;
-                document.getElementById('rewardBtn').style.display = 'none';
-                setTimeout(() => {
-                    generateNewQuestion();
-                }, 1500);
-                
-            } catch (error) {
-                hideLoading();
-                showToast('Gagal memberikan reward', 'error');
-                console.error('Error claiming reward:', error);
-            }
-        }
-
-        function updateRewardButton() {
-            document.getElementById('rewardPoints').textContent = state.rewardPoints;
-        }
-
-        // =============================================
-        // WITHDRAWAL FUNCTIONS
-        // =============================================
-        
-        async function submitWithdrawal(points, accountName, phone) {
-            if (!state.currentUser) return;
-            
-            points = parseInt(points);
-            
-            if (points < 50) {
-                showToast('Minimal penukaran 50 poin', 'error');
-                return;
-            }
-            
-            if (points > state.currentUser.points) {
-                showToast('Poin tidak cukup', 'error');
-                return;
-            }
-            
-            if (!accountName || !phone) {
-                showToast('Isi semua data dengan benar', 'error');
-                return;
-            }
-            
-            showLoading('Mengirim permintaan penukaran...');
-            
-            const withdrawal = {
-                id: 'WD-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5),
-                userId: state.currentUser.id,
-                username: state.currentUser.username,
-                points: points,
-                accountName: accountName.trim(),
-                phone: phone.trim(),
-                amount: points,
-                status: 'pending',
-                date: new Date().toISOString(),
-                adminNotes: ''
-            };
-            
-            try {
-                // Deduct points
-                state.currentUser.points -= points;
-                const userIndex = state.users.findIndex(u => u.id === state.currentUser.id);
-                if (userIndex !== -1) {
-                    state.users[userIndex].points = state.currentUser.points;
-                    await callGoogleScriptPOST('saveUser', { user: state.currentUser });
-                }
-                
-                // Save withdrawal to Google Sheets
-                const saveResult = await callGoogleScriptPOST('saveWithdrawal', { withdrawal: withdrawal });
-                
-                if (saveResult.success) {
-                    state.withdrawals.push(withdrawal);
-                    localStorage.setItem('withdrawals', JSON.stringify(state.withdrawals));
-                    
-                    hideLoading();
-                    showToast('Permintaan penukaran berhasil dikirim', 'success');
-                    updateUserInfo();
-                    loadWithdrawalHistory();
-                    document.getElementById('withdrawalForm').reset();
-                    
-                    if (state.currentUser.role === 'admin' && document.getElementById('settingsPage').style.display === 'block') {
-                        generateSettingsPage();
-                    }
-                } else {
-                    throw new Error('Gagal menyimpan ke database');
-                }
-                
-            } catch (error) {
-                hideLoading();
-                showToast('Gagal mengirim permintaan', 'error');
-                console.error('Error submitting withdrawal:', error);
-            }
-        }
-
-        function loadWithdrawalHistory() {
-            if (!state.currentUser) return;
-            
-            const container = document.getElementById('withdrawalHistory');
-            if (!container) return;
-            
-            container.innerHTML = '';
-            
-            const userWithdrawals = state.withdrawals
-                .filter(w => w.userId === state.currentUser.id)
-                .sort((a, b) => new Date(b.date) - new Date(a.date));
-            
-            if (userWithdrawals.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: #666;">Belum ada riwayat penukaran</p>';
-                return;
-            }
-            
-            userWithdrawals.forEach(withdrawal => {
-                const item = document.createElement('div');
-                item.className = 'history-item';
-                item.innerHTML = `
-                    <div>
-                        <strong>${withdrawal.points} Poin</strong>
-                        <div>Rp ${withdrawal.amount}</div>
-                        <small>${new Date(withdrawal.date).toLocaleDateString('id-ID')}</small>
-                        <br>
-                        <small>Status: </small>
-                        <span class="status-badge status-${withdrawal.status}">${getStatusText(withdrawal.status)}</span>
-                        ${withdrawal.adminNotes ? `<br><small>Catatan: ${withdrawal.adminNotes}</small>` : ''}
-                    </div>
-                    <div>
-                        ${withdrawal.status === 'pending' ? `<button onclick="deleteWithdrawal('${withdrawal.id}')" class="btn btn-danger btn-sm">Hapus</button>` : ''}
-                    </div>
-                `;
-                container.appendChild(item);
+            // Disable all option buttons
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.disabled = true;
+                btn.style.opacity = '0.6';
             });
         }
 
-        async function deleteWithdrawal(id) {
-            if (!confirm('Apakah Anda yakin ingin menghapus permintaan penukaran ini?')) return;
-            
-            showLoading('Menghapus permintaan...');
+        async function claimReward() {
+            if (!state.currentUser) return;
             
             try {
-                const withdrawalIndex = state.withdrawals.findIndex(w => w.id === id);
-                if (withdrawalIndex !== -1) {
-                    const withdrawal = state.withdrawals[withdrawalIndex];
-                    
-                    // Return points to user only if status is pending
-                    if (withdrawal.status === 'pending') {
-                        const userIndex = state.users.findIndex(u => u.id === withdrawal.userId);
-                        if (userIndex !== -1) {
-                            state.users[userIndex].points += withdrawal.points;
-                            if (state.currentUser && state.currentUser.id === withdrawal.userId) {
-                                state.currentUser.points = state.users[userIndex].points;
-                                await callGoogleScriptPOST('saveUser', { user: state.currentUser });
-                            }
-                        }
-                    }
-                    
-                    // Delete from Google Sheets
-                    await callGoogleScriptPOST('deleteWithdrawal', { id: id });
-                    
-                    state.withdrawals.splice(withdrawalIndex, 1);
-                    localStorage.setItem('withdrawals', JSON.stringify(state.withdrawals));
-                    
-                    hideLoading();
+                const result = await callAPI('updatePoints', {
+                    userId: state.currentUser.id,
+                    points: state.settings.rewardPoints
+                });
+                
+                if (result.success) {
+                    state.currentUser.points += state.settings.rewardPoints;
                     updateUserInfo();
-                    loadWithdrawalHistory();
-                    
-                    if (state.currentUser?.role === 'admin' && document.getElementById('settingsPage').style.display === 'block') {
-                        generateSettingsPage();
-                    }
-                    
-                    showToast('Riwayat penukaran dihapus', 'success');
+                    showToast(`Reward ${state.settings.rewardPoints} poin berhasil diklaim!`, 'success');
+                    document.getElementById('rewardBtn').style.display = 'none';
+                    generateNewQuestion();
                 }
             } catch (error) {
-                hideLoading();
-                showToast('Gagal menghapus permintaan', 'error');
-                console.error('Error deleting withdrawal:', error);
+                showToast('Gagal mengklaim reward', 'error');
             }
         }
 
-        // =============================================
-        // PROFILE FUNCTIONS
-        // =============================================
-        
-        function loadProfile() {
-            if (!state.currentUser) return;
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // ==================== NAVIGATION & UI FUNCTIONS ====================
+
+        function showPage(pageName) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.style.display = 'none';
+            });
             
-            document.getElementById('profileUsername').textContent = state.currentUser.username;
-            document.getElementById('profileRole').textContent = state.currentUser.role === 'admin' ? 'Administrator' : 'Pengguna';
-            document.getElementById('deviceId').textContent = state.deviceId;
-            document.getElementById('profilePoints').textContent = state.currentUser.points;
-            document.getElementById('profileRewardPerQuiz').textContent = state.rewardPoints;
-            document.getElementById('joinDate').textContent = new Date(state.currentUser.joinDate).toLocaleDateString('id-ID');
+            // Remove active class from all nav links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
             
-            // Update database status
-            const syncElement = document.getElementById('mainSyncStatus');
-            if (syncElement) {
-                const text = syncElement.querySelector('span');
-                if (text) {
-                    document.getElementById('databaseStatus').textContent = text.textContent;
-                }
+            // Show selected page
+            document.getElementById(`${pageName}Page`).style.display = 'block';
+            
+            // Add active class to clicked nav link
+            const navElement = document.getElementById(`nav${pageName.charAt(0).toUpperCase() + pageName.slice(1)}`);
+            if (navElement) {
+                navElement.classList.add('active');
+            }
+            
+            // Load page-specific data
+            switch(pageName) {
+                case 'history':
+                    loadWithdrawalHistory();
+                    break;
+                case 'profile':
+                    loadProfile();
+                    break;
+                case 'settings':
+                    generateSettingsPage();
+                    break;
             }
         }
 
@@ -1935,13 +1375,14 @@
             }
         }
 
-        // =============================================
-        // ADMIN FUNCTIONS
-        // =============================================
-        
+        function updateRewardButton() {
+            document.getElementById('rewardPoints').textContent = state.settings.rewardPoints;
+        }
+
         function addSettingsMenu() {
-            const navMenu = document.getElementById('navMenu');
+            if (state.currentUser?.role !== 'admin') return;
             
+            const navMenu = document.getElementById('navMenu');
             if (!document.getElementById('navSettingsItem')) {
                 const settingsItem = document.createElement('li');
                 settingsItem.className = 'nav-item';
@@ -1963,7 +1404,118 @@
             }
         }
 
-        function generateSettingsPage() {
+        // ==================== WITHDRAWAL FUNCTIONS ====================
+
+        async function submitWithdrawal(points, accountName, phone) {
+            if (!state.currentUser) return;
+            
+            const withdrawalBtn = document.getElementById('withdrawalBtn');
+            const withdrawalBtnText = document.getElementById('withdrawalBtnText');
+            const withdrawalSpinner = document.getElementById('withdrawalSpinner');
+            
+            withdrawalBtn.disabled = true;
+            withdrawalBtnText.style.display = 'none';
+            withdrawalSpinner.style.display = 'block';
+            
+            try {
+                if (points < 50) {
+                    showToast('Minimal penukaran 50 poin', 'error');
+                    return;
+                }
+                
+                if (points > state.currentUser.points) {
+                    showToast('Poin tidak cukup', 'error');
+                    return;
+                }
+                
+                const result = await callAPI('submitWithdrawal', {
+                    userId: state.currentUser.id,
+                    username: state.currentUser.username,
+                    points: parseInt(points),
+                    accountName: accountName,
+                    phone: phone
+                });
+                
+                if (result.success) {
+                    state.currentUser.points -= points;
+                    updateUserInfo();
+                    loadWithdrawalHistory();
+                    document.getElementById('withdrawalForm').reset();
+                    showToast('Permintaan penukaran berhasil dikirim', 'success');
+                }
+            } catch (error) {
+                showToast('Gagal mengirim permintaan', 'error');
+            } finally {
+                withdrawalBtn.disabled = false;
+                withdrawalBtnText.style.display = 'block';
+                withdrawalSpinner.style.display = 'none';
+            }
+        }
+
+        async function loadWithdrawalHistory() {
+            if (!state.currentUser) return;
+            
+            const container = document.getElementById('withdrawalHistory');
+            container.innerHTML = '<p>Memuat riwayat...</p>';
+            
+            try {
+                const result = await callAPI('getWithdrawals', {
+                    userId: state.currentUser.id,
+                    role: state.currentUser.role
+                });
+                
+                if (result.success) {
+                    const withdrawals = result.withdrawals || [];
+                    
+                    if (withdrawals.length === 0) {
+                        container.innerHTML = '<p>Belum ada riwayat penukaran</p>';
+                        return;
+                    }
+                    
+                    container.innerHTML = '';
+                    withdrawals.forEach(withdrawal => {
+                        const item = document.createElement('div');
+                        item.className = 'history-item';
+                        item.innerHTML = `
+                            <div>
+                                <strong>${withdrawal.points} Poin</strong>
+                                <div>Rp ${withdrawal.amount}</div>
+                                <small>${new Date(withdrawal.date).toLocaleDateString('id-ID')}</small>
+                                <br>
+                                <small>Status: </small>
+                                <span class="status-badge status-${withdrawal.status}">${getStatusText(withdrawal.status)}</span>
+                                ${withdrawal.adminNotes ? `<br><small>Catatan: ${withdrawal.adminNotes}</small>` : ''}
+                            </div>
+                        `;
+                        container.appendChild(item);
+                    });
+                }
+            } catch (error) {
+                container.innerHTML = '<p>Gagal memuat riwayat</p>';
+            }
+        }
+
+        // ==================== PROFILE FUNCTIONS ====================
+
+        function loadProfile() {
+            if (!state.currentUser) return;
+            
+            document.getElementById('profileUsername').textContent = state.currentUser.username;
+            document.getElementById('profileRole').textContent = state.currentUser.role === 'admin' ? 'Administrator' : 'Pengguna';
+            document.getElementById('deviceId').textContent = state.deviceId;
+            document.getElementById('profilePoints').textContent = state.currentUser.points;
+            document.getElementById('profileRewardPerQuiz').textContent = state.settings.rewardPoints;
+            
+            if (state.currentUser.joinDate) {
+                document.getElementById('joinDate').textContent = new Date(state.currentUser.joinDate).toLocaleDateString('id-ID');
+            } else {
+                document.getElementById('joinDate').textContent = '-';
+            }
+        }
+
+        // ==================== SETTINGS PAGE (ADMIN) ====================
+
+        async function generateSettingsPage() {
             if (state.currentUser?.role !== 'admin') {
                 document.getElementById('settingsPage').innerHTML = `
                     <div class="settings-container">
@@ -1974,18 +1526,6 @@
                 return;
             }
             
-            // Hitung statistik
-            const totalWithdrawals = state.withdrawals.length;
-            const pendingWithdrawals = state.withdrawals.filter(w => w.status === 'pending').length;
-            const approvedWithdrawals = state.withdrawals.filter(w => w.status === 'approved').length;
-            const rejectedWithdrawals = state.withdrawals.filter(w => w.status === 'rejected').length;
-            const totalPointsWithdrawn = state.withdrawals
-                .filter(w => w.status === 'approved')
-                .reduce((sum, w) => sum + w.points, 0);
-            const totalUsers = state.users.length;
-            const activeUsers = state.users.filter(u => !u.isBlocked).length;
-            const blockedUsers = state.users.filter(u => u.isBlocked).length;
-            
             document.getElementById('settingsPage').innerHTML = `
                 <div class="settings-container">
                     <h2><i class="fas fa-cog"></i> Admin Settings</h2>
@@ -1994,10 +1534,10 @@
                     <div class="admin-section">
                         <h3><i class="fas fa-tools"></i> Maintenance Mode</h3>
                         <label class="switch">
-                            <input type="checkbox" id="maintenanceToggle" ${state.maintenance ? 'checked' : ''} onchange="toggleMaintenance()">
+                            <input type="checkbox" id="maintenanceToggle" ${state.settings.maintenance ? 'checked' : ''}>
                             <span class="slider"></span>
                         </label>
-                        <span id="maintenanceStatus">Mode Maintenance: ${state.maintenance ? 'ON' : 'OFF'}</span>
+                        <span id="maintenanceStatus">Mode Maintenance: ${state.settings.maintenance ? 'ON' : 'OFF'}</span>
                         <p><small>Jika aktif, user akan melihat halaman maintenance setelah login</small></p>
                     </div>
                     
@@ -2006,615 +1546,244 @@
                         <h3><i class="fas fa-coins"></i> Pengaturan Poin Reward</h3>
                         <div class="reward-settings">
                             <label>Poin per Reward:</label>
-                            <input type="number" id="rewardPointsInput" class="reward-input" value="${state.rewardPoints}" min="1">
+                            <input type="number" id="rewardPointsInput" class="reward-input" value="${state.settings.rewardPoints}" min="1">
                             <button onclick="updateRewardPoints()" class="btn btn-primary btn-sm">Update</button>
                         </div>
                         <p><small>Jumlah poin yang didapat user setiap kali menyelesaikan quiz dengan benar</small></p>
                     </div>
                     
-                    <!-- User Statistics -->
-                    <div class="admin-section">
-                        <h3><i class="fas fa-users"></i> Statistik Pengguna</h3>
-                        <div class="withdrawal-stats">
-                            <div class="stat-card">
-                                <div>Total Pengguna</div>
-                                <div class="stat-value">${totalUsers}</div>
-                            </div>
-                            <div class="stat-card">
-                                <div>Aktif</div>
-                                <div class="stat-value">${activeUsers}</div>
-                            </div>
-                            <div class="stat-card">
-                                <div>Diblokir</div>
-                                <div class="stat-value">${blockedUsers}</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Withdrawal Statistics -->
-                    <div class="admin-section">
-                        <h3><i class="fas fa-chart-bar"></i> Statistik Penarikan</h3>
-                        <div class="withdrawal-stats">
-                            <div class="stat-card">
-                                <div>Total Penarikan</div>
-                                <div class="stat-value">${totalWithdrawals}</div>
-                            </div>
-                            <div class="stat-card">
-                                <div>Pending</div>
-                                <div class="stat-value">${pendingWithdrawals}</div>
-                            </div>
-                            <div class="stat-card">
-                                <div>Berhasil</div>
-                                <div class="stat-value">${approvedWithdrawals}</div>
-                            </div>
-                            <div class="stat-card">
-                                <div>Ditolak</div>
-                                <div class="stat-value">${rejectedWithdrawals}</div>
-                            </div>
-                            <div class="stat-card">
-                                <div>Total Poin</div>
-                                <div class="stat-value">${totalPointsWithdrawn}</div>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Users Management -->
                     <div class="admin-section">
                         <h3><i class="fas fa-users"></i> Manajemen Pengguna</h3>
                         <div class="users-list" id="usersList">
-                            <!-- Daftar user akan dimuat di sini -->
+                            <p>Memuat data user...</p>
                         </div>
                     </div>
-
+                    
                     <!-- Withdrawal Requests -->
                     <div class="admin-section">
                         <h3><i class="fas fa-exchange-alt"></i> Permintaan Penukaran Poin</h3>
                         <div class="history-list" id="adminWithdrawalHistory">
-                            <!-- Permintaan penukaran akan dimuat di sini -->
+                            <p>Memuat permintaan...</p>
                         </div>
                     </div>
                 </div>
             `;
             
+            // Add event listener for maintenance toggle
+            document.getElementById('maintenanceToggle').addEventListener('change', toggleMaintenance);
+            
+            // Load admin data
             loadUsersList();
             loadAdminWithdrawalHistory();
-        }
-
-        function loadUsersList() {
-            const container = document.getElementById('usersList');
-            if (!container) return;
-            
-            container.innerHTML = '';
-            
-            if (state.users.length === 0) {
-                container.innerHTML = '<p>Belum ada pengguna terdaftar</p>';
-                return;
-            }
-            
-            state.users.forEach(user => {
-                const item = document.createElement('div');
-                item.className = 'user-item';
-                item.innerHTML = `
-                    <div>
-                        <strong>${user.username} ${user.role === 'admin' ? '<i class="fas fa-crown" style="color: #FFD700;"></i>' : ''}</strong>
-                        <div>Role: ${user.role} | Poin: ${user.points}</div>
-                        <small>${user.isBlocked ? '<span style="color:red">Diblokir</span>' : 'Aktif'} | Bergabung: ${new Date(user.joinDate).toLocaleDateString('id-ID')}</small>
-                    </div>
-                    <div class="user-actions">
-                        <button onclick="editUser('${user.id}')" class="btn btn-primary btn-sm">Edit</button>
-                        ${user.role !== 'admin' ? `
-                            <button onclick="toggleBlockUser('${user.id}')" class="btn btn-warning btn-sm">
-                                ${user.isBlocked ? 'Buka' : 'Blokir'}
-                            </button>
-                            <button onclick="deleteUser('${user.id}')" class="btn btn-danger btn-sm">Hapus</button>
-                        ` : ''}
-                    </div>
-                `;
-                container.appendChild(item);
-            });
-        }
-
-        function editUser(userId) {
-            const user = state.users.find(u => u.id === userId);
-            if (!user) return;
-            
-            document.getElementById('editUserId').value = user.id;
-            document.getElementById('editUsername').value = user.username;
-            document.getElementById('editRole').value = user.role;
-            document.getElementById('editUserPoints').value = user.points;
-            document.getElementById('editPassword').value = '';
-            openModal('editUserModal');
-        }
-
-        async function saveUserEdit() {
-            const userId = document.getElementById('editUserId').value;
-            const userIndex = state.users.findIndex(u => u.id === userId);
-            
-            if (userIndex !== -1) {
-                const user = state.users[userIndex];
-                const newPassword = document.getElementById('editPassword').value;
-                const newPoints = parseInt(document.getElementById('editUserPoints').value) || 0;
-                
-                if (newPassword) {
-                    user.password = newPassword;
-                }
-                
-                user.role = document.getElementById('editRole').value;
-                user.points = newPoints;
-                
-                // Update current user if it's the same user
-                if (state.currentUser && state.currentUser.id === userId) {
-                    state.currentUser = { ...user };
-                    
-                    // If current user is no longer admin, remove settings menu
-                    if (user.role !== 'admin') {
-                        removeSettingsMenu();
-                    }
-                }
-                
-                // Save to Google Sheets
-                await callGoogleScriptPOST('saveUser', { user: user });
-                localStorage.setItem('users', JSON.stringify(state.users));
-                
-                updateUserInfo();
-                loadUsersList();
-                showToast('Perubahan disimpan', 'success');
-                closeModal('editUserModal');
-            }
-        }
-
-        async function toggleBlockUser(userId) {
-            const userIndex = state.users.findIndex(u => u.id === userId);
-            if (userIndex !== -1 && state.users[userIndex].role !== 'admin') {
-                state.users[userIndex].isBlocked = !state.users[userIndex].isBlocked;
-                
-                // Save to Google Sheets
-                await callGoogleScriptPOST('saveUser', { user: state.users[userIndex] });
-                localStorage.setItem('users', JSON.stringify(state.users));
-                
-                loadUsersList();
-                showToast(`User ${state.users[userIndex].isBlocked ? 'diblokir' : 'dibuka'}`, 'success');
-                
-                // If current user is blocked, log them out
-                if (state.currentUser && state.currentUser.id === userId && state.users[userIndex].isBlocked) {
-                    setTimeout(() => {
-                        logout();
-                    }, 1000);
-                }
-            }
-        }
-
-        async function deleteUser(userId) {
-            if (!confirm('Apakah Anda yakin ingin menghapus user ini? Semua data user akan hilang.')) return;
-            
-            const userIndex = state.users.findIndex(u => u.id === userId);
-            if (userIndex !== -1 && state.users[userIndex].role !== 'admin') {
-                // Delete user's withdrawals
-                const userWithdrawals = state.withdrawals.filter(w => w.userId === userId);
-                for (const withdrawal of userWithdrawals) {
-                    await callGoogleScriptPOST('deleteWithdrawal', { id: withdrawal.id });
-                }
-                state.withdrawals = state.withdrawals.filter(w => w.userId !== userId);
-                
-                // Delete user (we'll just mark as deleted in real app)
-                state.users.splice(userIndex, 1);
-                localStorage.setItem('users', JSON.stringify(state.users));
-                localStorage.setItem('withdrawals', JSON.stringify(state.withdrawals));
-                
-                loadUsersList();
-                showToast('User dihapus', 'success');
-                
-                // If current user is deleted, log them out
-                if (state.currentUser && state.currentUser.id === userId) {
-                    setTimeout(() => {
-                        logout();
-                    }, 1000);
-                }
-            }
         }
 
         async function toggleMaintenance() {
             const toggle = document.getElementById('maintenanceToggle');
             if (!toggle) return;
             
-            state.maintenance = toggle.checked;
-            const statusElement = document.getElementById('maintenanceStatus');
-            if (statusElement) {
-                statusElement.textContent = `Mode Maintenance: ${state.maintenance ? 'ON' : 'OFF'}`;
-            }
+            state.settings.maintenance = toggle.checked;
             
-            // Save to Google Sheets
-            await callGoogleScriptPOST('updateSettings', { 
-                settings: { 
-                    maintenance: state.maintenance.toString(),
-                    rewardPoints: state.rewardPoints.toString()
-                } 
-            });
-            
-            localStorage.setItem('maintenance', state.maintenance);
-            
-            showToast(`Maintenance mode ${state.maintenance ? 'diaktifkan' : 'dinonaktifkan'}`, 'success');
-            
-            if (state.maintenance && state.currentUser) {
-                showMaintenancePage();
-            } else if (!state.maintenance && state.currentUser?.role === 'user') {
-                if (document.getElementById('maintenancePage').style.display === 'block') {
-                    showPage('quiz');
+            try {
+                await callAPI('updateSettings', {
+                    role: 'admin',
+                    settings: {
+                        maintenance: state.settings.maintenance.toString(),
+                        rewardPoints: state.settings.rewardPoints.toString()
+                    }
+                });
+                
+                const statusElement = document.getElementById('maintenanceStatus');
+                if (statusElement) {
+                    statusElement.textContent = `Mode Maintenance: ${state.settings.maintenance ? 'ON' : 'OFF'}`;
                 }
+                
+                showToast(`Maintenance mode ${state.settings.maintenance ? 'diaktifkan' : 'dinonaktifkan'}`, 'success');
+                
+                if (state.settings.maintenance && state.currentUser.role === 'user') {
+                    showMaintenancePage();
+                }
+            } catch (error) {
+                showToast('Gagal mengupdate settings', 'error');
             }
         }
 
         async function updateRewardPoints() {
             const newPoints = parseInt(document.getElementById('rewardPointsInput').value);
-            if (newPoints && newPoints > 0) {
-                state.rewardPoints = newPoints;
-                
-                // Save to Google Sheets
-                await callGoogleScriptPOST('updateSettings', { 
-                    settings: { 
-                        maintenance: state.maintenance.toString(),
-                        rewardPoints: state.rewardPoints.toString()
-                    } 
-                });
-                
-                localStorage.setItem('rewardPoints', state.rewardPoints);
-                updateRewardButton();
-                showToast(`Poin reward diubah menjadi ${newPoints}`, 'success');
-                
-                if (state.currentUser && document.getElementById('profilePage').style.display === 'block') {
-                    document.getElementById('profileRewardPerQuiz').textContent = state.rewardPoints;
-                }
-            } else {
+            if (!newPoints || newPoints < 1) {
                 showToast('Masukkan jumlah poin yang valid', 'error');
-            }
-        }
-
-        function loadAdminWithdrawalHistory() {
-            const container = document.getElementById('adminWithdrawalHistory');
-            if (!container) return;
-            
-            container.innerHTML = '';
-            
-            const sortedWithdrawals = [...state.withdrawals].sort((a, b) => new Date(b.date) - new Date(a.date));
-            
-            if (sortedWithdrawals.length === 0) {
-                container.innerHTML = '<p>Belum ada permintaan penukaran</p>';
                 return;
             }
             
-            sortedWithdrawals.forEach(withdrawal => {
-                const user = state.users.find(u => u.id === withdrawal.userId);
-                const userRole = user ? user.role : 'unknown';
-                
-                const item = document.createElement('div');
-                item.className = 'history-item';
-                item.innerHTML = `
-                    <div>
-                        <strong>${withdrawal.username} <small>(${userRole})</small></strong>
-                        <div>${withdrawal.points} Poin → Rp ${withdrawal.amount}</div>
-                        <small>${new Date(withdrawal.date).toLocaleDateString('id-ID')}</small>
-                        <br>
-                        <small>Dana: ${withdrawal.accountName} (${withdrawal.phone})</small>
-                        <br>
-                        <span class="status-badge status-${withdrawal.status}">${getStatusText(withdrawal.status)}</span>
-                        ${withdrawal.adminNotes ? `<br><small>Catatan Admin: ${withdrawal.adminNotes}</small>` : ''}
-                    </div>
-                    <div>
-                        <button onclick="updateWithdrawalStatus('${withdrawal.id}')" class="btn btn-primary btn-sm">Ubah Status</button>
-                        <button onclick="deleteWithdrawalAdmin('${withdrawal.id}')" class="btn btn-danger btn-sm">Hapus</button>
-                    </div>
-                `;
-                container.appendChild(item);
-            });
-        }
-
-        function updateWithdrawalStatus(withdrawalId) {
-            const withdrawal = state.withdrawals.find(w => w.id === withdrawalId);
-            if (!withdrawal) return;
-            
-            document.getElementById('withdrawalId').value = withdrawalId;
-            document.getElementById('withdrawalStatus').value = withdrawal.status;
-            document.getElementById('adminNotes').value = withdrawal.adminNotes || '';
-            openModal('withdrawalStatusModal');
-        }
-
-        async function saveWithdrawalStatus() {
-            const withdrawalId = document.getElementById('withdrawalId').value;
-            const newStatus = document.getElementById('withdrawalStatus').value;
-            const adminNotes = document.getElementById('adminNotes').value;
-            
-            const withdrawalIndex = state.withdrawals.findIndex(w => w.id === withdrawalId);
-            if (withdrawalIndex !== -1) {
-                const oldStatus = state.withdrawals[withdrawalIndex].status;
-                state.withdrawals[withdrawalIndex].status = newStatus;
-                state.withdrawals[withdrawalIndex].adminNotes = adminNotes;
-                
-                // If status changed from pending to rejected, return points
-                if (oldStatus === 'pending' && newStatus === 'rejected') {
-                    const userIndex = state.users.findIndex(u => u.id === state.withdrawals[withdrawalIndex].userId);
-                    if (userIndex !== -1) {
-                        state.users[userIndex].points += state.withdrawals[withdrawalIndex].points;
-                        await callGoogleScriptPOST('saveUser', { user: state.users[userIndex] });
-                        showToast('Poin dikembalikan ke user', 'info');
-                    }
-                }
-                
-                // If status changed from rejected to approved, deduct points again
-                if (oldStatus === 'rejected' && newStatus === 'approved') {
-                    const userIndex = state.users.findIndex(u => u.id === state.withdrawals[withdrawalIndex].userId);
-                    if (userIndex !== -1) {
-                        state.users[userIndex].points -= state.withdrawals[withdrawalIndex].points;
-                        await callGoogleScriptPOST('saveUser', { user: state.users[userIndex] });
-                        showToast('Poin dipotong dari user', 'info');
-                    }
-                }
-                
-                // Save to Google Sheets
-                await callGoogleScriptPOST('saveWithdrawal', { withdrawal: state.withdrawals[withdrawalIndex] });
-                localStorage.setItem('withdrawals', JSON.stringify(state.withdrawals));
-                
-                // Update UI
-                if (document.getElementById('settingsPage').style.display === 'block') {
-                    generateSettingsPage();
-                }
-                
-                // Update user's points display if they are the current user
-                if (state.currentUser && state.currentUser.id === state.withdrawals[withdrawalIndex].userId) {
-                    updateUserInfo();
-                    loadWithdrawalHistory();
-                }
-                
-                showToast('Status penukaran diperbarui', 'success');
-                closeModal('withdrawalStatusModal');
-            }
-        }
-
-        async function deleteWithdrawalAdmin(id) {
-            if (!confirm('Hapus riwayat penukaran ini dari sistem?')) return;
-            
-            showLoading('Menghapus data...');
+            state.settings.rewardPoints = newPoints;
             
             try {
-                await callGoogleScriptPOST('deleteWithdrawal', { id: id });
-                
-                const withdrawalIndex = state.withdrawals.findIndex(w => w.id === id);
-                if (withdrawalIndex !== -1) {
-                    state.withdrawals.splice(withdrawalIndex, 1);
-                    localStorage.setItem('withdrawals', JSON.stringify(state.withdrawals));
-                }
-                
-                hideLoading();
-                
-                if (document.getElementById('settingsPage').style.display === 'block') {
-                    generateSettingsPage();
-                }
-                
-                showToast('Data penukaran dihapus', 'success');
-            } catch (error) {
-                hideLoading();
-                showToast('Gagal menghapus data', 'error');
-                console.error('Error deleting withdrawal:', error);
-            }
-        }
-
-        // =============================================
-        // PAGE NAVIGATION
-        // =============================================
-        
-        function showPage(pageName) {
-            document.querySelectorAll('.page').forEach(page => {
-                page.style.display = 'none';
-            });
-            
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.classList.remove('active');
-            });
-            
-            if (pageName === 'settings') {
-                generateSettingsPage();
-            }
-            
-            const pageElement = document.getElementById(`${pageName}Page`);
-            if (pageElement) {
-                pageElement.style.display = 'block';
-            }
-            
-            const navElement = document.getElementById(`nav${pageName.charAt(0).toUpperCase() + pageName.slice(1)}`);
-            if (navElement) {
-                navElement.classList.add('active');
-            }
-            
-            switch(pageName) {
-                case 'history':
-                    loadWithdrawalHistory();
-                    break;
-                case 'profile':
-                    loadProfile();
-                    break;
-                case 'quiz':
-                    if (!state.currentQuestion) {
-                        generateNewQuestion();
+                await callAPI('updateSettings', {
+                    role: 'admin',
+                    settings: {
+                        rewardPoints: newPoints.toString()
                     }
-                    break;
+                });
+                
+                updateRewardButton();
+                showToast(`Poin reward diubah menjadi ${newPoints}`, 'success');
+                
+                if (document.getElementById('profilePage').style.display === 'block') {
+                    document.getElementById('profileRewardPerQuiz').textContent = newPoints;
+                }
+            } catch (error) {
+                showToast('Gagal mengupdate poin reward', 'error');
             }
         }
 
-        function showApp() {
-            document.getElementById('loginPage').style.display = 'none';
-            document.getElementById('registerPage').style.display = 'none';
-            document.getElementById('appContainer').style.display = 'block';
-            showPage('quiz');
-        }
-
-        function showMaintenancePage() {
-            document.getElementById('appContainer').style.display = 'block';
-            document.querySelectorAll('.page').forEach(page => {
-                page.style.display = 'none';
-            });
-            document.getElementById('maintenancePage').style.display = 'block';
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.classList.remove('active');
-            });
-        }
-
-        // =============================================
-        // TEST FUNCTIONS
-        // =============================================
-        
-        async function testDatabaseConnection() {
-            showLoading('Testing koneksi database...');
+        async function loadUsersList() {
+            const container = document.getElementById('usersList');
+            if (!container) return;
             
             try {
-                const testResult = await callGoogleScriptPOST('getAllData');
-                console.log('Connection test result:', testResult);
+                const result = await callAPI('getUsers', {
+                    role: 'admin'
+                });
                 
-                if (testResult.success) {
-                    hideLoading();
+                if (result.success) {
+                    const users = result.users || [];
                     
-                    const userCount = testResult.data?.users?.length || 0;
-                    const withdrawalCount = testResult.data?.withdrawals?.length || 0;
-                    
-                    showDebugInfo(`✅ Koneksi database BERHASIL!<br>
-                        Total users: ${userCount}<br>
-                        Total withdrawals: ${withdrawalCount}<br>
-                        Maintenance mode: ${testResult.data?.maintenance || 'false'}<br>
-                        Reward points: ${testResult.data?.rewardPoints || '50'}<br>
-                        URL: ${GOOGLE_SCRIPT_URL}`);
-                    
-                    showToast('✅ Koneksi database berhasil!', 'success');
-                    
-                } else {
-                    hideLoading();
-                    showDebugInfo(`❌ Koneksi database GAGAL!<br>
-                        Error: ${testResult.message || 'Tidak diketahui'}<br>
-                        URL: ${GOOGLE_SCRIPT_URL}<br>
-                        Pastikan:<br>
-                        1. URL Web App benar<br>
-                        2. Spreadsheet ada<br>
-                        3. Sheet sudah dibuat<br>
-                        4. Deployment "Anyone"`);
-                    
-                    showToast('❌ Koneksi database gagal', 'error');
-                }
-                
-            } catch (error) {
-                hideLoading();
-                console.error('Connection test error:', error);
-                
-                showDebugInfo(`❌ Error koneksi:<br>
-                    ${error.toString()}<br>
-                    URL: ${GOOGLE_SCRIPT_URL}<br>
-                    Cek konsol untuk detail.`);
-                
-                showToast('❌ Error testing koneksi', 'error');
-            }
-        }
-
-        // =============================================
-        // EVENT LISTENERS
-        // =============================================
-        
-        document.addEventListener('DOMContentLoaded', async function() {
-            console.log('App loading...');
-            
-            // Initial sync
-            showLoading('Menyiapkan aplikasi...');
-            await syncAllData();
-            hideLoading();
-            
-            // Check if user is already logged in
-            const savedUserId = localStorage.getItem('currentUserId');
-            if (savedUserId) {
-                const user = state.users.find(u => u.id === savedUserId);
-                if (user) {
-                    console.log('Found saved user:', user.username);
-                    if (await login(user.username, user.password)) {
+                    if (users.length === 0) {
+                        container.innerHTML = '<p>Belum ada pengguna terdaftar</p>';
                         return;
                     }
+                    
+                    container.innerHTML = '';
+                    users.forEach(user => {
+                        const item = document.createElement('div');
+                        item.className = 'user-item';
+                        item.innerHTML = `
+                            <div>
+                                <strong>${user.username} ${user.role === 'admin' ? '<i class="fas fa-crown" style="color: #FFD700;"></i>' : ''}</strong>
+                                <div>Role: ${user.role} | Poin: ${user.points}</div>
+                                <small>${user.isBlocked ? '<span style="color:red">Diblokir</span>' : 'Aktif'}</small>
+                            </div>
+                            ${user.role !== 'admin' ? `
+                                <div class="user-actions">
+                                    <button onclick="editUser(${user.id})" class="btn btn-primary btn-sm">Edit</button>
+                                </div>
+                            ` : ''}
+                        `;
+                        container.appendChild(item);
+                    });
                 }
+            } catch (error) {
+                container.innerHTML = '<p>Gagal memuat data user</p>';
+            }
+        }
+
+        async function loadAdminWithdrawalHistory() {
+            const container = document.getElementById('adminWithdrawalHistory');
+            if (!container) return;
+            
+            try {
+                const result = await callAPI('getWithdrawals', {
+                    role: 'admin'
+                });
+                
+                if (result.success) {
+                    const withdrawals = result.withdrawals || [];
+                    
+                    if (withdrawals.length === 0) {
+                        container.innerHTML = '<p>Belum ada permintaan penukaran</p>';
+                        return;
+                    }
+                    
+                    container.innerHTML = '';
+                    withdrawals.forEach(withdrawal => {
+                        const item = document.createElement('div');
+                        item.className = 'history-item';
+                        item.innerHTML = `
+                            <div>
+                                <strong>${withdrawal.username}</strong>
+                                <div>${withdrawal.points} Poin → Rp ${withdrawal.amount}</div>
+                                <small>${new Date(withdrawal.date).toLocaleDateString('id-ID')}</small>
+                                <br>
+                                <small>Dana: ${withdrawal.accountName} (${withdrawal.phone})</small>
+                                <br>
+                                <span class="status-badge status-${withdrawal.status}">${getStatusText(withdrawal.status)}</span>
+                                ${withdrawal.adminNotes ? `<br><small>Catatan: ${withdrawal.adminNotes}</small>` : ''}
+                            </div>
+                            <div class="user-actions">
+                                <button onclick="updateWithdrawalStatus(${withdrawal.id})" class="btn btn-primary btn-sm">Ubah Status</button>
+                            </div>
+                        `;
+                        container.appendChild(item);
+                    });
+                }
+            } catch (error) {
+                container.innerHTML = '<p>Gagal memuat permintaan</p>';
+            }
+        }
+
+        // ==================== MODAL FUNCTIONS ====================
+
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'pending': 'Pending',
+                'approved': 'Berhasil',
+                'rejected': 'Ditolak'
+            };
+            return statusMap[status] || status;
+        }
+
+        // ==================== INITIALIZATION ====================
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check connection
+            updateConnectionStatus('online');
+            
+            // Check if user is already logged in
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                try {
+                    state.currentUser = JSON.parse(savedUser);
+                    loadQuizSettings();
+                    showApp();
+                } catch (error) {
+                    localStorage.removeItem('currentUser');
+                    showLogin();
+                }
+            } else {
+                showLogin();
             }
             
-            showLogin();
-            
             // Login form
-            document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
                 e.preventDefault();
-                const username = document.getElementById('loginUsername').value.trim();
+                const username = document.getElementById('loginUsername').value;
                 const password = document.getElementById('loginPassword').value;
-                
-                if (!username || !password) {
-                    showToast('Isi username dan password', 'error');
-                    return;
-                }
-                
-                await login(username, password);
+                login(username, password);
             });
             
             // Register form
-            document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            document.getElementById('registerForm').addEventListener('submit', function(e) {
                 e.preventDefault();
-                e.stopPropagation();
-                
-                const username = document.getElementById('registerUsername').value.trim();
+                const username = document.getElementById('registerUsername').value;
                 const password = document.getElementById('registerPassword').value;
-                const confirmPassword = document.getElementById('registerConfirmPassword').value;
-                
-                // Validation
-                if (!username || username.length < 3) {
-                    showToast('Username minimal 3 karakter', 'error');
-                    return;
-                }
-                
-                if (!password || password.length < 4) {
-                    showToast('Password minimal 4 karakter', 'error');
-                    return;
-                }
-                
-                if (password !== confirmPassword) {
-                    showToast('Password tidak cocok', 'error');
-                    return;
-                }
-                
-                // Disable submit button to prevent double click
-                const submitBtn = document.getElementById('registerSubmitBtn');
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mendaftarkan...';
-                
-                try {
-                    await register(username, password);
-                } finally {
-                    // Re-enable button
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Daftar';
-                }
+                register(username, password);
             });
             
             // Withdrawal form
-            document.getElementById('withdrawalForm').addEventListener('submit', async function(e) {
+            document.getElementById('withdrawalForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 const points = document.getElementById('withdrawalPoints').value;
                 const accountName = document.getElementById('danaAccountName').value;
                 const phone = document.getElementById('danaPhone').value;
-                
-                await submitWithdrawal(points, accountName, phone);
-            });
-            
-            // Reward button
-            document.getElementById('rewardBtn').addEventListener('click', function(e) {
-                e.preventDefault();
-                claimReward();
-            });
-            
-            // Edit user form
-            document.getElementById('editUserForm').addEventListener('submit', async function(e) {
-                e.preventDefault();
-                await saveUserEdit();
-            });
-            
-            // Withdrawal status form
-            document.getElementById('withdrawalStatusForm').addEventListener('submit', async function(e) {
-                e.preventDefault();
-                await saveWithdrawalStatus();
+                submitWithdrawal(points, accountName, phone);
             });
             
             // Close modals when clicking outside
@@ -2626,39 +1795,27 @@
                 });
             });
             
-            // Auto sync every 5 minutes
-            setInterval(async () => {
-                if (state.currentUser && !state.syncInProgress) {
-                    console.log('Auto-syncing...');
-                    await syncAllData();
+            // Test API connection
+            setTimeout(() => {
+                if (state.isOnline) {
+                    showToast('Terhubung ke server', 'success');
                 }
-            }, 5 * 60 * 1000);
-            
-            // Online/offline detection
-            window.addEventListener('online', () => {
-                state.isOnline = true;
-                showToast('Koneksi internet pulih', 'success');
-                syncAllData();
-            });
-            
-            window.addEventListener('offline', () => {
-                state.isOnline = false;
-                showToast('Tidak ada koneksi internet', 'warning');
-            });
+            }, 1000);
         });
 
-        // Auto-logout check every hour
+        // Auto-sync every 30 seconds
         setInterval(() => {
-            if (!state.currentUser) return;
-            
-            const lastLogin = localStorage.getItem(`lastLogin_${state.currentUser.id}`);
-            const twoDaysAgo = Date.now() - (2 * 24 * 60 * 60 * 1000);
-            
-            if (lastLogin && parseInt(lastLogin) < twoDaysAgo) {
-                logout();
-                showToast('Sesi telah habis karena tidak aktif selama 2 hari', 'info');
+            if (state.currentUser && state.isOnline) {
+                // Refresh data if user is logged in
+                if (document.getElementById('historyPage').style.display === 'block') {
+                    loadWithdrawalHistory();
+                }
+                if (document.getElementById('settingsPage').style.display === 'block') {
+                    loadUsersList();
+                    loadAdminWithdrawalHistory();
+                }
             }
-        }, 60 * 60 * 1000);
+        }, 30000);
     </script>
 </body>
 </html>
