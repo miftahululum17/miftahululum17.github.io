@@ -6,7 +6,6 @@
   <title>Telegram Mini App - Quiz Ads</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="/_sdk/element_sdk.js"></script>
-  <script src="/_sdk/data_sdk.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script async src="https://www.profitablecreativeformat.com/9865183/invoke.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -166,6 +165,7 @@
     }
   </style>
   <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
  </head>
  <body class="h-full gradient-bg overflow-hidden" style="color: #ffffff;"><!-- Login/Register Page -->
   <div id="auth-page" class="h-full w-full flex flex-col items-center justify-center p-4 sm:p-6 overflow-y-auto">
@@ -368,7 +368,6 @@
     let cooldownTime = 0;
     let currentUser = null;
     let allUsers = [];
-    let isDataSdkInitialized = false;
     let currentQuestion = {};
     let correctAnswer = 0;
     let canWatchAd = false;
@@ -416,13 +415,18 @@
     
     currentDeviceId = generateDeviceId();
 
-    const dataHandler = {
-      onDataChanged(data) {
-        allUsers = data.filter(item => item.type === 'user' || !item.type);
-        withdrawalRequests = data.filter(item => item.type === 'withdrawal');
+    function loadFromLocalStorage() {
+      try {
+        const storedUsers = localStorage.getItem('app_users');
+        const storedWithdrawals = localStorage.getItem('app_withdrawals');
+        const storedSettings = localStorage.getItem('app_settings');
+        const storedCurrentUser = localStorage.getItem('current_user');
         
-        const settings = data.find(item => item.type === 'settings');
-        if (settings) {
+        if (storedUsers) allUsers = JSON.parse(storedUsers);
+        if (storedWithdrawals) withdrawalRequests = JSON.parse(storedWithdrawals);
+        
+        if (storedSettings) {
+          const settings = JSON.parse(storedSettings);
           maintenanceMode = settings.maintenanceMode || false;
           rewardPerAd = settings.rewardPerAd || 10;
           minWithdrawal = settings.minWithdrawal || 50;
@@ -430,32 +434,46 @@
           monetagZoneId = settings.monetagZoneId || '9865183';
         }
         
-        if (currentUser) {
-          const updatedUser = allUsers.find(u => u.__backendId === currentUser.__backendId);
-          if (updatedUser && updatedUser.activeDeviceId && updatedUser.activeDeviceId !== currentDeviceId) {
-            showToast('Akun Anda login di perangkat lain!', 'error');
-            setTimeout(() => {
-              logoutBtn.click();
-            }, 2000);
+        if (storedCurrentUser) {
+          const userId = storedCurrentUser;
+          currentUser = allUsers.find(u => u.id === userId);
+          if (currentUser) {
+            coins = currentUser.coins || 0;
+            adsWatched = currentUser.adsWatched || 0;
           }
         }
         
-        updateRewardDisplay();
-        
-        console.log('Data updated - Users:', allUsers.length, 'Withdrawals:', withdrawalRequests.length);
+        console.log('✅ Loaded from LocalStorage:', {
+          users: allUsers.length,
+          withdrawals: withdrawalRequests.length,
+          currentUser: currentUser?.username
+        });
+      } catch (error) {
+        console.error('❌ Error loading from LocalStorage:', error);
       }
-    };
+    }
 
-    async function initDataSDK() {
-      if (window.dataSdk && !isDataSdkInitialized) {
-        const result = await window.dataSdk.init(dataHandler);
-        if (result.isOk) {
-          isDataSdkInitialized = true;
-          console.log('Data SDK initialized');
+    function saveToLocalStorage() {
+      try {
+        localStorage.setItem('app_users', JSON.stringify(allUsers));
+        localStorage.setItem('app_withdrawals', JSON.stringify(withdrawalRequests));
+        localStorage.setItem('app_settings', JSON.stringify({
+          maintenanceMode,
+          rewardPerAd,
+          minWithdrawal,
+          cooldownDuration,
+          monetagZoneId
+        }));
+        
+        if (currentUser) {
+          localStorage.setItem('current_user', currentUser.id);
         } else {
-          console.error('Failed to initialize Data SDK:', result.error);
-          showAuthError('Gagal menghubungkan ke database');
+          localStorage.removeItem('current_user');
         }
+        
+        console.log('💾 Saved to LocalStorage');
+      } catch (error) {
+        console.error('❌ Error saving to LocalStorage:', error);
       }
     }
 
@@ -527,6 +545,8 @@
       const confirm = document.getElementById('register-confirm').value;
       const submitBtn = document.getElementById('register-submit-btn');
       
+      console.log('📝 Register attempt:', { username, usersCount: allUsers.length });
+      
       if (password !== confirm) {
         showAuthError('Password tidak cocok!');
         return;
@@ -541,31 +561,38 @@
       submitBtn.disabled = true;
       submitBtn.textContent = 'Mendaftar...';
       
-      const hashedPassword = await hashPassword(password);
-      const isFirstUser = allUsers.length === 0;
-      
-      const newUser = {
-        type: 'user',
-        username: username,
-        password: hashedPassword,
-        isAdmin: isFirstUser,
-        coins: 0,
-        adsWatched: 0,
-        isBlocked: false,
-        createdAt: new Date().toISOString()
-      };
-      
-      const result = await window.dataSdk.create(newUser);
-      
-      if (result.isOk) {
+      try {
+        const hashedPassword = await hashPassword(password);
+        const isFirstUser = allUsers.length === 0;
+        
+        console.log('✅ Creating user:', { username, isAdmin: isFirstUser });
+        
+        const newUser = {
+          id: 'user_' + Date.now() + '_' + Math.random().toString(36).substring(2, 15),
+          username: username,
+          password: hashedPassword,
+          isAdmin: isFirstUser,
+          coins: 0,
+          adsWatched: 0,
+          isBlocked: false,
+          createdAt: new Date().toISOString(),
+          activeDeviceId: null,
+          lastLoginAt: null
+        };
+        
+        allUsers.push(newUser);
+        saveToLocalStorage();
+        
+        console.log('✅ User created successfully');
         showToast(isFirstUser ? '🎉 Akun admin berhasil dibuat!' : 'Akun berhasil dibuat!');
         registerForm.reset();
         
         setTimeout(() => {
           tabLogin.click();
         }, 1000);
-      } else {
-        showAuthError('Gagal membuat akun. Coba lagi.');
+      } catch (error) {
+        console.error('❌ Registration error:', error);
+        showAuthError('Terjadi kesalahan: ' + error.message);
       }
       
       submitBtn.disabled = false;
@@ -629,7 +656,7 @@
         
         user.activeDeviceId = currentDeviceId;
         user.lastLoginAt = new Date().toISOString();
-        await window.dataSdk.update(user);
+        saveToLocalStorage();
         
         currentUser = user;
         coins = user.coins || 0;
@@ -654,12 +681,13 @@
     logoutBtn.addEventListener('click', async () => {
       if (currentUser) {
         currentUser.activeDeviceId = null;
-        await window.dataSdk.update(currentUser);
+        saveToLocalStorage();
       }
       
       currentUser = null;
       coins = 0;
       adsWatched = 0;
+      localStorage.removeItem('current_user');
       updateStats();
       
       authPage.classList.remove('hidden');
@@ -746,35 +774,9 @@
     
     async function toggleMaintenance() {
       const maintenanceToggle = document.getElementById('maintenance-toggle');
-      const newValue = maintenanceToggle.checked;
-      
-      const existingSettings = allUsers.find(item => item.type === 'settings');
-      
-      if (existingSettings) {
-        existingSettings.maintenanceMode = newValue;
-        const result = await window.dataSdk.update(existingSettings);
-        if (result.isOk) {
-          maintenanceMode = newValue;
-          showToast(newValue ? 'Mode maintenance diaktifkan' : 'Mode maintenance dinonaktifkan');
-        } else {
-          maintenanceToggle.checked = !newValue;
-          showToast('Gagal mengubah mode maintenance', 'error');
-        }
-      } else {
-        const newSettings = {
-          type: 'settings',
-          maintenanceMode: newValue,
-          rewardPerAd: rewardPerAd
-        };
-        const result = await window.dataSdk.create(newSettings);
-        if (result.isOk) {
-          maintenanceMode = newValue;
-          showToast(newValue ? 'Mode maintenance diaktifkan' : 'Mode maintenance dinonaktifkan');
-        } else {
-          maintenanceToggle.checked = !newValue;
-          showToast('Gagal mengubah mode maintenance', 'error');
-        }
-      }
+      maintenanceMode = maintenanceToggle.checked;
+      saveToLocalStorage();
+      showToast(maintenanceMode ? 'Mode maintenance diaktifkan' : 'Mode maintenance dinonaktifkan');
     }
     
     async function saveRewardSettings() {
@@ -790,32 +792,9 @@
       saveBtn.disabled = true;
       saveBtn.textContent = 'Menyimpan...';
       
-      const existingSettings = allUsers.find(item => item.type === 'settings');
-      
-      if (existingSettings) {
-        existingSettings.rewardPerAd = newValue;
-        const result = await window.dataSdk.update(existingSettings);
-        if (result.isOk) {
-          rewardPerAd = newValue;
-          showToast('Pengaturan reward berhasil disimpan');
-        } else {
-          showToast('Gagal menyimpan pengaturan', 'error');
-        }
-      } else {
-        const newSettings = {
-          type: 'settings',
-          maintenanceMode: maintenanceMode,
-          rewardPerAd: newValue,
-          minWithdrawal: minWithdrawal
-        };
-        const result = await window.dataSdk.create(newSettings);
-        if (result.isOk) {
-          rewardPerAd = newValue;
-          showToast('Pengaturan reward berhasil disimpan');
-        } else {
-          showToast('Gagal menyimpan pengaturan', 'error');
-        }
-      }
+      rewardPerAd = newValue;
+      saveToLocalStorage();
+      showToast('Pengaturan reward berhasil disimpan');
       
       saveBtn.disabled = false;
       saveBtn.textContent = 'Simpan';
@@ -834,33 +813,9 @@
       saveBtn.disabled = true;
       saveBtn.textContent = 'Menyimpan...';
       
-      const existingSettings = allUsers.find(item => item.type === 'settings');
-      
-      if (existingSettings) {
-        existingSettings.minWithdrawal = newValue;
-        const result = await window.dataSdk.update(existingSettings);
-        if (result.isOk) {
-          minWithdrawal = newValue;
-          showToast('Minimal penarikan berhasil diperbarui');
-        } else {
-          showToast('Gagal menyimpan pengaturan', 'error');
-        }
-      } else {
-        const newSettings = {
-          type: 'settings',
-          maintenanceMode: maintenanceMode,
-          rewardPerAd: rewardPerAd,
-          minWithdrawal: newValue,
-          cooldownDuration: cooldownDuration
-        };
-        const result = await window.dataSdk.create(newSettings);
-        if (result.isOk) {
-          minWithdrawal = newValue;
-          showToast('Minimal penarikan berhasil diperbarui');
-        } else {
-          showToast('Gagal menyimpan pengaturan', 'error');
-        }
-      }
+      minWithdrawal = newValue;
+      saveToLocalStorage();
+      showToast('Minimal penarikan berhasil diperbarui');
       
       saveBtn.disabled = false;
       saveBtn.textContent = 'Simpan';
@@ -879,34 +834,9 @@
       saveBtn.disabled = true;
       saveBtn.textContent = 'Menyimpan...';
       
-      const existingSettings = allUsers.find(item => item.type === 'settings');
-      
-      if (existingSettings) {
-        existingSettings.cooldownDuration = newValue;
-        const result = await window.dataSdk.update(existingSettings);
-        if (result.isOk) {
-          cooldownDuration = newValue;
-          showToast('Hitungan mundur berhasil diperbarui');
-        } else {
-          showToast('Gagal menyimpan pengaturan', 'error');
-        }
-      } else {
-        const newSettings = {
-          type: 'settings',
-          maintenanceMode: maintenanceMode,
-          rewardPerAd: rewardPerAd,
-          minWithdrawal: minWithdrawal,
-          cooldownDuration: newValue,
-          monetagZoneId: monetagZoneId
-        };
-        const result = await window.dataSdk.create(newSettings);
-        if (result.isOk) {
-          cooldownDuration = newValue;
-          showToast('Hitungan mundur berhasil diperbarui');
-        } else {
-          showToast('Gagal menyimpan pengaturan', 'error');
-        }
-      }
+      cooldownDuration = newValue;
+      saveToLocalStorage();
+      showToast('Hitungan mundur berhasil diperbarui');
       
       saveBtn.disabled = false;
       saveBtn.textContent = 'Simpan';
@@ -925,34 +855,9 @@
       saveBtn.disabled = true;
       saveBtn.textContent = 'Menyimpan...';
       
-      const existingSettings = allUsers.find(item => item.type === 'settings');
-      
-      if (existingSettings) {
-        existingSettings.monetagZoneId = newValue;
-        const result = await window.dataSdk.update(existingSettings);
-        if (result.isOk) {
-          monetagZoneId = newValue;
-          showToast('Zone ID berhasil diperbarui. Reload halaman untuk menerapkan perubahan.');
-        } else {
-          showToast('Gagal menyimpan pengaturan', 'error');
-        }
-      } else {
-        const newSettings = {
-          type: 'settings',
-          maintenanceMode: maintenanceMode,
-          rewardPerAd: rewardPerAd,
-          minWithdrawal: minWithdrawal,
-          cooldownDuration: cooldownDuration,
-          monetagZoneId: newValue
-        };
-        const result = await window.dataSdk.create(newSettings);
-        if (result.isOk) {
-          monetagZoneId = newValue;
-          showToast('Zone ID berhasil diperbarui. Reload halaman untuk menerapkan perubahan.');
-        } else {
-          showToast('Gagal menyimpan pengaturan', 'error');
-        }
-      }
+      monetagZoneId = newValue;
+      saveToLocalStorage();
+      showToast('Zone ID berhasil diperbarui. Reload halaman untuk menerapkan perubahan.');
       
       saveBtn.disabled = false;
       saveBtn.textContent = 'Simpan';
@@ -1852,5 +1757,5 @@
     updateStats();
     updateRewardDisplay();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c65723124afe793',t:'MTc2OTgyMzA1MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c65801dd6bee77e',t:'MTc2OTgyMzYyMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
