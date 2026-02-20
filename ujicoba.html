@@ -1,1761 +1,1683 @@
 <!doctype html>
 <html lang="id" class="h-full">
- <head>
+<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Telegram Mini App - Quiz Ads</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <title>Math Quiz - Kuis Matematika Berhadiah</title>
+  
+  <!-- CSS Libraries -->
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- SDKs -->
   <script src="/_sdk/element_sdk.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script async src="https://www.profitablecreativeformat.com/9865183/invoke.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <script src="/_sdk/data_sdk.js"></script>
+  <script src="//libtl.com/sdk.js" data-zone="10547702" data-sdk="show_10547702"></script>
+  
   <style>
-    body {
-      box-sizing: border-box;
+    /* Global Styles */
+    * {
       font-family: 'Poppins', sans-serif;
     }
     
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-10px); }
+    html, body {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
     }
     
-    @keyframes slideUp {
-      from { 
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to { 
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    @keyframes scaleIn {
-      from { 
-        opacity: 0;
-        transform: scale(0.9);
-      }
-      to { 
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-    
-    @keyframes slideInRight {
-      from {
-        opacity: 0;
-        transform: translateX(100px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-    
-    @keyframes slideOutRight {
-      from {
-        opacity: 1;
-        transform: translateX(0);
-      }
-      to {
-        opacity: 0;
-        transform: translateX(100px);
-      }
-    }
-    
-    .floating-coin {
-      animation: float 3s ease-in-out infinite;
-    }
-    
-    .slide-up {
-      animation: slideUp 0.5s ease-out forwards;
-    }
-    
-    .scale-in {
-      animation: scaleIn 0.4s ease-out forwards;
-    }
-    
-    .toast-notification {
-      animation: slideInRight 0.3s ease-out forwards;
-    }
-    
-    .toast-notification.hide {
-      animation: slideOutRight 0.3s ease-out forwards;
-    }
-    
+    /* Gradients */
     .gradient-bg {
-      background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
-      position: relative;
-      overflow: hidden;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
     
-    .gradient-bg::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
-      animation: rotate 20s linear infinite;
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      transition: all 0.3s;
     }
     
-    @keyframes rotate {
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-danger {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .btn-success {
+      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+    
+    /* Cards & Shadows */
+    .card-shadow {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+    
+    /* Input Fields */
+    .input-field {
+      transition: all 0.3s;
+      border: 1.5px solid #e2e8f0;
+    }
+    
+    .input-field:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      outline: none;
+    }
+    
+    /* Navigation */
+    .menu-active {
+      background: rgba(102, 126, 234, 0.1);
+      color: #667eea;
+    }
+    
+    /* Toast Notifications */
+    .toast {
+      animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateY(-100px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+    
+    /* Loading Spinner */
+    .loading-spinner {
+      border: 2px solid #f3f3f3;
+      border-top: 2px solid #667eea;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
     
-    .glass-card {
-      background: rgba(30, 30, 50, 0.85);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+    /* Point Animation */
+    .point-change {
+      animation: pointPulse 0.5s ease;
     }
     
-    .answer-btn.correct {
-      background: linear-gradient(135deg, #10b981, #059669) !important;
-      border-color: #10b981 !important;
-      animation: pulse 0.5s ease-in-out;
+    @keyframes pointPulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+      100% { transform: scale(1); }
     }
     
-    .answer-btn.wrong {
-      background: linear-gradient(135deg, #ef4444, #dc2626) !important;
-      border-color: #ef4444 !important;
-      animation: shake 0.5s ease-in-out;
+    /* Broadcast Banner */
+    .broadcast-banner {
+      background: linear-gradient(90deg, #ff6b6b 0%, #ff8e72 100%);
+      color: white;
+      padding: 12px;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 16px;
+      position: relative;
     }
     
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
+    .broadcast-text {
+      animation: scrollText 15s linear infinite;
+      white-space: nowrap;
+      font-weight: 600;
+      font-size: 14px;
+      display: inline-block;
     }
     
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-10px); }
-      75% { transform: translateX(10px); }
+    @keyframes scrollText {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
     }
     
-    .nav-btn {
-      color: #9ca3af;
+    .broadcast-banner.paused .broadcast-text {
+      animation-play-state: paused;
     }
     
-    .nav-btn.active {
-      color: #6366f1;
+    /* Page Management */
+    .page {
+      display: none !important;
     }
     
-    #maintenance-toggle:checked + span {
-      background-color: #10b981;
+    .page.active {
+      display: block !important;
     }
     
-    #maintenance-toggle:checked + span:before {
-      transform: translateX(24px);
+    /* Layout */
+    #main-app {
+      display: flex;
+      flex-direction: column;
     }
     
-    #maintenance-toggle + span:before {
-      content: '';
-      position: absolute;
-      height: 20px;
-      width: 20px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      border-radius: 50%;
-      transition: transform 0.3s;
+    main {
+      padding-bottom: 100px;
+    }
+    
+    .auth-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100%;
     }
   </style>
-  <style>@view-transition { navigation: auto; }</style>
-  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
- </head>
- <body class="h-full gradient-bg overflow-hidden" style="color: #ffffff;"><!-- Login/Register Page -->
-  <div id="auth-page" class="h-full w-full flex flex-col items-center justify-center p-4 sm:p-6 overflow-y-auto">
-   <div class="glass-card rounded-2xl sm:rounded-3xl p-6 sm:p-8 w-full max-w-md scale-in">
-    <div class="text-center mb-6 sm:mb-8 slide-up">
-     <div class="text-4xl sm:text-5xl mb-3">
-      🔐
-     </div>
-     <h1 class="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent">Selamat Datang</h1>
-     <p class="text-gray-300 text-xs sm:text-sm mt-2">Silakan login atau daftar akun</p>
-    </div>
-    <div class="flex gap-1 sm:gap-2 mb-4 sm:mb-6 bg-black/20 p-1 rounded-lg sm:rounded-xl slide-up" style="animation-delay: 0.1s"><button id="tab-login" class="flex-1 py-2 sm:py-2.5 px-3 sm:px-4 rounded-lg text-sm sm:text-base font-semibold transition-all bg-indigo-600 text-white"> Login </button> <button id="tab-register" class="flex-1 py-2 sm:py-2.5 px-3 sm:px-4 rounded-lg text-sm sm:text-base font-semibold transition-all text-gray-400 hover:text-white"> Daftar </button>
-    </div>
-    <form id="login-form" class="space-y-3 sm:space-y-4 slide-up" style="animation-delay: 0.2s">
-     <div><label for="login-username" class="block text-xs sm:text-sm font-medium text-gray-300 mb-1.5 sm:mb-2">Username</label> <input type="text" id="login-username" required style="background: rgba(20, 20, 40, 0.8); color: #ffffff; border: 1px solid rgba(255,255,255,0.25);" class="w-full rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 transition-all" placeholder="Masukkan username">
-     </div>
-     <div><label for="login-password" class="block text-xs sm:text-sm font-medium text-gray-300 mb-1.5 sm:mb-2">Password</label> <input type="password" id="login-password" required style="background: rgba(20, 20, 40, 0.8); color: #ffffff; border: 1px solid rgba(255,255,255,0.25);" class="w-full rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 transition-all" placeholder="Masukkan password">
-     </div><button type="submit" id="login-submit-btn" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-2.5 sm:py-3 text-sm sm:text-base rounded-lg sm:rounded-xl transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50 shadow-lg"> Masuk </button>
-    </form>
-    <form id="register-form" class="space-y-3 sm:space-y-4 hidden slide-up" style="animation-delay: 0.2s">
-     <div><label for="register-username" class="block text-xs sm:text-sm font-medium text-gray-300 mb-1.5 sm:mb-2">Username</label> <input type="text" id="register-username" required minlength="3" class="w-full border rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base text-white placeholder-gray-400 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/50 transition-all" style="background: rgba(20, 20, 40, 0.8); border-color: rgba(255,255,255,0.25);" placeholder="Minimal 3 karakter">
-     </div>
-     <div><label for="register-password" class="block text-xs sm:text-sm font-medium text-gray-300 mb-1.5 sm:mb-2">Password</label> <input type="password" id="register-password" required minlength="6" class="w-full border rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base text-white placeholder-gray-400 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/50 transition-all" style="background: rgba(20, 20, 40, 0.8); border-color: rgba(255,255,255,0.25);" placeholder="Minimal 6 karakter">
-     </div>
-     <div><label for="register-confirm" class="block text-xs sm:text-sm font-medium text-gray-300 mb-1.5 sm:mb-2">Konfirmasi Password</label> <input type="password" id="register-confirm" required minlength="6" class="w-full border rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base text-white placeholder-gray-400 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/50 transition-all" style="background: rgba(20, 20, 40, 0.8); border-color: rgba(255,255,255,0.25);" placeholder="Ulangi password">
-     </div>
-     <div id="admin-badge" class="hidden bg-yellow-500/20 border border-yellow-500/50 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-center">
-      <p class="text-yellow-300 text-xs sm:text-sm font-semibold">👑 Akun pertama akan menjadi Admin</p>
-     </div><button type="submit" id="register-submit-btn" class="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-bold py-2.5 sm:py-3 text-sm sm:text-base rounded-lg sm:rounded-xl transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50 shadow-lg"> Daftar Akun </button>
-    </form>
-    <div id="auth-error" class="hidden mt-4 bg-red-500/20 border border-red-500/50 rounded-xl px-4 py-3">
-     <p class="text-red-300 text-sm text-center"></p>
-    </div>
-   </div>
-  </div><!-- Main App Page -->
-  <div id="app" class="hidden h-full w-full flex flex-col">
-   <div class="flex-1 w-full max-w-sm mx-auto flex flex-col" style="padding: 1rem 0.75rem 6rem 0.75rem;">
-    <div class="flex flex-col items-center w-full">
-     <div id="home-page" class="w-full">
-      <div class="w-full flex justify-between items-center mb-3 sm:mb-4 slide-up">
-       <div class="flex items-center gap-1.5 sm:gap-2"><span id="user-role-badge" class="text-xs px-2 py-0.5 sm:py-1 rounded-full bg-indigo-500/30 border border-indigo-500/50 whitespace-nowrap"> ���� User </span> <span id="logged-username" class="text-xs text-gray-300 truncate max-w-[70px] sm:max-w-[120px]"></span>
-       </div><button id="logout-btn" class="bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 text-red-300 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs font-medium transition-all active:scale-95 whitespace-nowrap"> Logout </button>
-      </div>
-      <div class="text-center mb-3 sm:mb-4 slide-up" style="animation-delay: 0.1s">
-       <div class="floating-coin text-3xl sm:text-4xl lg:text-5xl mb-2">
-        🧮
-       </div>
-       <h1 id="app-title" class="text-lg sm:text-xl lg:text-2xl font-bold bg-gradient-to-r from-yellow-400 via-orange-500 to-pink-500 bg-clip-text text-transparent px-2">Quiz Penjumlahan</h1>
-       <p class="text-gray-300 mt-1 text-xs sm:text-sm">Jawab benar untuk dapat reward</p>
-      </div>
-      <div class="glass-card stat-card rounded-xl p-3 sm:p-4 w-full mb-3 sm:mb-4 scale-in" style="animation-delay: 0.2s">
-       <div class="flex justify-between items-center mb-2"><span class="text-gray-200 text-xs sm:text-sm font-medium">Total Koin</span> <span id="coin-display" class="text-lg sm:text-xl font-bold text-yellow-400">0 ����</span>
-       </div>
-       <div class="pt-2 border-t border-white/20">
-        <div class="flex justify-between items-center"><span class="text-gray-200 text-xs font-medium">Reward per iklan</span> <span id="reward-per-ad-display" class="text-green-400 text-xs sm:text-sm font-semibold">+10 🪙</span>
-        </div>
-       </div>
-      </div>
-      <div class="glass-card rounded-xl p-4 sm:p-6 w-full mb-3 sm:mb-4 scale-in" style="animation-delay: 0.2s">
-       <div class="text-center mb-4">
-        <p class="text-gray-300 text-sm mb-3">Soal:</p>
-        <h2 id="quiz-question" class="text-3xl sm:text-4xl font-bold text-white mb-1">? + ? = ?</h2>
-       </div>
-       <div class="grid grid-cols-2 gap-2 sm:gap-3"><button class="answer-btn glass-card hover:bg-indigo-600/30 active:bg-indigo-700/40 text-white font-bold py-4 sm:py-5 rounded-xl transition-all transform hover:scale-105 active:scale-95 text-lg sm:text-xl" data-answer="0"> 0 </button> <button class="answer-btn glass-card hover:bg-indigo-600/30 active:bg-indigo-700/40 text-white font-bold py-4 sm:py-5 rounded-xl transition-all transform hover:scale-105 active:scale-95 text-lg sm:text-xl" data-answer="1"> 0 </button> <button class="answer-btn glass-card hover:bg-indigo-600/30 active:bg-indigo-700/40 text-white font-bold py-4 sm:py-5 rounded-xl transition-all transform hover:scale-105 active:scale-95 text-lg sm:text-xl" data-answer="2"> 0 </button> <button class="answer-btn glass-card hover:bg-indigo-600/30 active:bg-indigo-700/40 text-white font-bold py-4 sm:py-5 rounded-xl transition-all transform hover:scale-105 active:scale-95 text-lg sm:text-xl" data-answer="3"> 0 </button>
-       </div>
-      </div><button id="watch-ad-btn" disabled class="w-full bg-gradient-to-r from-gray-600 to-gray-700 text-white font-bold py-3 sm:py-3.5 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg scale-in opacity-50 cursor-not-allowed mb-3" style="animation-delay: 0.3s">
-       <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-       </svg><span id="button-label" class="text-sm sm:text-base">Lihat Iklan</span> </button>
-      <div id="cooldown-container" class="hidden text-center scale-in mt-3 mb-3">
-       <p class="text-gray-200 text-xs font-medium">Iklan berikutnya dalam</p>
-       <p id="cooldown-timer" class="text-lg sm:text-xl font-bold text-indigo-300">00:00</p>
-      </div>
-      <div class="text-center text-gray-300 text-xs w-full px-2 slide-up" style="animation-delay: 0.5s">
-       <p>💡 Jawab soal dengan benar untuk aktifkan tombol iklan</p>
-      </div>
-     </div>
-     <div id="admin-page" class="hidden w-full overflow-y-auto" style="max-height: calc(100vh - 10rem);">
-      <h2 class="text-2xl font-bold text-center mb-6 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">👑 Admin Panel</h2><!-- Maintenance Mode -->
-      <div class="glass-card rounded-xl p-4 mb-4">
-       <h3 class="font-bold text-white mb-3 flex items-center gap-2"><span>🔧</span> Mode Maintenance</h3>
-       <div class="flex items-center justify-between"><span class="text-gray-300 text-sm">Aktifkan mode maintenance</span> <label class="relative inline-block w-12 h-6"> <input type="checkbox" id="maintenance-toggle" class="opacity-0 w-0 h-0"> <span class="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-600 rounded-full transition-all duration-300"></span> </label>
-       </div>
-       <p class="text-gray-400 text-xs mt-2">User biasa tidak dapat login saat mode maintenance aktif</p>
-      </div><!-- SDK Settings -->
-      <div class="glass-card rounded-xl p-4 mb-4">
-       <h3 class="font-bold text-white mb-3 flex items-center gap-2"><span>🔧</span> Pengaturan SDK Monetag</h3>
-       <div class="space-y-3">
-        <div><label class="text-gray-300 text-sm block mb-2">Zone ID Interstitial</label>
-         <div class="flex gap-2"><input type="text" id="zone-id-input" placeholder="9865183" class="flex-1 bg-black/30 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"> <button id="save-zone-btn" class="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-bold px-4 py-2 rounded-lg text-sm transition-all"> Simpan </button>
-         </div>
-         <p class="text-gray-400 text-xs mt-1">Dapatkan Zone ID dari dashboard Monetag Anda</p>
-        </div>
-       </div>
-      </div><!-- Reward Settings -->
-      <div class="glass-card rounded-xl p-4 mb-4">
-       <h3 class="font-bold text-white mb-3 flex items-center gap-2"><span>💰</span> Pengaturan Reward</h3>
-       <div class="space-y-3">
-        <div><label class="text-gray-300 text-sm block mb-2">Poin per Iklan</label>
-         <div class="flex gap-2"><input type="number" id="reward-input" min="1" class="flex-1 bg-black/30 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-yellow-500"> <button id="save-reward-btn" class="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-bold px-4 py-2 rounded-lg text-sm transition-all"> Simpan </button>
-         </div>
-        </div>
-        <div><label class="text-gray-300 text-sm block mb-2">Minimal Penarikan (koin)</label>
-         <div class="flex gap-2"><input type="number" id="min-withdrawal-input" min="1" class="flex-1 bg-black/30 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-yellow-500"> <button id="save-min-withdrawal-btn" class="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-bold px-4 py-2 rounded-lg text-sm transition-all"> Simpan </button>
-         </div>
-        </div>
-        <div><label class="text-gray-300 text-sm block mb-2">Hitungan Mundur (detik)</label>
-         <div class="flex gap-2"><input type="number" id="cooldown-input" min="1" class="flex-1 bg-black/30 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-yellow-500"> <button id="save-cooldown-btn" class="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-bold px-4 py-2 rounded-lg text-sm transition-all"> Simpan </button>
-         </div>
-        </div>
-       </div>
-      </div><!-- User Management -->
-      <div class="glass-card rounded-xl p-4 mb-4">
-       <h3 class="font-bold text-white mb-3 flex items-center gap-2"><span>👥</span> Manajemen User</h3>
-       <div id="user-management-list" class="space-y-2 max-h-96 overflow-y-auto">
-       </div>
-      </div><!-- Withdrawal Requests -->
-      <div class="glass-card rounded-xl p-4 mb-4">
-       <h3 class="font-bold text-white mb-3 flex items-center gap-2"><span>💸</span> Riwayat Penukaran Poin</h3>
-       <div id="withdrawal-list" class="space-y-2 max-h-96 overflow-y-auto">
-       </div>
-       <div id="no-withdrawals" class="text-center py-8 text-gray-400 text-sm">
-        Belum ada permintaan penukaran poin
-       </div>
-      </div>
-     </div>
-     <div id="withdrawal-page" class="hidden w-full overflow-y-auto" style="max-height: calc(100vh - 10rem);">
-      <h2 class="text-2xl font-bold text-center mb-6 bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent">💸 Penarikan Koin</h2>
-      <div class="glass-card rounded-xl p-6 mb-4">
-       <div class="text-center mb-4">
-        <p class="text-gray-300 text-sm mb-2">Saldo Koin Anda</p>
-        <p class="text-4xl font-bold text-yellow-400" id="withdrawal-coins">0 🪙</p>
-        <p class="text-gray-400 text-xs mt-2" id="min-withdrawal-text">Minimal penarikan: 50 koin (Rp. 50)</p>
-       </div><button id="open-withdrawal-form" class="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-bold py-3 px-6 rounded-xl transition-all transform hover:scale-105 active:scale-95"> Tukar Koin </button>
-      </div>
-      <div class="glass-card rounded-xl p-4">
-       <h3 class="font-bold text-white mb-3 flex items-center gap-2"><span>📜</span> Riwayat Penarikan</h3>
-       <div id="user-withdrawal-list" class="space-y-2 max-h-96 overflow-y-auto">
-       </div>
-       <div id="no-user-withdrawals" class="text-center py-8 text-gray-400 text-sm">
-        Belum ada riwayat penarikan
-       </div>
-      </div>
-     </div>
-     <div id="profile-page" class="hidden w-full">
-      <h2 class="text-2xl font-bold text-center mb-6 bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent">👤 Profil Saya</h2>
-      <div class="glass-card rounded-xl p-6 mb-4">
-       <div class="flex flex-col items-center mb-6">
-        <div class="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-3xl font-bold mb-3"><span id="profile-avatar">?</span>
-        </div>
-        <h3 class="text-xl font-bold text-white" id="profile-username">Username</h3><span class="text-xs px-3 py-1 rounded-full bg-indigo-500/30 border border-indigo-500/50 mt-2" id="profile-role">User</span>
-       </div>
-       <div class="space-y-3">
-        <div class="flex justify-between items-center py-2 border-b border-white/10"><span class="text-gray-200 text-sm">Device ID</span> <span class="text-gray-400 text-xs font-mono" id="profile-device">-</span>
-        </div>
-        <div class="flex justify-between items-center py-2"><span class="text-gray-200 text-sm">Member Since</span> <span class="text-gray-400 text-sm" id="profile-since">-</span>
-        </div>
-       </div>
-      </div><button id="profile-logout" class="w-full bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 text-white font-bold py-3 px-6 rounded-xl transition-all transform hover:scale-105 active:scale-95"> Logout </button>
-     </div>
-    </div>
-   </div>
-   <div class="fixed bottom-0 left-0 right-0 glass-card border-t border-white/20 z-40">
-    <div class="max-w-sm mx-auto flex justify-around items-center py-2"><button class="nav-btn active flex flex-col items-center gap-1 px-3 py-2 transition-all" data-page="home">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-      </svg><span class="text-xs">Beranda</span> </button> <button class="nav-btn flex flex-col items-center gap-1 px-3 py-2 transition-all" data-page="withdrawal">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
-      </svg><span class="text-xs">Penarikan</span> </button> <button class="nav-btn flex flex-col items-center gap-1 px-3 py-2 transition-all" data-page="profile">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-      </svg><span class="text-xs">Profil</span> </button> <button id="admin-nav-btn" class="nav-btn hidden flex-col items-center gap-1 px-3 py-2 transition-all" data-page="admin">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-      </svg><span class="text-xs">Admin</span> </button>
-    </div>
-   </div>
-   <div id="reward-popup" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-    <div class="glass-card rounded-2xl sm:rounded-3xl p-6 sm:p-8 text-center max-w-xs w-full scale-in">
-     <div class="text-5xl sm:text-6xl mb-3 sm:mb-4">
-      ���
-     </div>
-     <h2 id="reward-title" class="text-xl sm:text-2xl font-bold text-yellow-400 mb-2">Selamat!</h2>
-     <p id="reward-message" class="text-gray-300 text-sm sm:text-base mb-4 sm:mb-6">Kamu mendapatkan +10 koin!</p><button id="close-popup" class="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-white font-bold py-2.5 sm:py-3 px-6 sm:px-8 rounded-lg sm:rounded-xl transition-all duration-300 transform hover:scale-105 active:scale-95 text-sm sm:text-base shadow-lg"> Klaim Reward </button>
-    </div>
-   </div>
-   <div id="loading-overlay" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center z-50">
-    <div class="w-12 h-12 sm:w-16 sm:h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-3 sm:mb-4"></div>
-    <p class="text-gray-300 text-sm sm:text-base">Memuat iklan...</p>
-   </div>
-  </div>
-  <script>
-    const defaultConfig = {
-      app_title: 'Quiz Penjumlahan',
-      reward_text: 'Kamu mendapatkan +10 koin!',
-      button_text: 'Lihat Iklan',
-      font_family: 'Poppins',
-      font_size: 16
-    };
+</head>
 
-    let coins = 0;
-    let adsWatched = 0;
-    let cooldownActive = false;
-    let cooldownTime = 0;
+<body class="bg-gray-50">
+  <div id="app" class="w-full h-full overflow-auto">
+    
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50"></div>
+
+    <!-- LOGIN PAGE -->
+    <div id="login-page" class="page active w-full h-full">
+      <div class="auth-container">
+        <div class="w-full max-w-sm px-4">
+          <div class="text-center mb-6">
+            <h1 id="app-title" class="text-3xl font-bold text-gray-800">Math Quiz</h1>
+            <p class="text-sm text-gray-500 mt-1">Jawab quiz & dapatkan reward!</p>
+          </div>
+          
+          <div class="bg-white rounded-2xl p-6 card-shadow">
+            <form id="login-form" class="space-y-3">
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-2">Username</label>
+                <input type="text" id="login-username" class="input-field w-full px-3 py-2.5 rounded-lg text-sm" placeholder="Masukkan username" required>
+              </div>
+              
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-2">Password</label>
+                <input type="password" id="login-password" class="input-field w-full px-3 py-2.5 rounded-lg text-sm" placeholder="Masukkan password" required>
+              </div>
+              
+              <button type="submit" class="btn-primary w-full py-2.5 rounded-lg text-white font-semibold text-sm mt-4">
+                <span id="login-btn-text">Masuk</span>
+              </button>
+            </form>
+            
+            <p class="text-center mt-4 text-gray-500 text-xs">
+              Belum punya akun? 
+              <button type="button" onclick="showPage('register-page')" class="text-purple-600 font-semibold hover:underline">
+                Daftar
+              </button>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REGISTER PAGE -->
+    <div id="register-page" class="page w-full h-full">
+      <div class="auth-container">
+        <div class="w-full max-w-sm px-4">
+          <div class="text-center mb-6">
+            <h1 class="text-3xl font-bold text-gray-800">Daftar Akun</h1>
+            <p class="text-sm text-gray-500 mt-1">Buat akun baru untuk mulai bermain</p>
+          </div>
+          
+          <div class="bg-white rounded-2xl p-6 card-shadow">
+            <form id="register-form" class="space-y-3">
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-2">Username</label>
+                <input type="text" id="reg-username" class="input-field w-full px-3 py-2.5 rounded-lg text-sm" placeholder="Pilih username" required>
+              </div>
+              
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-2">Password</label>
+                <input type="password" id="reg-password" class="input-field w-full px-3 py-2.5 rounded-lg text-sm" placeholder="Buat password" required>
+              </div>
+              
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-2">Negara</label>
+                <select id="reg-country" class="input-field w-full px-3 py-2.5 rounded-lg bg-white text-sm" required>
+                  <option value="">🔍 Mendeteksi lokasi...</option>
+                  <option value="Indonesia">🇮🇩 Indonesia</option>
+                  <option value="Malaysia">🇲🇾 Malaysia</option>
+                  <option value="Singapore">🇸🇬 Singapore</option>
+                  <option value="Thailand">🇹🇭 Thailand</option>
+                  <option value="Vietnam">🇻🇳 Vietnam</option>
+                  <option value="Philippines">🇵🇭 Philippines</option>
+                </select>
+              </div>
+              
+              <button type="submit" class="btn-primary w-full py-2.5 rounded-lg text-white font-semibold text-sm mt-4">
+                <span id="reg-btn-text">Daftar</span>
+              </button>
+            </form>
+            
+            <p class="text-center mt-4 text-gray-500 text-xs">
+              Sudah punya akun? 
+              <button type="button" onclick="showPage('login-page')" class="text-purple-600 font-semibold hover:underline">
+                Masuk
+              </button>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAINTENANCE PAGE -->
+    <div id="maintenance-page" class="page w-full h-full">
+      <div class="auth-container">
+        <div class="text-center px-4">
+          <div class="w-20 h-20 bg-yellow-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+            <span class="text-3xl">🔧</span>
+          </div>
+          <h1 class="text-2xl font-bold text-gray-800 mb-2">Maintenance</h1>
+          <p class="text-gray-500 max-w-xs text-sm">Aplikasi sedang dalam perbaikan. Silakan kembali beberapa saat lagi.</p>
+          <button type="button" onclick="handleLogout()" class="mt-6 px-4 py-2 bg-gray-200 rounded-lg text-gray-700 font-semibold hover:bg-gray-300 transition text-sm">
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN APPLICATION -->
+    <div id="main-app" class="page w-full h-full">
+      
+      <!-- Header -->
+      <header class="gradient-bg text-white p-3 sticky top-0 z-40">
+        <div class="max-w-2xl mx-auto flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+              <span class="text-sm">👤</span>
+            </div>
+            <div>
+              <p id="header-username" class="font-semibold text-sm">Username</p>
+              <p id="header-points" class="text-xs opacity-80">0 Poin</p>
+            </div>
+          </div>
+          <button type="button" onclick="handleLogout()" class="px-3 py-1.5 bg-white/20 rounded-lg hover:bg-white/30 transition text-xs font-medium">
+            Logout
+          </button>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <main class="flex-1 p-3 overflow-auto">
+        <div class="max-w-2xl mx-auto">
+          
+          <!-- Broadcast Banner -->
+          <div id="broadcast-container" class="hidden">
+            <div class="broadcast-banner" onmouseenter="this.classList.add('paused')" onmouseleave="this.classList.remove('paused')">
+              <span class="broadcast-text" id="broadcast-text-display">📢 </span>
+            </div>
+          </div>
+
+          <!-- QUIZ SECTION -->
+          <div id="quiz-section" class="section">
+            <div class="bg-white rounded-2xl p-4 card-shadow mb-3">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-bold text-gray-800">🎯 Quiz Matematika</h2>
+                <div class="px-3 py-1.5 bg-purple-100 rounded-lg">
+                  <span id="quiz-points" class="font-bold text-purple-600 text-sm">0 Poin</span>
+                </div>
+              </div>
+              
+              <div id="quiz-container">
+                <div class="text-center py-6 bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl mb-4">
+                  <p class="text-gray-500 mb-1 text-xs">Berapa hasil dari:</p>
+                  <p id="quiz-question" class="text-3xl font-bold text-gray-800">0 + 0 = ?</p>
+                </div>
+                
+                <div id="quiz-options" class="grid grid-cols-2 gap-2 mb-4"></div>
+                
+                <div id="claim-reward-container" class="hidden">
+                  <button type="button" id="claim-reward-btn" onclick="claimReward()" class="btn-success w-full py-3 rounded-lg text-white font-bold text-sm flex items-center justify-center gap-2">
+                    <span>🎁</span>
+                    <span>Klaim Reward</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- HISTORY SECTION -->
+          <div id="history-section" class="section hidden">
+            <!-- Points Card -->
+            <div class="bg-white rounded-2xl p-4 card-shadow mb-3">
+              <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2">
+                  <h2 class="text-lg font-bold text-gray-800">💰 Poin Saya</h2>
+                  <span id="refresh-indicator" class="text-xs text-green-600 opacity-0">🔄 Auto-refresh</span>
+                </div>
+                <div class="px-3 py-1.5 bg-green-100 rounded-lg">
+                  <span id="history-points" class="font-bold text-green-600 text-sm">0 Poin</span>
+                </div>
+              </div>
+              
+              <button type="button" onclick="showExchangeForm()" class="btn-primary w-full py-2.5 rounded-lg text-white font-semibold text-sm mb-3">
+                Tukar Poin
+              </button>
+              
+              <p class="text-xs text-gray-500 text-center">Minimal: 50 Poin = Rp 50</p>
+            </div>
+
+            <!-- Exchange Form -->
+            <div id="exchange-form-container" class="bg-white rounded-2xl p-4 card-shadow mb-3 hidden">
+              <h3 class="text-base font-bold text-gray-800 mb-3">📝 Form Penukaran</h3>
+              
+              <form id="exchange-form" class="space-y-2.5">
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1.5">Jumlah Poin</label>
+                  <input type="number" id="exchange-amount" class="input-field w-full px-3 py-2 rounded-lg text-sm" placeholder="Min. 50 poin" min="50" required>
+                </div>
+                
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1.5">Nama Akun DANA</label>
+                  <input type="text" id="dana-account" class="input-field w-full px-3 py-2 rounded-lg text-sm" placeholder="Nama lengkap" required>
+                </div>
+                
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1.5">Nomor HP DANA</label>
+                  <input type="tel" id="dana-phone" class="input-field w-full px-3 py-2 rounded-lg text-sm" placeholder="08xxxxxxxxxx" required>
+                </div>
+                
+                <div class="flex gap-2 pt-2">
+                  <button type="button" onclick="hideExchangeForm()" class="flex-1 py-2 bg-gray-200 rounded-lg text-gray-700 font-semibold text-xs">
+                    Batal
+                  </button>
+                  <button type="submit" class="flex-1 btn-primary py-2 rounded-lg text-white font-semibold text-xs">
+                    Kirim
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Exchange History -->
+            <div class="bg-white rounded-2xl p-4 card-shadow">
+              <h3 class="text-base font-bold text-gray-800 mb-3">📋 Riwayat Penukaran</h3>
+              <div id="exchange-history" class="space-y-2">
+                <p class="text-gray-500 text-center py-3 text-xs">Belum ada riwayat</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- PROFILE SECTION -->
+          <div id="profile-section" class="section hidden">
+            <div class="bg-white rounded-2xl p-4 card-shadow">
+              <div class="text-center mb-4">
+                <div class="w-16 h-16 gradient-bg rounded-full mx-auto mb-3 flex items-center justify-center">
+                  <span class="text-2xl">👤</span>
+                </div>
+                <h2 id="profile-username" class="text-xl font-bold text-gray-800">Username</h2>
+                <span id="profile-role" class="inline-block mt-1.5 px-2.5 py-1 bg-purple-100 text-purple-600 rounded-full text-xs font-medium">
+                  User
+                </span>
+              </div>
+              
+              <div class="space-y-2">
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <span class="text-gray-600 text-sm">🌍 Negara</span>
+                  <span id="profile-country" class="font-semibold text-gray-800 text-sm">-</span>
+                </div>
+                
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <span class="text-gray-600 text-sm">📱 Device ID</span>
+                  <span id="profile-device" class="font-semibold text-gray-800 text-xs">-</span>
+                </div>
+                
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <span class="text-gray-600 text-sm">💰 Total Poin</span>
+                  <span id="profile-points" class="font-semibold text-green-600">0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SETTINGS SECTION (Admin Only) -->
+          <div id="settings-section" class="section hidden">
+            <div class="space-y-3">
+              
+              <!-- Database Status -->
+              <div class="bg-white rounded-2xl p-4 card-shadow">
+                <h2 class="text-lg font-bold text-gray-800 mb-3">☁️ Database Status</h2>
+                
+                <div class="space-y-2">
+                  <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <span class="text-gray-600 text-sm">🔗 Koneksi Google Sheets</span>
+                    <span id="connection-status" class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-medium">✓ Connected</span>
+                  </div>
+                  
+                  <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <span class="text-gray-600 text-sm">📊 Total Records</span>
+                    <span class="font-semibold text-gray-800 text-sm" id="total-records">0</span>
+                  </div>
+                  
+                  <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <span class="text-gray-600 text-sm">⏱️ Last Sync</span>
+                    <span class="font-semibold text-gray-800 text-sm" id="last-sync">Baru saja</span>
+                  </div>
+                </div>
+                
+                <button type="button" onclick="syncDataNow()" class="btn-success w-full py-2.5 rounded-lg text-white font-semibold text-sm mt-3">
+                  🔄 Sync ke Google Sheets
+                </button>
+              </div>
+
+              <!-- Broadcast Message -->
+              <div class="bg-white rounded-2xl p-4 card-shadow">
+                <h2 class="text-lg font-bold text-gray-800 mb-3">📢 Pesan Broadcast</h2>
+                
+                <form id="broadcast-form" class="space-y-2.5">
+                  <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1.5">Pesan</label>
+                    <textarea id="broadcast-message" class="input-field w-full px-3 py-2 rounded-lg text-sm" rows="3" placeholder="Ketik pesan untuk semua user..." required maxlength="100"></textarea>
+                    <p id="char-count" class="text-xs text-gray-500 mt-1">0/100</p>
+                  </div>
+                  
+                  <button type="submit" class="btn-primary w-full py-2.5 rounded-lg text-white font-semibold text-sm flex items-center justify-center gap-2">
+                    <span>📤</span>
+                    <span>Kirim Broadcast</span>
+                  </button>
+                </form>
+              </div>
+
+              <!-- Admin Settings -->
+              <div class="bg-white rounded-2xl p-4 card-shadow">
+                <h2 class="text-lg font-bold text-gray-800 mb-3">⚙️ Pengaturan Admin</h2>
+                
+                <!-- Maintenance Toggle -->
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg mb-3">
+                  <div>
+                    <p class="font-semibold text-gray-800 text-sm">Mode Maintenance</p>
+                    <p class="text-xs text-gray-500">Nonaktifkan akses user</p>
+                  </div>
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="maintenance-toggle" class="sr-only peer" onchange="toggleMaintenance()">
+                    <div class="w-12 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                  </label>
+                </div>
+                
+                <!-- Reward Points Setting -->
+                <div class="p-3 bg-gray-50 rounded-lg">
+                  <p class="font-semibold text-gray-800 text-sm mb-2">Poin Reward per Klaim</p>
+                  <div class="flex gap-2">
+                    <input type="number" id="reward-points-input" class="input-field flex-1 px-3 py-2 rounded-lg text-sm" value="50" min="1">
+                    <button type="button" onclick="updateRewardPoints()" class="px-3 py-2 btn-primary rounded-lg text-white font-semibold text-xs">
+                      Simpan
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- User Management -->
+              <div class="bg-white rounded-2xl p-4 card-shadow">
+                <h3 class="text-base font-bold text-gray-800 mb-3">👥 Manajemen User</h3>
+                <div id="user-list" class="space-y-2">
+                  <p class="text-gray-500 text-center py-3 text-xs">Memuat data...</p>
+                </div>
+              </div>
+
+              <!-- Exchange Requests -->
+              <div class="bg-white rounded-2xl p-4 card-shadow">
+                <h3 class="text-base font-bold text-gray-800 mb-3">💳 Riwayat Penukaran</h3>
+                <div id="admin-exchange-list" class="space-y-2">
+                  <p class="text-gray-500 text-center py-3 text-xs">Belum ada permintaan</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Bottom Navigation -->
+      <nav class="bg-white border-t border-gray-200 px-4 py-2 mt-auto">
+        <div class="flex justify-around max-w-2xl mx-auto">
+          <button type="button" onclick="showSection('quiz')" class="nav-btn flex flex-col items-center p-1.5 rounded-lg transition text-center" data-section="quiz">
+            <span class="text-xl">🎯</span>
+            <span class="text-xs font-medium text-gray-600">Quiz</span>
+          </button>
+          
+          <button type="button" onclick="showSection('history')" class="nav-btn flex flex-col items-center p-1.5 rounded-lg transition text-center" data-section="history">
+            <span class="text-xl">📋</span>
+            <span class="text-xs font-medium text-gray-600">Riwayat</span>
+          </button>
+          
+          <button type="button" onclick="showSection('profile')" class="nav-btn flex flex-col items-center p-1.5 rounded-lg transition text-center" data-section="profile">
+            <span class="text-xl">👤</span>
+            <span class="text-xs font-medium text-gray-600">Profil</span>
+          </button>
+          
+          <button id="settings-nav-btn" type="button" onclick="showSection('settings')" class="nav-btn flex flex-col items-center p-1.5 rounded-lg transition hidden text-center" data-section="settings">
+            <span class="text-xl">⚙️</span>
+            <span class="text-xs font-medium text-gray-600">Setting</span>
+          </button>
+        </div>
+      </nav>
+    </div>
+
+    <!-- EDIT USER MODAL -->
+    <div id="edit-user-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+      <div class="bg-white rounded-2xl p-4 w-full max-w-sm max-h-[90%] overflow-auto">
+        <h3 class="text-lg font-bold text-gray-800 mb-3">Edit User</h3>
+        
+        <form id="edit-user-form" class="space-y-2.5">
+          <input type="hidden" id="edit-user-id">
+          
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1.5">Username</label>
+            <input type="text" id="edit-user-username" class="input-field w-full px-3 py-2 rounded-lg text-sm" readonly>
+          </div>
+          
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1.5">Password Baru</label>
+            <input type="password" id="edit-user-password" class="input-field w-full px-3 py-2 rounded-lg text-sm" placeholder="Kosongkan jika tidak diubah">
+          </div>
+          
+          <div class="p-3 bg-blue-50 rounded-lg">
+            <p class="text-xs font-semibold text-gray-700 mb-1.5">Poin Saat Ini</p>
+            <p id="edit-user-current-points" class="text-xl font-bold text-blue-600">0</p>
+          </div>
+          
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1.5">Total Poin Baru</label>
+            <input type="number" id="edit-user-new-points" class="input-field w-full px-3 py-2 rounded-lg text-sm" placeholder="0" min="0">
+          </div>
+          
+          <div class="flex gap-2 pt-2">
+            <button type="button" onclick="closeEditUserModal()" class="flex-1 py-2 bg-gray-200 rounded-lg text-gray-700 font-semibold text-xs">
+              Batal
+            </button>
+            <button type="submit" class="flex-1 btn-primary py-2 rounded-lg text-white font-semibold text-xs">
+              Simpan
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- EXCHANGE STATUS MODAL -->
+    <div id="exchange-status-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+      <div class="bg-white rounded-2xl p-4 w-full max-w-sm">
+        <h3 class="text-lg font-bold text-gray-800 mb-3">Ubah Status Penukaran</h3>
+        
+        <form id="exchange-status-form" class="space-y-2.5">
+          <input type="hidden" id="exchange-status-id">
+          <input type="hidden" id="exchange-status-user-id">
+          <input type="hidden" id="exchange-status-amount">
+          
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1.5">Status</label>
+            <select id="exchange-status-select" class="input-field w-full px-3 py-2 rounded-lg bg-white text-sm" required>
+              <option value="success">Berhasil</option>
+              <option value="rejected">Tolak</option>
+            </select>
+          </div>
+          
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1.5">Catatan Admin</label>
+            <textarea id="exchange-status-note" class="input-field w-full px-3 py-2 rounded-lg text-sm" rows="2" placeholder="Tambahkan catatan..."></textarea>
+          </div>
+          
+          <div class="flex gap-2 pt-2">
+            <button type="button" onclick="closeExchangeStatusModal()" class="flex-1 py-2 bg-gray-200 rounded-lg text-gray-700 font-semibold text-xs">
+              Batal
+            </button>
+            <button type="submit" class="flex-1 btn-primary py-2 rounded-lg text-white font-semibold text-xs">
+              Simpan
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==================== APP STATE ====================
     let currentUser = null;
     let allUsers = [];
-    let currentQuestion = {};
-    let correctAnswer = 0;
-    let canWatchAd = false;
-    let maintenanceMode = false;
-    let rewardPerAd = 10;
-    let minWithdrawal = 50;
-    let cooldownDuration = 15;
-    let withdrawalRequests = [];
-    let monetagZoneId = '9865183';
-
-    const authPage = document.getElementById('auth-page');
-    const appPage = document.getElementById('app');
-    const loginForm = document.getElementById('login-form');
-    const registerForm = document.getElementById('register-form');
-    const tabLogin = document.getElementById('tab-login');
-    const tabRegister = document.getElementById('tab-register');
-    const authError = document.getElementById('auth-error');
-    const adminBadge = document.getElementById('admin-badge');
-    const logoutBtn = document.getElementById('logout-btn');
-    const userRoleBadge = document.getElementById('user-role-badge');
-    const loggedUsername = document.getElementById('logged-username');
-    const watchAdBtn = document.getElementById('watch-ad-btn');
-    const buttonLabel = document.getElementById('button-label');
-    const coinDisplay = document.getElementById('coin-display');
-    const rewardPopup = document.getElementById('reward-popup');
-    const closePopupBtn = document.getElementById('close-popup');
-    const loadingOverlay = document.getElementById('loading-overlay');
-    const cooldownContainer = document.getElementById('cooldown-container');
-    const cooldownTimer = document.getElementById('cooldown-timer');
-    const appTitle = document.getElementById('app-title');
-    const rewardMessage = document.getElementById('reward-message');
-    const quizQuestion = document.getElementById('quiz-question');
-    const answerBtns = document.querySelectorAll('.answer-btn');
-
-    let currentDeviceId = null;
+    let allExchanges = [];
+    let allBroadcasts = [];
+    let appSettings = null;
+    let currentQuiz = null;
+    let isAnswerCorrect = false;
+    let historyRefreshInterval = null;
+    let detectedCountry = null;
+    let currentBroadcast = null;
+    let isLoading = false;
     
+    // Ganti dengan URL Apps Script Anda setelah deploy
+    const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyniFIRSe-v7KM1jE7Hu101ko1T8eUZPCf17NHDpXllFi2mDOs5O9YKsvBPLUiQPD1P/exec';
+    
+    let lastSyncTime = new Date();
+
+    // Default Configuration
+    const defaultConfig = {
+      app_title: 'Math Quiz'
+    };
+
+    // ==================== UTILITY FUNCTIONS ====================
+    
+    // Generate Device ID
     function generateDeviceId() {
-      let deviceId = localStorage.getItem('device_id');
-      if (!deviceId) {
-        deviceId = 'dev_' + Date.now() + '_' + Math.random().toString(36).substring(2, 15);
-        localStorage.setItem('device_id', deviceId);
-      }
-      return deviceId;
+      const stored = localStorage.getItem('deviceId');
+      if (stored) return stored;
+      const id = 'DEV-' + Math.random().toString(36).substring(2, 10).toUpperCase();
+      localStorage.setItem('deviceId', id);
+      return id;
     }
-    
-    currentDeviceId = generateDeviceId();
 
-    function loadFromLocalStorage() {
+    const deviceId = generateDeviceId();
+
+    // Detect Country by IP
+    async function detectCountry() {
       try {
-        const storedUsers = localStorage.getItem('app_users');
-        const storedWithdrawals = localStorage.getItem('app_withdrawals');
-        const storedSettings = localStorage.getItem('app_settings');
-        const storedCurrentUser = localStorage.getItem('current_user');
-        
-        if (storedUsers) allUsers = JSON.parse(storedUsers);
-        if (storedWithdrawals) withdrawalRequests = JSON.parse(storedWithdrawals);
-        
-        if (storedSettings) {
-          const settings = JSON.parse(storedSettings);
-          maintenanceMode = settings.maintenanceMode || false;
-          rewardPerAd = settings.rewardPerAd || 10;
-          minWithdrawal = settings.minWithdrawal || 50;
-          cooldownDuration = settings.cooldownDuration || 15;
-          monetagZoneId = settings.monetagZoneId || '9865183';
-        }
-        
-        if (storedCurrentUser) {
-          const userId = storedCurrentUser;
-          currentUser = allUsers.find(u => u.id === userId);
-          if (currentUser) {
-            coins = currentUser.coins || 0;
-            adsWatched = currentUser.adsWatched || 0;
+        const countryMap = {
+          'ID': 'Indonesia', 'MY': 'Malaysia', 'SG': 'Singapore',
+          'TH': 'Thailand', 'VN': 'Vietnam', 'PH': 'Philippines'
+        };
+
+        try {
+          const response = await fetch('https://ipapi.co/json/', { 
+            signal: AbortSignal.timeout(3000)
+          });
+          if (response.ok) {
+            const data = await response.json();
+            if (data.country_code && countryMap[data.country_code]) {
+              const country = countryMap[data.country_code];
+              detectedCountry = country;
+              document.getElementById('reg-country').value = country;
+              return;
+            }
           }
+        } catch (e) {
+          console.warn('Country detection fallback...');
         }
-        
-        console.log('✅ Loaded from LocalStorage:', {
-          users: allUsers.length,
-          withdrawals: withdrawalRequests.length,
-          currentUser: currentUser?.username
-        });
-      } catch (error) {
-        console.error('❌ Error loading from LocalStorage:', error);
+      } catch (e) {
+        console.error('Country detection error:', e);
       }
-    }
-
-    function saveToLocalStorage() {
-      try {
-        localStorage.setItem('app_users', JSON.stringify(allUsers));
-        localStorage.setItem('app_withdrawals', JSON.stringify(withdrawalRequests));
-        localStorage.setItem('app_settings', JSON.stringify({
-          maintenanceMode,
-          rewardPerAd,
-          minWithdrawal,
-          cooldownDuration,
-          monetagZoneId
-        }));
-        
-        if (currentUser) {
-          localStorage.setItem('current_user', currentUser.id);
-        } else {
-          localStorage.removeItem('current_user');
-        }
-        
-        console.log('💾 Saved to LocalStorage');
-      } catch (error) {
-        console.error('❌ Error saving to LocalStorage:', error);
-      }
-    }
-
-    function showAuthError(message) {
-      const errorText = authError.querySelector('p');
-      errorText.textContent = message;
-      authError.classList.remove('hidden');
       
-      setTimeout(() => {
-        authError.classList.add('hidden');
+      // Default ke Indonesia jika gagal deteksi
+      document.getElementById('reg-country').value = 'Indonesia';
+    }
+
+    // ==================== GOOGLE SHEETS API FUNCTIONS ====================
+    
+    async function callGAS(action, data = null) {
+      try {
+        console.log(`Calling GAS: ${action}`, data);
+        
+        const response = await fetch(GAS_WEB_APP_URL, {
+          method: 'POST',
+          mode: 'cors',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            action: action,
+            data: data
+          })
+        });
+
+        const result = await response.json();
+        console.log(`GAS Response [${action}]:`, result);
+        return result;
+        
+      } catch (error) {
+        console.error('GAS Error:', error);
+        return { 
+          success: false, 
+          error: error.message 
+        };
+      }
+    }
+
+    // Load all data from Google Sheets
+    async function loadAllData() {
+      if (isLoading) return;
+      
+      isLoading = true;
+      try {
+        const result = await callGAS('getAllData');
+        
+        if (result.success && result.data) {
+          // Update data dari Google Sheets
+          allUsers = result.data.filter(d => d && d.type === 'user');
+          allExchanges = result.data.filter(d => d && d.type === 'exchange');
+          allBroadcasts = result.data.filter(d => d && d.type === 'broadcast');
+          appSettings = result.data.find(d => d && d.type === 'settings');
+          
+          lastSyncTime = new Date();
+          
+          // Update current user jika ada
+          if (currentUser) {
+            const updated = allUsers.find(u => u && u.__backendId === currentUser.__backendId);
+            if (updated) {
+              currentUser = updated;
+              updatePointsDisplay();
+            }
+          }
+          
+          // Update UI untuk admin
+          if (currentUser?.role === 'admin') {
+            renderUserList();
+            renderAdminExchangeList();
+          }
+          
+          updateDatabaseStatus();
+          displayBroadcast();
+        } else {
+          console.error('Load data failed:', result.error);
+          showToast('Gagal memuat data dari server', 'error');
+        }
+      } catch (error) {
+        console.error('Load data error:', error);
+      } finally {
+        isLoading = false;
+      }
+    }
+
+    // ==================== SESSION MANAGEMENT ====================
+    
+    function saveSession(user) {
+      const session = {
+        userId: user.__backendId,
+        username: user.username,
+        role: user.role,
+        loginTime: new Date().toISOString()
+      };
+      localStorage.setItem('userSession', JSON.stringify(session));
+    }
+
+    function getSession() {
+      const session = localStorage.getItem('userSession');
+      if (!session) return null;
+      
+      try {
+        const parsed = JSON.parse(session);
+        const loginTime = new Date(parsed.loginTime);
+        const now = new Date();
+        const diffDays = (now - loginTime) / (1000 * 60 * 60 * 24);
+        
+        if (diffDays >= 2) {
+          localStorage.removeItem('userSession');
+          return null;
+        }
+        return parsed;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function clearSession() {
+      localStorage.removeItem('userSession');
+    }
+
+    // ==================== UI FUNCTIONS ====================
+    
+    // Toast Notification
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+      toast.className = `toast ${bgColor} text-white px-4 py-2 rounded-lg shadow-lg font-medium text-sm`;
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    // Page Navigation
+    function showPage(pageId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+    }
+
+    // Section Navigation
+    function showSection(section) {
+      document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+      document.getElementById(`${section}-section`).classList.remove('hidden');
+      
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('menu-active');
+        if (btn.dataset.section === section) {
+          btn.classList.add('menu-active');
+        }
+      });
+
+      stopHistoryRefresh();
+      
+      if (section === 'history') {
+        renderExchangeHistory();
+        startHistoryRefresh();
+      } else if (section === 'settings') {
+        renderUserList();
+        renderAdminExchangeList();
+        updateDatabaseStatus();
+      }
+    }
+
+    // History Auto-Refresh
+    function startHistoryRefresh() {
+      const indicator = document.getElementById('refresh-indicator');
+      indicator.classList.remove('opacity-0');
+      
+      if (historyRefreshInterval) clearInterval(historyRefreshInterval);
+      historyRefreshInterval = setInterval(() => {
+        loadAllData();
+        renderExchangeHistory();
       }, 5000);
     }
 
-    function showToast(message, type = 'success') {
-      const toast = document.createElement('div');
-      const bgColor = type === 'success' ? 'from-green-500 to-emerald-600' : 'from-red-500 to-rose-600';
-      const icon = type === 'success' ? '���' : '❌';
-      toast.className = `toast-notification fixed top-4 right-4 bg-gradient-to-r ${bgColor} text-white px-6 py-4 rounded-xl shadow-2xl z-50 flex items-center gap-3 max-w-xs`;
-      toast.innerHTML = `<span class="text-2xl">${icon}</span><span class="font-semibold">${message}</span>`;
-      document.body.appendChild(toast);
-      
-      setTimeout(() => {
-        toast.classList.add('hide');
-        setTimeout(() => {
-          toast.remove();
-        }, 300);
-      }, 2500);
+    function stopHistoryRefresh() {
+      if (historyRefreshInterval) {
+        clearInterval(historyRefreshInterval);
+        historyRefreshInterval = null;
+      }
+      const indicator = document.getElementById('refresh-indicator');
+      indicator.classList.add('opacity-0');
     }
 
-    async function hashPassword(password) {
-      const encoder = new TextEncoder();
-      const data = encoder.encode(password);
-      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    }
-
-    tabLogin.addEventListener('click', () => {
-      loginForm.classList.remove('hidden');
-      registerForm.classList.add('hidden');
-      tabLogin.classList.add('bg-indigo-600', 'text-white');
-      tabLogin.classList.remove('text-gray-400');
-      tabRegister.classList.remove('bg-indigo-600', 'text-white');
-      tabRegister.classList.add('text-gray-400');
-      authError.classList.add('hidden');
-    });
-
-    tabRegister.addEventListener('click', () => {
-      registerForm.classList.remove('hidden');
-      loginForm.classList.add('hidden');
-      tabRegister.classList.add('bg-indigo-600', 'text-white');
-      tabRegister.classList.remove('text-gray-400');
-      tabLogin.classList.remove('bg-indigo-600', 'text-white');
-      tabLogin.classList.add('text-gray-400');
-      authError.classList.add('hidden');
+    // ==================== BROADCAST ====================
+    
+    function displayBroadcast() {
+      const latestBroadcast = allBroadcasts
+        .filter(b => b && b.type === 'broadcast')
+        .sort((a, b) => new Date(b.sentAt || 0) - new Date(a.sentAt || 0))[0];
       
-      if (allUsers.length === 0) {
-        adminBadge.classList.remove('hidden');
+      if (latestBroadcast) {
+        currentBroadcast = latestBroadcast;
+        const container = document.getElementById('broadcast-container');
+        const textDisplay = document.getElementById('broadcast-text-display');
+        textDisplay.textContent = '📢 ' + (latestBroadcast.message || '');
+        container.classList.remove('hidden');
       } else {
-        adminBadge.classList.add('hidden');
+        document.getElementById('broadcast-container').classList.add('hidden');
       }
-    });
+    }
 
-    registerForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
+    // ==================== SYNC FUNCTIONS ====================
+    
+    async function syncDataNow() {
+      const btn = event.target;
+      btn.disabled = true;
+      btn.innerHTML = '<div class="loading-spinner mx-auto"></div>';
+
+      try {
+        // Kirim semua data ke Google Sheets
+        await callGAS('syncUsers', allUsers);
+        await callGAS('syncExchanges', allExchanges);
+        await callGAS('syncBroadcasts', allBroadcasts);
+        await callGAS('syncSettings', appSettings ? [appSettings] : []);
+
+        showToast('✅ Data berhasil disync ke Google Sheets!', 'success');
+        await loadAllData(); // Refresh data
+      } catch (e) {
+        showToast('❌ Gagal sync data: ' + e.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '🔄 Sync ke Google Sheets';
+      }
+    }
+
+    function updateDatabaseStatus() {
+      const totalRecords = allUsers.length + allExchanges.length + allBroadcasts.length + (appSettings ? 1 : 0);
+      document.getElementById('total-records').textContent = totalRecords;
       
-      const username = document.getElementById('register-username').value.trim();
-      const password = document.getElementById('register-password').value;
-      const confirm = document.getElementById('register-confirm').value;
-      const submitBtn = document.getElementById('register-submit-btn');
+      const syncTime = lastSyncTime.toLocaleTimeString('id-ID');
+      document.getElementById('last-sync').textContent = syncTime;
+    }
+
+    // ==================== QUIZ LOGIC ====================
+    
+    function generateQuiz() {
+      const a = Math.floor(Math.random() * 100) + 1;
+      const b = Math.floor(Math.random() * 100) + 1;
+      const correct = a + b;
       
-      console.log('📝 Register attempt:', { username, usersCount: allUsers.length });
-      
-      if (password !== confirm) {
-        showAuthError('Password tidak cocok!');
-        return;
+      const options = [correct];
+      while (options.length < 4) {
+        const wrong = correct + Math.floor(Math.random() * 21) - 10;
+        if (wrong !== correct && wrong > 0 && !options.includes(wrong)) {
+          options.push(wrong);
+        }
       }
       
-      const userExists = allUsers.find(u => u.username === username);
-      if (userExists) {
-        showAuthError('Username sudah digunakan!');
-        return;
+      for (let i = options.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [options[i], options[j]] = [options[j], options[i]];
       }
       
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Mendaftar...';
+      currentQuiz = { a, b, correct, options };
+      renderQuiz();
+    }
+
+    function renderQuiz() {
+      if (!currentQuiz) return;
+      
+      document.getElementById('quiz-question').textContent = `${currentQuiz.a} + ${currentQuiz.b} = ?`;
+      
+      const optionsContainer = document.getElementById('quiz-options');
+      optionsContainer.innerHTML = currentQuiz.options.map(opt => `
+        <button type="button" onclick="checkAnswer(${opt})" class="p-3 bg-gray-100 hover:bg-purple-100 rounded-lg text-lg font-bold text-gray-800 transition">
+          ${opt}
+        </button>
+      `).join('');
+      
+      document.getElementById('claim-reward-container').classList.add('hidden');
+      isAnswerCorrect = false;
+    }
+
+    function checkAnswer(answer) {
+      if (answer === currentQuiz.correct) {
+        showToast('🎉 Jawaban Benar!', 'success');
+        isAnswerCorrect = true;
+        document.getElementById('claim-reward-container').classList.remove('hidden');
+      } else {
+        showToast('❌ Jawaban Salah!', 'error');
+        setTimeout(generateQuiz, 1000);
+      }
+    }
+
+    async function claimReward() {
+      if (!isAnswerCorrect || !currentUser) return;
+      
+      const btn = document.getElementById('claim-reward-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<div class="loading-spinner mx-auto"></div>';
       
       try {
-        const hashedPassword = await hashPassword(password);
-        const isFirstUser = allUsers.length === 0;
-        
-        console.log('✅ Creating user:', { username, isAdmin: isFirstUser });
-        
-        const newUser = {
-          id: 'user_' + Date.now() + '_' + Math.random().toString(36).substring(2, 15),
-          username: username,
-          password: hashedPassword,
-          isAdmin: isFirstUser,
-          coins: 0,
-          adsWatched: 0,
-          isBlocked: false,
-          createdAt: new Date().toISOString(),
-          activeDeviceId: null,
-          lastLoginAt: null
-        };
-        
-        allUsers.push(newUser);
-        saveToLocalStorage();
-        
-        console.log('✅ User created successfully');
-        showToast(isFirstUser ? '🎉 Akun admin berhasil dibuat!' : 'Akun berhasil dibuat!');
-        registerForm.reset();
-        
-        setTimeout(() => {
-          tabLogin.click();
-        }, 1000);
-      } catch (error) {
-        console.error('❌ Registration error:', error);
-        showAuthError('Terjadi kesalahan: ' + error.message);
-      }
-      
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Daftar Akun';
-    });
-
-    async function checkVPNorDNS() {
-      try {
-        const response = await fetch('https://ipapi.co/json/');
-        const data = await response.json();
-        
-        if (data.threat) {
-          return data.threat.is_proxy || data.threat.is_vpn || data.threat.is_tor || data.threat.is_relay;
+        if (typeof show_10547702 === 'function') {
+          await show_10547702();
         }
         
-        return false;
-      } catch (error) {
-        console.error('VPN check error:', error);
-        return false;
+        const rewardAmount = appSettings?.rewardPoints || 50;
+        currentUser.points = (currentUser.points || 0) + rewardAmount;
+        
+        // Update ke Google Sheets
+        const result = await callGAS('updateUser', currentUser);
+        
+        if (result.success) {
+          showToast(`+${rewardAmount} Poin!`, 'success');
+          await loadAllData(); // Refresh data
+          updatePointsDisplay();
+        } else {
+          showToast('Gagal menyimpan poin', 'error');
+        }
+        
+        generateQuiz();
+      } catch (e) {
+        console.error('Claim reward error:', e);
+        showToast('Terjadi kesalahan', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>🎁</span><span>Klaim Reward</span>';
       }
     }
 
-    loginForm.addEventListener('submit', async (e) => {
+    function updatePointsDisplay() {
+      if (!currentUser) return;
+      const points = currentUser.points || 0;
+      
+      const pointsElements = [
+        document.getElementById('header-points'),
+        document.getElementById('quiz-points'),
+        document.getElementById('history-points'),
+        document.getElementById('profile-points')
+      ];
+      
+      pointsElements.forEach(el => {
+        if (el) {
+          el.classList.remove('point-change');
+          void el.offsetWidth;
+          el.classList.add('point-change');
+        }
+      });
+      
+      document.getElementById('header-points').textContent = `${points} Poin`;
+      document.getElementById('quiz-points').textContent = `${points} Poin`;
+      document.getElementById('history-points').textContent = `${points} Poin`;
+      document.getElementById('profile-points').textContent = points;
+    }
+
+    // ==================== EXCHANGE FUNCTIONS ====================
+    
+    function showExchangeForm() {
+      document.getElementById('exchange-form-container').classList.remove('hidden');
+    }
+
+    function hideExchangeForm() {
+      document.getElementById('exchange-form-container').classList.add('hidden');
+      document.getElementById('exchange-form').reset();
+    }
+
+    async function submitExchange(e) {
+      e.preventDefault();
+      
+      const amount = parseInt(document.getElementById('exchange-amount').value);
+      const danaAccount = document.getElementById('dana-account').value;
+      const danaPhone = document.getElementById('dana-phone').value;
+      
+      if (amount < 50) {
+        showToast('Minimal penukaran 50 poin!', 'error');
+        return;
+      }
+      
+      if ((currentUser.points || 0) < amount) {
+        showToast('Poin tidak mencukupi!', 'error');
+        return;
+      }
+      
+      currentUser.points = (currentUser.points || 0) - amount;
+      
+      const exchange = {
+        type: 'exchange',
+        exchangeId: 'EX-' + Date.now(),
+        userId: currentUser.__backendId,
+        username: currentUser.username,
+        amount: amount,
+        danaAccount: danaAccount,
+        danaPhone: danaPhone,
+        status: 'pending',
+        adminNote: '',
+        requestedAt: new Date().toISOString()
+      };
+      
+      // Update user points di Google Sheets
+      await callGAS('updateUser', currentUser);
+      
+      // Create exchange di Google Sheets
+      const result = await callGAS('createExchange', exchange);
+      
+      if (result.success) {
+        hideExchangeForm();
+        await loadAllData(); // Refresh data
+        updatePointsDisplay();
+        showToast('Permintaan penukaran berhasil!', 'success');
+        
+        try {
+          if (typeof show_10547702 === 'function') {
+            await show_10547702();
+          }
+        } catch (e) {}
+        
+        renderExchangeHistory();
+      } else {
+        // Rollback points jika gagal
+        currentUser.points = (currentUser.points || 0) + amount;
+        showToast('Gagal membuat permintaan', 'error');
+      }
+    }
+
+    function renderExchangeHistory() {
+      const container = document.getElementById('exchange-history');
+      const userExchanges = allExchanges.filter(ex => ex && ex.userId === currentUser?.__backendId);
+      
+      if (userExchanges.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-center py-3 text-xs">Belum ada riwayat</p>';
+        return;
+      }
+      
+      container.innerHTML = userExchanges.sort((a, b) => new Date(b.requestedAt || 0) - new Date(a.requestedAt || 0)).map(ex => {
+        const statusClass = ex.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : 
+                           ex.status === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
+        const statusText = ex.status === 'pending' ? 'Pending' : 
+                          ex.status === 'success' ? 'Berhasil' : 'Ditolak';
+        
+        return `
+          <div class="p-3 bg-gray-50 rounded-lg">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="font-semibold text-gray-800 text-sm">${ex.amount || 0} Poin = Rp ${ex.amount || 0}</span>
+              <span class="px-2 py-0.5 ${statusClass} rounded-lg text-xs font-medium">${statusText}</span>
+            </div>
+            <p class="text-xs text-gray-500">${ex.danaAccount || '-'} - ${ex.danaPhone || '-'}</p>
+            <p class="text-xs text-gray-400 mt-1">${ex.requestedAt ? new Date(ex.requestedAt).toLocaleString('id-ID') : '-'}</p>
+            ${ex.adminNote ? `<p class="text-xs text-blue-600 mt-1.5 p-1.5 bg-blue-50 rounded">📝 ${ex.adminNote}</p>` : ''}
+            ${ex.status === 'pending' ? `
+              <button type="button" onclick="deleteUserExchange('${ex.__backendId}')" class="mt-1.5 text-xs text-red-500 hover:underline">Hapus</button>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function deleteUserExchange(exchangeId) {
+      const exchange = allExchanges.find(ex => ex && ex.__backendId === exchangeId);
+      if (!exchange || exchange.status !== 'pending') return;
+      
+      currentUser.points = (currentUser.points || 0) + exchange.amount;
+      
+      await callGAS('updateUser', currentUser);
+      await callGAS('deleteExchange', exchange);
+      
+      await loadAllData(); // Refresh data
+      showToast('Permintaan dibatalkan, poin dikembalikan', 'success');
+      updatePointsDisplay();
+    }
+
+    // ==================== BROADCAST FUNCTIONS ====================
+    
+    async function submitBroadcast(e) {
+      e.preventDefault();
+      
+      const message = document.getElementById('broadcast-message').value.trim();
+      
+      if (!message) {
+        showToast('Pesan tidak boleh kosong!', 'error');
+        return;
+      }
+      
+      const broadcast = {
+        type: 'broadcast',
+        messageId: 'BC-' + Date.now(),
+        message: message,
+        sentAt: new Date().toISOString()
+      };
+      
+      const result = await callGAS('createBroadcast', broadcast);
+      
+      if (result.success) {
+        document.getElementById('broadcast-form').reset();
+        document.getElementById('char-count').textContent = '0/100';
+        showToast('Pesan broadcast berhasil dikirim!', 'success');
+        await loadAllData(); // Refresh data
+      } else {
+        showToast('Gagal mengirim broadcast', 'error');
+      }
+    }
+
+    // ==================== ADMIN FUNCTIONS ====================
+    
+    async function toggleMaintenance() {
+      const isEnabled = document.getElementById('maintenance-toggle').checked;
+      
+      if (!appSettings) {
+        appSettings = {
+          type: 'settings',
+          maintenanceMode: isEnabled,
+          rewardPoints: 50
+        };
+        await callGAS('updateSettings', appSettings);
+      } else {
+        appSettings.maintenanceMode = isEnabled;
+        await callGAS('updateSettings', appSettings);
+      }
+      
+      await loadAllData(); // Refresh data
+      
+      if (isEnabled) {
+        const session = getSession();
+        if (session && session.role !== 'admin') {
+          clearSession();
+          showToast('Aplikasi sedang maintenance', 'info');
+          setTimeout(() => handleLogout(), 500);
+          return;
+        }
+        showToast('Mode maintenance aktif', 'success');
+      } else {
+        showToast('Mode maintenance nonaktif', 'success');
+      }
+    }
+
+    async function updateRewardPoints() {
+      const points = parseInt(document.getElementById('reward-points-input').value) || 50;
+      
+      if (!appSettings) {
+        appSettings = {
+          type: 'settings',
+          maintenanceMode: false,
+          rewardPoints: points
+        };
+        await callGAS('updateSettings', appSettings);
+      } else {
+        appSettings.rewardPoints = points;
+        await callGAS('updateSettings', appSettings);
+      }
+      
+      await loadAllData(); // Refresh data
+      showToast('Poin reward berhasil diubah!', 'success');
+    }
+
+    function renderUserList() {
+      const container = document.getElementById('user-list');
+      const users = allUsers.filter(u => u && u.type === 'user');
+      
+      if (users.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-center py-3 text-xs">Tidak ada user terdaftar</p>';
+        return;
+      }
+      
+      container.innerHTML = users.map(user => {
+        const isBlocked = user.blocked;
+        return `
+          <div class="p-3 bg-gray-50 rounded-lg ${isBlocked ? 'opacity-50' : ''}">
+            <div class="flex items-center justify-between mb-2">
+              <div>
+                <p class="font-semibold text-gray-800 text-sm">${user.username || '-'}</p>
+                <p class="text-xs text-gray-500">${user.country || '-'} | <span class="text-green-600 font-medium">${user.points || 0} Poin</span></p>
+              </div>
+              ${isBlocked ? '<span class="px-1.5 py-0.5 bg-red-100 text-red-700 rounded text-xs">Blocked</span>' : ''}
+            </div>
+            <div class="flex gap-1.5 mt-2">
+              <button type="button" onclick="openEditUserModal('${user.__backendId}')" class="flex-1 py-1.5 bg-blue-100 text-blue-700 rounded text-xs font-medium hover:bg-blue-200">Edit</button>
+              <button type="button" onclick="toggleBlockUser('${user.__backendId}')" class="flex-1 py-1.5 ${isBlocked ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'} rounded text-xs font-medium hover:opacity-80">
+                ${isBlocked ? 'Unblock' : 'Block'}
+              </button>
+              <button type="button" onclick="deleteUser('${user.__backendId}')" class="flex-1 py-1.5 bg-red-100 text-red-700 rounded text-xs font-medium hover:bg-red-200">Hapus</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openEditUserModal(userId) {
+      const user = allUsers.find(u => u && u.__backendId === userId);
+      if (!user) return;
+      
+      document.getElementById('edit-user-id').value = userId;
+      document.getElementById('edit-user-username').value = user.username || '';
+      document.getElementById('edit-user-password').value = '';
+      document.getElementById('edit-user-current-points').textContent = user.points || 0;
+      document.getElementById('edit-user-new-points').value = user.points || 0;
+      document.getElementById('edit-user-modal').classList.remove('hidden');
+    }
+
+    function closeEditUserModal() {
+      document.getElementById('edit-user-modal').classList.add('hidden');
+    }
+
+    async function saveEditUser(e) {
+      e.preventDefault();
+      
+      const userId = document.getElementById('edit-user-id').value;
+      const newPassword = document.getElementById('edit-user-password').value;
+      const newPoints = parseInt(document.getElementById('edit-user-new-points').value) || 0;
+      
+      const user = allUsers.find(u => u && u.__backendId === userId);
+      if (!user) return;
+      
+      const oldPoints = user.points || 0;
+      
+      if (newPassword) {
+        user.password = newPassword;
+      }
+      
+      user.points = newPoints;
+      
+      await callGAS('updateUser', user);
+      await loadAllData(); // Refresh data
+      
+      closeEditUserModal();
+      showToast('User berhasil diperbarui!', 'success');
+      renderUserList();
+      
+      if (currentUser && currentUser.__backendId === userId) {
+        currentUser.points = newPoints;
+        updatePointsDisplay();
+        
+        const pointDiff = newPoints - oldPoints;
+        if (pointDiff !== 0) {
+          const message = pointDiff > 0 ? 
+            `✨ Poin Anda ditambah ${pointDiff}! Total: ${newPoints}` : 
+            `⚠️ Poin Anda dikurangi ${Math.abs(pointDiff)}. Total: ${newPoints}`;
+          showToast(message, 'success');
+        }
+      }
+    }
+
+    async function toggleBlockUser(userId) {
+      const user = allUsers.find(u => u && u.__backendId === userId);
+      if (!user) return;
+      
+      user.blocked = !user.blocked;
+      await callGAS('updateUser', user);
+      await loadAllData(); // Refresh data
+      
+      showToast(user.blocked ? 'User diblokir' : 'User di-unblock', 'success');
+      renderUserList();
+    }
+
+    async function deleteUser(userId) {
+      if (!confirm('Yakin ingin menghapus user ini?')) return;
+      
+      const user = allUsers.find(u => u && u.__backendId === userId);
+      if (!user) return;
+      
+      await callGAS('deleteUser', user);
+      await loadAllData(); // Refresh data
+      
+      showToast('User berhasil dihapus!', 'success');
+    }
+
+    function renderAdminExchangeList() {
+      const container = document.getElementById('admin-exchange-list');
+      const allExchangesData = [...allExchanges].sort((a, b) => new Date(b.requestedAt || 0) - new Date(a.requestedAt || 0));
+      
+      if (allExchangesData.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-center py-3 text-xs">Belum ada permintaan penukaran</p>';
+        return;
+      }
+      
+      container.innerHTML = allExchangesData.map(ex => {
+        if (!ex) return '';
+        
+        const statusClass = ex.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : 
+                           ex.status === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
+        const statusText = ex.status === 'pending' ? 'Pending' : 
+                          ex.status === 'success' ? 'Berhasil' : 'Ditolak';
+        const canEdit = ex.status === 'pending';
+        
+        return `
+          <div class="p-3 bg-gray-50 rounded-lg ${!canEdit ? 'opacity-70' : ''}">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="font-semibold text-gray-800 text-sm">${ex.username || '-'}</span>
+              <span class="px-2 py-0.5 ${statusClass} rounded text-xs font-medium">${statusText}</span>
+            </div>
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-green-600 font-bold text-sm">${ex.amount || 0} Poin</span>
+              <span class="text-xs text-gray-400">${ex.requestedAt ? new Date(ex.requestedAt).toLocaleString('id-ID') : '-'}</span>
+            </div>
+            <p class="text-xs text-gray-500">${ex.danaAccount || '-'}</p>
+            <p class="text-xs text-gray-500">${ex.danaPhone || '-'}</p>
+            ${ex.adminNote ? `<p class="text-xs text-blue-600 mt-1.5 p-1.5 bg-blue-50 rounded">📝 ${ex.adminNote}</p>` : ''}
+            <div class="flex gap-1.5 mt-2">
+              ${canEdit ? `
+                <button type="button" onclick="openExchangeStatusModal('${ex.__backendId}')" class="flex-1 py-1.5 bg-blue-100 text-blue-700 rounded text-xs font-medium hover:bg-blue-200">Ubah</button>
+                <button type="button" onclick="deleteExchangeAdmin('${ex.__backendId}')" class="flex-1 py-1.5 bg-red-100 text-red-700 rounded text-xs font-medium hover:bg-red-200">Hapus</button>
+              ` : `
+                <button type="button" onclick="deleteExchangeAdmin('${ex.__backendId}')" class="flex-1 py-1.5 bg-red-100 text-red-700 rounded text-xs font-medium hover:bg-red-200">Hapus</button>
+              `}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openExchangeStatusModal(exchangeId) {
+      const exchange = allExchanges.find(ex => ex && ex.__backendId === exchangeId);
+      if (!exchange) return;
+      
+      document.getElementById('exchange-status-id').value = exchangeId;
+      document.getElementById('exchange-status-user-id').value = exchange.userId || '';
+      document.getElementById('exchange-status-amount').value = exchange.amount || 0;
+      document.getElementById('exchange-status-select').value = 'success';
+      document.getElementById('exchange-status-note').value = '';
+      document.getElementById('exchange-status-modal').classList.remove('hidden');
+    }
+
+    function closeExchangeStatusModal() {
+      document.getElementById('exchange-status-modal').classList.add('hidden');
+    }
+
+    async function saveExchangeStatus(e) {
+      e.preventDefault();
+      
+      const exchangeId = document.getElementById('exchange-status-id').value;
+      const userId = document.getElementById('exchange-status-user-id').value;
+      const amount = parseInt(document.getElementById('exchange-status-amount').value);
+      const status = document.getElementById('exchange-status-select').value;
+      const note = document.getElementById('exchange-status-note').value;
+      
+      const exchange = allExchanges.find(ex => ex && ex.__backendId === exchangeId);
+      if (!exchange) return;
+      
+      if (status === 'rejected') {
+        const user = allUsers.find(u => u && u.__backendId === userId);
+        if (user) {
+          user.points = (user.points || 0) + amount;
+          await callGAS('updateUser', user);
+          
+          if (currentUser && currentUser.__backendId === userId) {
+            currentUser.points = user.points;
+            updatePointsDisplay();
+            showToast(`✅ Poin ${amount} dikembalikan! Total: ${user.points}`, 'success');
+          } else {
+            showToast(`✅ Poin ${amount} dikembalikan ke ${user.username}`, 'success');
+          }
+        }
+      }
+      
+      exchange.status = status;
+      exchange.adminNote = note;
+      await callGAS('updateExchange', exchange);
+      await loadAllData(); // Refresh data
+      
+      closeExchangeStatusModal();
+      if (status !== 'rejected') {
+        showToast(`Status diubah ke Berhasil ✅`, 'success');
+      }
+      renderAdminExchangeList();
+    }
+
+    async function deleteExchangeAdmin(exchangeId) {
+      if (!confirm('Yakin ingin menghapus riwayat ini?')) return;
+      
+      const exchange = allExchanges.find(ex => ex && ex.__backendId === exchangeId);
+      if (!exchange) return;
+      
+      await callGAS('deleteExchange', exchange);
+      await loadAllData(); // Refresh data
+      
+      showToast('Riwayat penukaran dihapus!', 'success');
+    }
+
+    // ==================== AUTH FUNCTIONS ====================
+    
+    async function handleLogin(e) {
       e.preventDefault();
       
       const username = document.getElementById('login-username').value.trim();
       const password = document.getElementById('login-password').value;
-      const submitBtn = document.getElementById('login-submit-btn');
       
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Memeriksa...';
+      // Load fresh data dari Google Sheets
+      await loadAllData();
       
-      const isUsingVPN = await checkVPNorDNS();
+      const user = allUsers.find(u => u && u.type === 'user' && u.username === username && u.password === password);
       
-      if (isUsingVPN) {
-        showAuthError('❌ VPN/DNS terdeteksi! Matikan VPN untuk login.');
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Masuk';
+      if (!user) {
+        showToast('Username atau password salah!', 'error');
         return;
       }
       
-      submitBtn.textContent = 'Masuk...';
-      
-      const hashedPassword = await hashPassword(password);
-      const user = allUsers.find(u => u.username === username && u.password === hashedPassword);
-      
-      if (user) {
-        if (user.isBlocked) {
-          showAuthError('Akun Anda telah diblokir!');
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'Masuk';
-          return;
-        }
-        
-        if (user.activeDeviceId && user.activeDeviceId !== currentDeviceId) {
-          showAuthError('❌ Akun sudah aktif di perangkat lain!');
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'Masuk';
-          return;
-        }
-        
-        user.activeDeviceId = currentDeviceId;
-        user.lastLoginAt = new Date().toISOString();
-        saveToLocalStorage();
-        
-        currentUser = user;
-        coins = user.coins || 0;
-        adsWatched = user.adsWatched || 0;
-        showToast('Login berhasil! 🎉');
-        
-        setTimeout(() => {
-          if (maintenanceMode && !user.isAdmin) {
-            showMaintenancePage();
-          } else {
-            showMainApp();
-          }
-        }, 500);
-      } else {
-        showAuthError('Username atau password salah!');
+      if (user.blocked) {
+        showToast('Akun Anda diblokir!', 'error');
+        return;
       }
       
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Masuk';
-    });
+      user.lastLogin = new Date().toISOString();
+      await callGAS('updateUser', user);
+      
+      currentUser = user;
+      saveSession(user);
+      
+      afterLogin();
+    }
 
-    logoutBtn.addEventListener('click', async () => {
-      if (currentUser) {
-        currentUser.activeDeviceId = null;
-        saveToLocalStorage();
+    async function handleRegister(e) {
+      e.preventDefault();
+      
+      const username = document.getElementById('reg-username').value.trim();
+      const password = document.getElementById('reg-password').value;
+      const country = document.getElementById('reg-country').value;
+      
+      if (!username || !password || !country) {
+        showToast('Semua field harus diisi!', 'error');
+        return;
       }
       
+      if (username.length < 3) {
+        showToast('Username minimal 3 karakter!', 'error');
+        return;
+      }
+      
+      if (password.length < 4) {
+        showToast('Password minimal 4 karakter!', 'error');
+        return;
+      }
+      
+      // Load fresh data dari Google Sheets
+      await loadAllData();
+      
+      // Cek username sudah ada
+      const exists = allUsers.find(u => u && u.username === username);
+      if (exists) {
+        showToast('Username sudah digunakan!', 'error');
+        return;
+      }
+      
+      if (allUsers.filter(u => u && u.type === 'user').length >= 900) {
+        showToast('Pendaftaran ditutup sementara', 'error');
+        return;
+      }
+      
+      const isFirstUser = allUsers.filter(u => u && u.type === 'user').length === 0;
+      
+      const newUser = {
+        type: 'user',
+        username: username,
+        password: password,
+        role: isFirstUser ? 'admin' : 'user',
+        country: country,
+        deviceId: deviceId,
+        points: 0,
+        blocked: false,
+        createdAt: new Date().toISOString(),
+        lastLogin: new Date().toISOString()
+      };
+      
+      console.log('Registering new user:', newUser);
+      
+      const result = await callGAS('createUser', newUser);
+      console.log('Registration result:', result);
+      
+      if (result.success) {
+        showToast(isFirstUser ? 'Selamat! Anda terdaftar sebagai Admin' : 'Pendaftaran berhasil! Silakan login', 'success');
+        document.getElementById('register-form').reset();
+        showPage('login-page');
+      } else {
+        showToast('Pendaftaran gagal: ' + (result.error || 'Unknown error'), 'error');
+      }
+    }
+
+    function handleLogout() {
+      clearSession();
       currentUser = null;
-      coins = 0;
-      adsWatched = 0;
-      localStorage.removeItem('current_user');
-      updateStats();
+      stopHistoryRefresh();
+      showPage('login-page');
+      document.getElementById('login-form').reset();
+    }
+
+    function afterLogin() {
+      if (!currentUser) return;
       
-      authPage.classList.remove('hidden');
-      appPage.classList.add('hidden');
-      document.getElementById('maintenance-page')?.classList.add('hidden');
+      if (appSettings?.maintenanceMode && currentUser.role !== 'admin') {
+        showPage('maintenance-page');
+        return;
+      }
       
-      loginForm.reset();
-      registerForm.reset();
+      document.getElementById('header-username').textContent = currentUser.username || 'Username';
+      document.getElementById('profile-username').textContent = currentUser.username || 'Username';
+      document.getElementById('profile-role').textContent = currentUser.role === 'admin' ? 'Admin' : 'User';
+      document.getElementById('profile-country').textContent = currentUser.country || '-';
+      document.getElementById('profile-device').textContent = currentUser.deviceId || deviceId;
       
-      showToast('Logout berhasil!', 'success');
-    });
+      updatePointsDisplay();
+      displayBroadcast();
+      
+      if (currentUser.role === 'admin') {
+        document.getElementById('settings-nav-btn').classList.remove('hidden');
+        if (appSettings) {
+          document.getElementById('maintenance-toggle').checked = appSettings.maintenanceMode || false;
+          document.getElementById('reward-points-input').value = appSettings.rewardPoints || 50;
+        }
+        renderUserList();
+        renderAdminExchangeList();
+      } else {
+        document.getElementById('settings-nav-btn').classList.add('hidden');
+      }
+      
+      showPage('main-app');
+      showSection('quiz');
+      generateQuiz();
+    }
+
+    // ==================== ELEMENT SDK HANDLER ====================
     
-    function showMaintenancePage() {
-      authPage.classList.add('hidden');
-      appPage.classList.add('hidden');
-      
-      let maintenancePage = document.getElementById('maintenance-page');
-      if (!maintenancePage) {
-        maintenancePage = document.createElement('div');
-        maintenancePage.id = 'maintenance-page';
-        maintenancePage.className = 'h-full w-full flex flex-col items-center justify-center p-4 gradient-bg';
-        maintenancePage.innerHTML = `
-          <div class="glass-card rounded-3xl p-8 text-center max-w-md scale-in">
-            <div class="text-6xl mb-4">🔧</div>
-            <h1 class="text-3xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent mb-3">
-              Mode Maintenance
-            </h1>
-            <p class="text-gray-300 mb-6">Sistem sedang dalam perbaikan. Silakan coba lagi nanti.</p>
-            <button id="maintenance-logout" class="bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 text-white font-bold py-3 px-8 rounded-xl transition-all transform hover:scale-105 active:scale-95">
-              Logout
-            </button>
-          </div>
-        `;
-        document.body.appendChild(maintenancePage);
-        
-        document.getElementById('maintenance-logout').addEventListener('click', () => {
-          logoutBtn.click();
+    async function onConfigChange(config) {
+      document.getElementById('app-title').textContent = config.app_title || defaultConfig.app_title;
+    }
+
+    // ==================== INITIALIZATION ====================
+    
+    async function init() {
+      // Initialize SDKs
+      if (window.elementSdk) {
+        await window.elementSdk.init({
+          defaultConfig,
+          onConfigChange,
+          mapToCapabilities: () => ({
+            recolorables: [],
+            borderables: [],
+            fontEditable: undefined,
+            fontSizeable: undefined
+          }),
+          mapToEditPanelValues: (config) => new Map([
+            ['app_title', config.app_title || defaultConfig.app_title]
+          ])
         });
       }
       
-      maintenancePage.classList.remove('hidden');
-    }
-
-    function showMainApp() {
-      authPage.classList.add('hidden');
-      appPage.classList.remove('hidden');
-      
-      loggedUsername.textContent = currentUser.username;
-      if (currentUser.isAdmin) {
-        userRoleBadge.textContent = '👑 Admin';
-        userRoleBadge.classList.remove('bg-indigo-500/30', 'border-indigo-500/50');
-        userRoleBadge.classList.add('bg-yellow-500/30', 'border-yellow-500/50', 'text-yellow-300');
-        document.getElementById('admin-nav-btn').classList.remove('hidden');
-        document.getElementById('admin-nav-btn').classList.add('flex');
-      } else {
-        userRoleBadge.textContent = '👤 User';
-        userRoleBadge.classList.add('bg-indigo-500/30', 'border-indigo-500/50');
-        userRoleBadge.classList.remove('bg-yellow-500/30', 'border-yellow-500/50', 'text-yellow-300');
-        document.getElementById('admin-nav-btn').classList.add('hidden');
-        document.getElementById('admin-nav-btn').classList.remove('flex');
-      }
-      
-      updateProfilePage();
-      showPage('home');
-      generateQuestion();
-    }
-    
-    function loadAdminPanel() {
-      const maintenanceToggle = document.getElementById('maintenance-toggle');
-      const rewardInput = document.getElementById('reward-input');
-      const minWithdrawalInput = document.getElementById('min-withdrawal-input');
-      const cooldownInput = document.getElementById('cooldown-input');
-      const zoneIdInput = document.getElementById('zone-id-input');
-      
-      maintenanceToggle.checked = maintenanceMode;
-      rewardInput.value = rewardPerAd;
-      minWithdrawalInput.value = minWithdrawal;
-      cooldownInput.value = cooldownDuration;
-      zoneIdInput.value = monetagZoneId;
-      
-      renderUserManagement();
-      renderWithdrawalRequests();
-    }
-    
-    async function toggleMaintenance() {
-      const maintenanceToggle = document.getElementById('maintenance-toggle');
-      maintenanceMode = maintenanceToggle.checked;
-      saveToLocalStorage();
-      showToast(maintenanceMode ? 'Mode maintenance diaktifkan' : 'Mode maintenance dinonaktifkan');
-    }
-    
-    async function saveRewardSettings() {
-      const rewardInput = document.getElementById('reward-input');
-      const newValue = parseInt(rewardInput.value);
-      
-      if (newValue < 1) {
-        showToast('Poin minimal adalah 1', 'error');
-        return;
-      }
-      
-      const saveBtn = document.getElementById('save-reward-btn');
-      saveBtn.disabled = true;
-      saveBtn.textContent = 'Menyimpan...';
-      
-      rewardPerAd = newValue;
-      saveToLocalStorage();
-      showToast('Pengaturan reward berhasil disimpan');
-      
-      saveBtn.disabled = false;
-      saveBtn.textContent = 'Simpan';
-    }
-    
-    async function saveMinWithdrawalSettings() {
-      const minWithdrawalInput = document.getElementById('min-withdrawal-input');
-      const newValue = parseInt(minWithdrawalInput.value);
-      
-      if (newValue < 1) {
-        showToast('Minimal penarikan harus lebih dari 0', 'error');
-        return;
-      }
-      
-      const saveBtn = document.getElementById('save-min-withdrawal-btn');
-      saveBtn.disabled = true;
-      saveBtn.textContent = 'Menyimpan...';
-      
-      minWithdrawal = newValue;
-      saveToLocalStorage();
-      showToast('Minimal penarikan berhasil diperbarui');
-      
-      saveBtn.disabled = false;
-      saveBtn.textContent = 'Simpan';
-    }
-    
-    async function saveCooldownSettings() {
-      const cooldownInput = document.getElementById('cooldown-input');
-      const newValue = parseInt(cooldownInput.value);
-      
-      if (newValue < 1) {
-        showToast('Hitungan mundur minimal 1 detik', 'error');
-        return;
-      }
-      
-      const saveBtn = document.getElementById('save-cooldown-btn');
-      saveBtn.disabled = true;
-      saveBtn.textContent = 'Menyimpan...';
-      
-      cooldownDuration = newValue;
-      saveToLocalStorage();
-      showToast('Hitungan mundur berhasil diperbarui');
-      
-      saveBtn.disabled = false;
-      saveBtn.textContent = 'Simpan';
-    }
-    
-    async function saveZoneIdSettings() {
-      const zoneIdInput = document.getElementById('zone-id-input');
-      const newValue = zoneIdInput.value.trim();
-      
-      if (!newValue) {
-        showToast('Zone ID tidak boleh kosong', 'error');
-        return;
-      }
-      
-      const saveBtn = document.getElementById('save-zone-btn');
-      saveBtn.disabled = true;
-      saveBtn.textContent = 'Menyimpan...';
-      
-      monetagZoneId = newValue;
-      saveToLocalStorage();
-      showToast('Zone ID berhasil diperbarui. Reload halaman untuk menerapkan perubahan.');
-      
-      saveBtn.disabled = false;
-      saveBtn.textContent = 'Simpan';
-    }
-    
-    function renderUserManagement() {
-      const container = document.getElementById('user-management-list');
-      container.innerHTML = '';
-      
-      allUsers.forEach(user => {
-        if (user.isAdmin) return;
-        
-        const userCard = document.createElement('div');
-        userCard.className = 'bg-black/20 rounded-lg p-3';
-        userCard.innerHTML = `
-          <div class="flex justify-between items-start mb-2">
-            <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-xs font-bold">
-                ${user.username.charAt(0).toUpperCase()}
-              </div>
-              <div>
-                <p class="text-white text-sm font-medium">${user.username}</p>
-                <p class="text-gray-400 text-xs">${user.coins || 0} koin • ${user.adsWatched || 0} iklan</p>
-              </div>
-            </div>
-            <span class="text-xs px-2 py-1 rounded-full ${user.isBlocked ? 'bg-red-500/20 text-red-300' : 'bg-green-500/20 text-green-300'}">
-              ${user.isBlocked ? '🚫 Diblokir' : '��� Aktif'}
-            </span>
-          </div>
-          <div class="flex gap-2 mt-2">
-            <button class="edit-user-btn flex-1 bg-blue-600/30 hover:bg-blue-600/50 text-blue-300 text-xs py-1.5 px-2 rounded transition-all" data-id="${user.__backendId}">
-              ✏️ Edit
-            </button>
-            <button class="block-user-btn flex-1 bg-${user.isBlocked ? 'green' : 'red'}-600/30 hover:bg-${user.isBlocked ? 'green' : 'red'}-600/50 text-${user.isBlocked ? 'green' : 'red'}-300 text-xs py-1.5 px-2 rounded transition-all" data-id="${user.__backendId}">
-              ${user.isBlocked ? '✅ Aktifkan' : '🚫 Blokir'}
-            </button>
-            <button class="delete-user-btn bg-red-700/40 hover:bg-red-700/60 text-red-200 text-xs py-1.5 px-2 rounded transition-all" data-id="${user.__backendId}">
-              🗑️
-            </button>
-          </div>
-        `;
-        
-        container.appendChild(userCard);
-      });
-      
-      document.querySelectorAll('.edit-user-btn').forEach(btn => {
-        btn.addEventListener('click', () => openEditUserModal(btn.dataset.id));
-      });
-      
-      document.querySelectorAll('.block-user-btn').forEach(btn => {
-        btn.addEventListener('click', () => toggleBlockUser(btn.dataset.id));
-      });
-      
-      document.querySelectorAll('.delete-user-btn').forEach(btn => {
-        btn.addEventListener('click', () => deleteUser(btn.dataset.id));
-      });
-    }
-    
-    function openEditUserModal(userId) {
-      const user = allUsers.find(u => u.__backendId === userId);
-      if (!user) return;
-      
-      const modal = document.createElement('div');
-      modal.className = 'fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4';
-      modal.innerHTML = `
-        <div class="glass-card rounded-2xl p-6 max-w-sm w-full">
-          <h3 class="text-xl font-bold text-white mb-4">Edit User: ${user.username}</h3>
-          <div class="space-y-3">
-            <div>
-              <label class="text-gray-300 text-sm block mb-2">Username Baru</label>
-              <input type="text" id="edit-username" value="${user.username}" class="w-full bg-black/30 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500">
-            </div>
-            <div>
-              <label class="text-gray-300 text-sm block mb-2">Password Baru (kosongkan jika tidak diubah)</label>
-              <input type="password" id="edit-password" placeholder="Password baru" class="w-full bg-black/30 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500">
-            </div>
-            <div>
-              <label class="text-gray-300 text-sm block mb-2">Poin</label>
-              <input type="number" id="edit-coins" value="${user.coins || 0}" min="0" class="w-full bg-black/30 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500">
-            </div>
-            <div class="flex gap-2 mt-4">
-              <button id="save-user-btn" class="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-bold py-2 px-4 rounded-lg transition-all">
-                Simpan
-              </button>
-              <button id="cancel-edit-btn" class="flex-1 bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg transition-all">
-                Batal
-              </button>
-            </div>
-          </div>
-        </div>
-      `;
-      
-      document.body.appendChild(modal);
-      
-      document.getElementById('save-user-btn').addEventListener('click', async () => {
-        const newUsername = document.getElementById('edit-username').value.trim();
-        const newPassword = document.getElementById('edit-password').value;
-        const newCoins = parseInt(document.getElementById('edit-coins').value);
-        
-        if (newUsername.length < 3) {
-          showToast('Username minimal 3 karakter', 'error');
-          return;
-        }
-        
-        const usernameExists = allUsers.find(u => u.username === newUsername && u.__backendId !== userId);
-        if (usernameExists) {
-          showToast('Username sudah digunakan', 'error');
-          return;
-        }
-        
-        user.username = newUsername;
-        user.coins = newCoins;
-        
-        if (newPassword) {
-          user.password = await hashPassword(newPassword);
-        }
-        
-        const result = await window.dataSdk.update(user);
-        if (result.isOk) {
-          showToast('User berhasil diupdate');
-          modal.remove();
-          renderUserManagement();
-        } else {
-          showToast('Gagal mengupdate user', 'error');
-        }
-      });
-      
-      document.getElementById('cancel-edit-btn').addEventListener('click', () => {
-        modal.remove();
-      });
-    }
-    
-    async function toggleBlockUser(userId) {
-      const user = allUsers.find(u => u.__backendId === userId);
-      if (!user) return;
-      
-      user.isBlocked = !user.isBlocked;
-      
-      const result = await window.dataSdk.update(user);
-      if (result.isOk) {
-        showToast(user.isBlocked ? 'User berhasil diblokir' : 'User berhasil diaktifkan');
-        renderUserManagement();
-      } else {
-        showToast('Gagal mengubah status user', 'error');
-      }
-    }
-    
-    function deleteUser(userId) {
-      const user = allUsers.find(u => u.__backendId === userId);
-      if (!user) return;
-      
-      const modal = document.createElement('div');
-      modal.className = 'fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4';
-      modal.innerHTML = `
-        <div class="glass-card rounded-2xl p-6 max-w-sm w-full text-center">
-          <div class="text-5xl mb-3">⚠���</div>
-          <h3 class="text-xl font-bold text-white mb-2">Hapus User?</h3>
-          <p class="text-gray-300 text-sm mb-1">Username: <strong>${user.username}</strong></p>
-          <p class="text-gray-400 text-xs mb-4">Akun ini akan dihapus permanen beserta semua datanya</p>
-          <div class="flex gap-2">
-            <button id="confirm-delete-user-btn" class="flex-1 bg-gradient-to-r from-red-600 to-rose-600 text-white font-bold py-2 px-4 rounded-lg transition-all">
-              Hapus
-            </button>
-            <button id="cancel-delete-user-btn" class="flex-1 bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg transition-all">
-              Batal
-            </button>
-          </div>
-        </div>
-      `;
-      
-      document.body.appendChild(modal);
-      
-      document.getElementById('confirm-delete-user-btn').addEventListener('click', async () => {
-        const result = await window.dataSdk.delete(user);
-        if (result.isOk) {
-          showToast('User berhasil dihapus');
-          modal.remove();
-          renderUserManagement();
-        } else {
-          showToast('Gagal menghapus user', 'error');
-        }
-      });
-      
-      document.getElementById('cancel-delete-user-btn').addEventListener('click', () => {
-        modal.remove();
-      });
-    }
-    
-    function renderWithdrawalRequests() {
-      const container = document.getElementById('withdrawal-list');
-      const noWithdrawals = document.getElementById('no-withdrawals');
-      
-      if (withdrawalRequests.length === 0) {
-        container.classList.add('hidden');
-        noWithdrawals.classList.remove('hidden');
-        return;
-      }
-      
-      container.classList.remove('hidden');
-      noWithdrawals.classList.add('hidden');
-      container.innerHTML = '';
-      
-      withdrawalRequests.forEach(request => {
-        const user = allUsers.find(u => u.__backendId === request.userId);
-        const username = user ? user.username : 'Unknown';
-        
-        const statusColor = request.status === 'pending' ? 'yellow' : request.status === 'approved' ? 'green' : 'red';
-        const statusText = request.status === 'pending' ? '⏳ Pending' : request.status === 'approved' ? '✅ Diterima' : '❌ Ditolak';
-        
-        const requestCard = document.createElement('div');
-        requestCard.className = 'bg-black/20 rounded-lg p-3';
-        requestCard.innerHTML = `
-          <div class="flex justify-between items-start mb-2">
-            <div>
-              <p class="text-white text-sm font-medium">${username}</p>
-              <p class="text-gray-400 text-xs">${request.amount} koin</p>
-              <p class="text-gray-500 text-xs">${new Date(request.requestedAt).toLocaleDateString('id-ID')}</p>
-            </div>
-            <span class="text-xs px-2 py-1 rounded-full bg-${statusColor}-500/20 text-${statusColor}-300">
-              ${statusText}
-            </span>
-          </div>
-          ${request.adminNote ? `<p class="text-gray-400 text-xs mb-2">📝 ${request.adminNote}</p>` : ''}
-          ${request.status === 'pending' ? `
-            <div class="flex gap-2 mt-2">
-              <button class="approve-request-btn flex-1 bg-green-600/30 hover:bg-green-600/50 text-green-300 text-xs py-1.5 px-2 rounded transition-all" data-id="${request.__backendId}">
-                ✅ Terima
-              </button>
-              <button class="reject-request-btn flex-1 bg-red-600/30 hover:bg-red-600/50 text-red-300 text-xs py-1.5 px-2 rounded transition-all" data-id="${request.__backendId}">
-                ❌ Tolak
-              </button>
-            </div>
-          ` : `
-            <button class="delete-request-btn w-full bg-red-600/30 hover:bg-red-600/50 text-red-300 text-xs py-1.5 px-2 rounded transition-all mt-2" data-id="${request.__backendId}">
-              🗑�� Hapus Riwayat
-            </button>
-          `}
-        `;
-        
-        container.appendChild(requestCard);
-      });
-      
-      document.querySelectorAll('.approve-request-btn').forEach(btn => {
-        btn.addEventListener('click', () => processWithdrawal(btn.dataset.id, 'approved'));
-      });
-      
-      document.querySelectorAll('.reject-request-btn').forEach(btn => {
-        btn.addEventListener('click', () => processWithdrawal(btn.dataset.id, 'rejected'));
-      });
-      
-      document.querySelectorAll('.delete-request-btn').forEach(btn => {
-        btn.addEventListener('click', () => deleteWithdrawal(btn.dataset.id));
-      });
-    }
-    
-    function processWithdrawal(requestId, status) {
-      const request = withdrawalRequests.find(r => r.__backendId === requestId);
-      if (!request) return;
-      
-      const modal = document.createElement('div');
-      modal.className = 'fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4';
-      modal.innerHTML = `
-        <div class="glass-card rounded-2xl p-6 max-w-sm w-full">
-          <h3 class="text-xl font-bold text-white mb-4">${status === 'approved' ? '�� Terima' : '❌ Tolak'} Permintaan</h3>
-          <div class="space-y-3">
-            <div>
-              <label class="text-gray-300 text-sm block mb-2">Catatan Admin</label>
-              <textarea id="admin-note" rows="3" placeholder="Tambahkan catatan..." class="w-full bg-black/30 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"></textarea>
-            </div>
-            <div class="flex gap-2 mt-4">
-              <button id="confirm-process-btn" class="flex-1 bg-gradient-to-r from-${status === 'approved' ? 'green' : 'red'}-600 to-${status === 'approved' ? 'emerald' : 'rose'}-600 text-white font-bold py-2 px-4 rounded-lg transition-all">
-                Konfirmasi
-              </button>
-              <button id="cancel-process-btn" class="flex-1 bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg transition-all">
-                Batal
-              </button>
-            </div>
-          </div>
-        </div>
-      `;
-      
-      document.body.appendChild(modal);
-      
-      document.getElementById('confirm-process-btn').addEventListener('click', async () => {
-        const note = document.getElementById('admin-note').value.trim();
-        
-        request.status = status;
-        request.adminNote = note || (status === 'approved' ? 'Permintaan diterima' : 'Permintaan ditolak');
-        
-        if (status === 'rejected') {
-          const user = allUsers.find(u => u.__backendId === request.userId);
-          if (user) {
-            user.coins = (user.coins || 0) + request.amount;
-            await window.dataSdk.update(user);
+      if (window.dataSdk) {
+        await window.dataSdk.init({
+          onDataChanged: (data) => {
+            loadAllData();
           }
-        }
-        
-        const result = await window.dataSdk.update(request);
-        if (result.isOk) {
-          showToast(status === 'approved' ? 'Permintaan diterima' : 'Permintaan ditolak dan poin dikembalikan');
-          modal.remove();
-          renderWithdrawalRequests();
-        } else {
-          showToast('Gagal memproses permintaan', 'error');
-        }
-      });
-      
-      document.getElementById('cancel-process-btn').addEventListener('click', () => {
-        modal.remove();
-      });
-    }
-    
-    async function deleteWithdrawal(requestId) {
-      const request = withdrawalRequests.find(r => r.__backendId === requestId);
-      if (!request) return;
-      
-      const modal = document.createElement('div');
-      modal.className = 'fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4';
-      modal.innerHTML = `
-        <div class="glass-card rounded-2xl p-6 max-w-sm w-full text-center">
-          <div class="text-5xl mb-3">��️</div>
-          <h3 class="text-xl font-bold text-white mb-2">Hapus Riwayat?</h3>
-          <p class="text-gray-300 text-sm mb-4">Riwayat penukaran ini akan dihapus permanen</p>
-          <div class="flex gap-2">
-            <button id="confirm-delete-btn" class="flex-1 bg-gradient-to-r from-red-600 to-rose-600 text-white font-bold py-2 px-4 rounded-lg transition-all">
-              Hapus
-            </button>
-            <button id="cancel-delete-btn" class="flex-1 bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg transition-all">
-              Batal
-            </button>
-          </div>
-        </div>
-      `;
-      
-      document.body.appendChild(modal);
-      
-      document.getElementById('confirm-delete-btn').addEventListener('click', async () => {
-        const result = await window.dataSdk.delete(request);
-        if (result.isOk) {
-          showToast('Riwayat berhasil dihapus');
-          modal.remove();
-          renderWithdrawalRequests();
-        } else {
-          showToast('Gagal menghapus riwayat', 'error');
-        }
-      });
-      
-      document.getElementById('cancel-delete-btn').addEventListener('click', () => {
-        modal.remove();
-      });
-    }
-
-    function showPage(pageName) {
-      document.getElementById('home-page').classList.add('hidden');
-      document.getElementById('profile-page').classList.add('hidden');
-      document.getElementById('admin-page').classList.add('hidden');
-      document.getElementById('withdrawal-page').classList.add('hidden');
-      
-      document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.classList.remove('active');
-      });
-      
-      document.getElementById(pageName + '-page').classList.remove('hidden');
-      
-      const activeBtn = document.querySelector(`.nav-btn[data-page="${pageName}"]`);
-      if (activeBtn) {
-        activeBtn.classList.add('active');
+        });
       }
       
-      if (pageName === 'admin' && currentUser && currentUser.isAdmin) {
-        loadAdminPanel();
-      }
+      // Load data dari Google Sheets
+      await loadAllData();
       
-      if (pageName === 'withdrawal') {
-        loadWithdrawalPage();
-      }
-    }
-    
-    function updateProfilePage() {
-      document.getElementById('profile-username').textContent = currentUser.username;
-      document.getElementById('profile-avatar').textContent = currentUser.username.charAt(0).toUpperCase();
-      document.getElementById('profile-role').textContent = currentUser.isAdmin ? '👑 Admin' : '👤 User';
+      // Detect country on page load
+      detectCountry();
       
-      const deviceId = currentUser.__backendId ? currentUser.__backendId.substring(0, 12) + '...' : 'N/A';
-      document.getElementById('profile-device').textContent = deviceId;
+      // Event Listeners
+      document.getElementById('login-form').addEventListener('submit', handleLogin);
+      document.getElementById('register-form').addEventListener('submit', handleRegister);
+      document.getElementById('exchange-form').addEventListener('submit', submitExchange);
+      document.getElementById('edit-user-form').addEventListener('submit', saveEditUser);
+      document.getElementById('exchange-status-form').addEventListener('submit', saveExchangeStatus);
+      document.getElementById('broadcast-form').addEventListener('submit', submitBroadcast);
       
-      const date = new Date(currentUser.createdAt);
-      const formattedDate = date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
-      document.getElementById('profile-since').textContent = formattedDate;
-    }
-    
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const page = btn.getAttribute('data-page');
-        showPage(page);
-      });
-    });
-    
-    document.getElementById('profile-logout').addEventListener('click', () => {
-      logoutBtn.click();
-    });
-    
-    function loadWithdrawalPage() {
-      if (currentUser) {
-        coins = currentUser.coins || 0;
-      }
-      document.getElementById('withdrawal-coins').textContent = coins + ' 🪙';
-      document.getElementById('min-withdrawal-text').textContent = `Minimal penarikan: ${minWithdrawal} koin (Rp. ${minWithdrawal})`;
-      renderUserWithdrawals();
-    }
-    
-    function renderUserWithdrawals() {
-      const container = document.getElementById('user-withdrawal-list');
-      const noWithdrawals = document.getElementById('no-user-withdrawals');
-      
-      const userWithdrawals = withdrawalRequests.filter(w => w.userId === currentUser.__backendId);
-      
-      if (userWithdrawals.length === 0) {
-        container.classList.add('hidden');
-        noWithdrawals.classList.remove('hidden');
-        return;
-      }
-      
-      container.classList.remove('hidden');
-      noWithdrawals.classList.add('hidden');
-      container.innerHTML = '';
-      
-      userWithdrawals.forEach(request => {
-        const statusColor = request.status === 'pending' ? 'yellow' : request.status === 'approved' ? 'green' : 'red';
-        const statusText = request.status === 'pending' ? '⏳ Pending' : request.status === 'approved' ? '✅ Diterima' : '❌ Ditolak';
-        
-        const requestCard = document.createElement('div');
-        requestCard.className = 'bg-black/20 rounded-lg p-3';
-        requestCard.innerHTML = `
-          <div class="flex justify-between items-start mb-2">
-            <div>
-              <p class="text-white text-sm font-medium">${request.amount} koin</p>
-              <p class="text-gray-400 text-xs">Rp. ${request.amount}</p>
-              <p class="text-gray-500 text-xs">${new Date(request.requestedAt).toLocaleDateString('id-ID')}</p>
-            </div>
-            <span class="text-xs px-2 py-1 rounded-full bg-${statusColor}-500/20 text-${statusColor}-300">
-              ${statusText}
-            </span>
-          </div>
-          <div class="text-gray-400 text-xs">
-            <p>Akun: ${request.accountName}</p>
-            <p>No: ${request.accountNumber}</p>
-            ${request.adminNote ? `<p class="mt-1 text-gray-300">📝 ${request.adminNote}</p>` : ''}
-          </div>
-        `;
-        
-        container.appendChild(requestCard);
-      });
-    }
-    
-    document.getElementById('open-withdrawal-form').addEventListener('click', () => {
-      if (coins < minWithdrawal) {
-        showToast(`Saldo koin minimal ${minWithdrawal} untuk melakukan penarikan`, 'error');
-        return;
-      }
-      
-      const modal = document.createElement('div');
-      modal.className = 'fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4';
-      modal.innerHTML = `
-        <div class="glass-card rounded-2xl p-6 max-w-sm w-full">
-          <h3 class="text-xl font-bold text-white mb-4">���� Form Penarikan</h3>
-          <form id="withdrawal-form" class="space-y-3">
-            <div>
-              <label class="text-gray-300 text-sm block mb-2">Jumlah Koin (min. ${minWithdrawal})</label>
-              <input type="number" id="withdrawal-amount" min="${minWithdrawal}" max="${coins}" value="${minWithdrawal}" class="w-full bg-black/30 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-green-500" required>
-              <p class="text-gray-400 text-xs mt-1">Saldo Anda: ${coins} koin</p>
-            </div>
-            <div>
-              <label class="text-gray-300 text-sm block mb-2">Nama Akun DANA</label>
-              <input type="text" id="account-name" placeholder="Nama lengkap" class="w-full bg-black/30 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-green-500" required>
-            </div>
-            <div>
-              <label class="text-gray-300 text-sm block mb-2">Nomor Akun DANA</label>
-              <input type="text" id="account-number" placeholder="08xxxxxxxxxx" class="w-full bg-black/30 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-green-500" required>
-            </div>
-            <div class="flex gap-2 mt-4">
-              <button type="submit" id="submit-withdrawal-btn" class="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-bold py-2 px-4 rounded-lg transition-all">
-                Submit
-              </button>
-              <button type="button" id="cancel-withdrawal-btn" class="flex-1 bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg transition-all">
-                Batal
-              </button>
-            </div>
-          </form>
-        </div>
-      `;
-      
-      document.body.appendChild(modal);
-      
-      document.getElementById('withdrawal-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const amount = parseInt(document.getElementById('withdrawal-amount').value);
-        const accountName = document.getElementById('account-name').value.trim();
-        const accountNumber = document.getElementById('account-number').value.trim();
-        
-        if (amount < minWithdrawal) {
-          showToast(`Minimal penarikan adalah ${minWithdrawal} koin`, 'error');
-          return;
-        }
-        
-        if (amount > coins) {
-          showToast('Saldo koin tidak mencukupi', 'error');
-          return;
-        }
-        
-        const submitBtn = document.getElementById('submit-withdrawal-btn');
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Memproses...';
-        
-        const newWithdrawal = {
-          type: 'withdrawal',
-          userId: currentUser.__backendId,
-          amount: amount,
-          accountName: accountName,
-          accountNumber: accountNumber,
-          status: 'pending',
-          adminNote: '',
-          requestedAt: new Date().toISOString()
-        };
-        
-        const result = await window.dataSdk.create(newWithdrawal);
-        
-        if (result.isOk) {
-          coins -= amount;
-          currentUser.coins = coins;
-          await window.dataSdk.update(currentUser);
-          
-          updateStats();
-          showToast('Permintaan penarikan berhasil dikirim!');
-          modal.remove();
-          loadWithdrawalPage();
-          
-          setTimeout(() => {
-            showInterstitialAd();
-          }, 500);
-        } else {
-          showToast('Gagal mengirim permintaan penarikan', 'error');
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'Submit';
-        }
-      });
-      
-      document.getElementById('cancel-withdrawal-btn').addEventListener('click', () => {
-        modal.remove();
-      });
-    });
-
-    function generateQuestion() {
-      const num1 = Math.floor(Math.random() * 100) + 1;
-      const num2 = Math.floor(Math.random() * 100) + 1;
-      correctAnswer = num1 + num2;
-      
-      quizQuestion.textContent = `${num1} + ${num2} = ?`;
-      
-      const wrongAnswers = [];
-      while (wrongAnswers.length < 3) {
-        const wrong = correctAnswer + (Math.floor(Math.random() * 20) - 10);
-        if (wrong !== correctAnswer && wrong > 0 && !wrongAnswers.includes(wrong)) {
-          wrongAnswers.push(wrong);
-        }
-      }
-      
-      const allAnswers = [correctAnswer, ...wrongAnswers];
-      
-      for (let i = allAnswers.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [allAnswers[i], allAnswers[j]] = [allAnswers[j], allAnswers[i]];
-      }
-      
-      answerBtns.forEach((btn, index) => {
-        btn.textContent = allAnswers[index];
-        btn.disabled = false;
-        btn.classList.remove('correct', 'wrong');
-      });
-    }
-
-    answerBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const selectedAnswer = parseInt(btn.textContent);
-        const isCorrect = selectedAnswer === correctAnswer;
-        
-        answerBtns.forEach(b => b.disabled = true);
-        
-        if (isCorrect) {
-          btn.classList.add('correct');
-          showToast('Jawaban Benar! ✅', 'success');
-          
-          setTimeout(() => {
-            enableAdButton();
-          }, 1000);
-        } else {
-          btn.classList.add('wrong');
-          showToast('Jawaban Salah! ❌', 'error');
-          
-          setTimeout(() => {
-            generateQuestion();
-          }, 1500);
-        }
-      });
-    });
-
-    function enableAdButton() {
-      canWatchAd = true;
-      watchAdBtn.disabled = false;
-      watchAdBtn.classList.remove('bg-gradient-to-r', 'from-gray-600', 'to-gray-700', 'opacity-50', 'cursor-not-allowed');
-      watchAdBtn.classList.add('bg-gradient-to-r', 'from-indigo-600', 'to-purple-600', 'hover:from-indigo-500', 'hover:to-purple-500', 'ad-button');
-    }
-
-    function disableAdButton() {
-      canWatchAd = false;
-      watchAdBtn.disabled = true;
-      watchAdBtn.classList.remove('bg-gradient-to-r', 'from-indigo-600', 'to-purple-600', 'hover:from-indigo-500', 'hover:to-purple-500', 'ad-button');
-      watchAdBtn.classList.add('bg-gradient-to-r', 'from-gray-600', 'to-gray-700', 'opacity-50', 'cursor-not-allowed');
-    }
-
-    function showInterstitialAd() {
-      if (typeof window.invoke_9865183 === 'function') {
-        console.log('Showing Monetag Interstitial for withdrawal...');
-        try {
-          window.invoke_9865183();
-          console.log('Withdrawal ad invoked!');
-        } catch (error) {
-          console.error('Withdrawal ad error:', error);
-        }
-      } else {
-        console.warn('Monetag not available');
-      }
-    }
-
-    function isMobileBrowser() {
-      const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-      return /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
-    }
-    
-    function getBrowserInfo() {
-      const ua = navigator.userAgent;
-      let browserName = 'Unknown';
-      
-      if (ua.indexOf('Chrome') > -1 && ua.indexOf('Edg') === -1) browserName = 'Chrome';
-      else if (ua.indexOf('Safari') > -1 && ua.indexOf('Chrome') === -1) browserName = 'Safari';
-      else if (ua.indexOf('Firefox') > -1) browserName = 'Firefox';
-      else if (ua.indexOf('Edg') > -1) browserName = 'Edge';
-      else if (ua.indexOf('Opera') > -1 || ua.indexOf('OPR') > -1) browserName = 'Opera';
-      
-      return {
-        isMobile: isMobileBrowser(),
-        name: browserName,
-        userAgent: ua
-      };
-    }
-
-    function watchAd() {
-      if (!canWatchAd || cooldownActive) return;
-      
-      const browserInfo = getBrowserInfo();
-      console.log('🔍 Browser Info:', browserInfo);
-      
-      watchAdBtn.disabled = true;
-      loadingOverlay.classList.remove('hidden');
-      
-      const timeoutDuration = browserInfo.isMobile ? 15000 : 8000;
-      const checkInterval = browserInfo.isMobile ? 1000 : 500;
-      const maxChecks = browserInfo.isMobile ? 25 : 15;
-      
-      console.log(`📱 Mobile: ${browserInfo.isMobile} | Timeout: ${timeoutDuration}ms | Interval: ${checkInterval}ms | Max: ${maxChecks}`);
-      
-      let adShown = false;
-      let checkCount = 0;
-      
-      const checkAdReady = setInterval(() => {
-        checkCount++;
-        const prefix = browserInfo.isMobile ? '📱[Mobile]' : '🖥️[Desktop]';
-        console.log(`${prefix} Check ${checkCount}/${maxChecks} - Looking for invoke function...`);
-        
-        if (typeof window.invoke_9865183 === 'function') {
-          clearInterval(checkAdReady);
-          adShown = true;
-          console.log('✅ Monetag invoke found!');
-          
-          try {
-            console.log('🎬 Invoking ad...');
-            window.invoke_9865183();
-            console.log('✅ Ad invoked successfully!');
-            
-            const adDisplayDelay = browserInfo.isMobile ? 4000 : 2500;
-            console.log(`⏱️ Waiting ${adDisplayDelay}ms for ad display...`);
-            
-            setTimeout(() => {
-              loadingOverlay.classList.add('hidden');
-              console.log('✅ Ad completed, giving reward');
-              onAdComplete();
-            }, adDisplayDelay);
-            
-          } catch (error) {
-            console.error('❌ Ad invoke error:', error);
-            loadingOverlay.classList.add('hidden');
-            onAdComplete();
-          }
-          
-        } else if (checkCount >= maxChecks) {
-          clearInterval(checkAdReady);
-          console.warn(`⚠️ Max checks (${maxChecks}) reached, Monetag not available`);
-          
-          if (!adShown) {
-            console.log('⚠️ No ad shown, but giving reward anyway');
-            loadingOverlay.classList.add('hidden');
-            onAdComplete();
-          }
-        }
-      }, checkInterval);
-      
-      setTimeout(() => {
-        if (!adShown) {
-          clearInterval(checkAdReady);
-          console.warn(`⏰ Timeout (${timeoutDuration}ms) reached`);
-          loadingOverlay.classList.add('hidden');
-          
-          if (typeof window.invoke_9865183 === 'function') {
-            console.log('🔄 Last attempt to invoke ad...');
-            try {
-              window.invoke_9865183();
-              setTimeout(() => {
-                console.log('✅ Final ad attempt completed');
-                onAdComplete();
-              }, 3000);
-            } catch (error) {
-              console.error('❌ Final attempt error:', error);
-              onAdComplete();
-            }
+      // Check existing session
+      const session = getSession();
+      if (session) {
+        setTimeout(async () => {
+          await loadAllData();
+          const user = allUsers.find(u => u && u.__backendId === session.userId);
+          if (user && !user.blocked) {
+            currentUser = user;
+            afterLogin();
           } else {
-            console.log('⚠️ Timeout with no ad, giving reward');
-            onAdComplete();
+            clearSession();
           }
-        }
-      }, timeoutDuration);
-    }
-    
-    function onAdComplete() {
-      coins += rewardPerAd;
-      adsWatched += 1;
-      
-      if (currentUser) {
-        currentUser.coins = coins;
-        currentUser.adsWatched = adsWatched;
-        window.dataSdk.update(currentUser);
-      }
-      
-      updateStats();
-      document.getElementById('reward-message').textContent = `Kamu mendapatkan +${rewardPerAd} koin!`;
-      rewardPopup.classList.remove('hidden');
-      
-      if (window.Telegram && window.Telegram.WebApp) {
-        window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+        }, 1000);
       }
     }
 
-    function updateStats() {
-      coinDisplay.textContent = coins + ' 🪙';
-      
-      if (currentUser && !document.getElementById('profile-page').classList.contains('hidden')) {
-        updateProfilePage();
-      }
-    }
-
-    function updateRewardDisplay() {
-      const rewardDisplay = document.getElementById('reward-per-ad-display');
-      if (rewardDisplay) {
-        rewardDisplay.textContent = `+${rewardPerAd} 🪙`;
-      }
-    }
-
-    function startCooldown() {
-      cooldownActive = true;
-      cooldownTime = cooldownDuration;
-      cooldownContainer.classList.remove('hidden');
-      disableAdButton();
-      
-      const interval = setInterval(() => {
-        cooldownTime--;
-        const minutes = Math.floor(cooldownTime / 60);
-        const seconds = cooldownTime % 60;
-        cooldownTimer.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-        
-        if (cooldownTime <= 0) {
-          clearInterval(interval);
-          cooldownActive = false;
-          cooldownContainer.classList.add('hidden');
-          generateQuestion();
-        }
-      }, 1000);
-    }
-
-    function closePopup() {
-      rewardPopup.classList.add('hidden');
-      startCooldown();
-      
-      if (window.Telegram && window.Telegram.WebApp) {
-        window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
-      }
-    }
-
-    watchAdBtn.addEventListener('click', () => {
-      if (!watchAdBtn.disabled && canWatchAd) {
-        watchAd();
-      }
-    });
-    
-    closePopupBtn.addEventListener('click', closePopup);
-    
-    document.addEventListener('DOMContentLoaded', () => {
-      const maintenanceToggle = document.getElementById('maintenance-toggle');
-      if (maintenanceToggle) {
-        maintenanceToggle.addEventListener('change', toggleMaintenance);
-      }
-      
-      const saveRewardBtn = document.getElementById('save-reward-btn');
-      if (saveRewardBtn) {
-        saveRewardBtn.addEventListener('click', saveRewardSettings);
-      }
-      
-      const saveMinWithdrawalBtn = document.getElementById('save-min-withdrawal-btn');
-      if (saveMinWithdrawalBtn) {
-        saveMinWithdrawalBtn.addEventListener('click', saveMinWithdrawalSettings);
-      }
-      
-      const saveCooldownBtn = document.getElementById('save-cooldown-btn');
-      if (saveCooldownBtn) {
-        saveCooldownBtn.addEventListener('click', saveCooldownSettings);
-      }
-      
-      const saveZoneBtn = document.getElementById('save-zone-btn');
-      if (saveZoneBtn) {
-        saveZoneBtn.addEventListener('click', saveZoneIdSettings);
+    // Character counter for broadcast
+    document.addEventListener('input', function(e) {
+      if (e.target.id === 'broadcast-message') {
+        const count = e.target.value.length;
+        document.getElementById('char-count').textContent = `${count}/100`;
       }
     });
 
-    async function onConfigChange(config) {
-      const title = config.app_title || defaultConfig.app_title;
-      const reward = config.reward_text || defaultConfig.reward_text;
-      const button = config.button_text || defaultConfig.button_text;
-      const fontFamily = config.font_family || defaultConfig.font_family;
-      const fontSize = config.font_size || defaultConfig.font_size;
-      
-      appTitle.textContent = title;
-      rewardMessage.textContent = reward;
-      buttonLabel.textContent = button;
-      
-      document.body.style.fontFamily = `${fontFamily}, Poppins, sans-serif`;
-      document.body.style.fontSize = `${fontSize}px`;
-    }
-
-    function mapToCapabilities(config) {
-      return {
-        recolorables: [],
-        borderables: [],
-        fontEditable: {
-          get: () => config.font_family || defaultConfig.font_family,
-          set: (value) => {
-            config.font_family = value;
-            window.elementSdk.setConfig({ font_family: value });
-          }
-        },
-        fontSizeable: {
-          get: () => config.font_size || defaultConfig.font_size,
-          set: (value) => {
-            config.font_size = value;
-            window.elementSdk.setConfig({ font_size: value });
-          }
-        }
-      };
-    }
-
-    function mapToEditPanelValues(config) {
-      return new Map([
-        ['app_title', config.app_title || defaultConfig.app_title],
-        ['reward_text', config.reward_text || defaultConfig.reward_text],
-        ['button_text', config.button_text || defaultConfig.button_text]
-      ]);
-    }
-
-    if (window.elementSdk) {
-      window.elementSdk.init({
-        defaultConfig,
-        onConfigChange,
-        mapToCapabilities,
-        mapToEditPanelValues
-      });
-    }
-
-    initDataSDK();
-    updateStats();
-    updateRewardDisplay();
+    // Start the app
+    init();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c65801dd6bee77e',t:'MTc2OTgyMzYyMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
