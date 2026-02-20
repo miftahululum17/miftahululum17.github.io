@@ -3,124 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Math Quiz - Kuis Matematika Berhadiah</title>
+  <title>Math Quiz App</title>
   
-  <!-- CSS Libraries -->
+  <!-- External Resources -->
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
-  <!-- SDKs -->
   <script src="/_sdk/element_sdk.js"></script>
   <script src="/_sdk/data_sdk.js"></script>
   <script src="//libtl.com/sdk.js" data-zone="10547702" data-sdk="show_10547702"></script>
   
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  
   <style>
-    /* Global Styles */
-    * {
-      font-family: 'Poppins', sans-serif;
-    }
-    
-    html, body {
-      height: 100%;
-      width: 100%;
-      margin: 0;
-      padding: 0;
-    }
-    
-    /* Gradients */
-    .gradient-bg {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-    
-    .btn-primary {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      transition: all 0.3s;
-    }
-    
-    .btn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-    }
-    
-    .btn-danger {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    }
-    
-    .btn-success {
-      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-    }
-    
-    /* Cards & Shadows */
-    .card-shadow {
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    }
-    
-    /* Input Fields */
-    .input-field {
-      transition: all 0.3s;
-      border: 1.5px solid #e2e8f0;
-    }
-    
-    .input-field:focus {
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-      outline: none;
-    }
-    
-    /* Navigation */
-    .menu-active {
-      background: rgba(102, 126, 234, 0.1);
-      color: #667eea;
-    }
-    
-    /* Toast Notifications */
-    .toast {
-      animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s;
-    }
-    
-    @keyframes slideIn {
-      from {
-        transform: translateY(-100px);
-        opacity: 0;
-      }
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
-    
-    @keyframes fadeOut {
-      from { opacity: 1; }
-      to { opacity: 0; }
-    }
-    
-    /* Loading Spinner */
-    .loading-spinner {
-      border: 2px solid #f3f3f3;
-      border-top: 2px solid #667eea;
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      animation: spin 1s linear infinite;
-    }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    
-    /* Point Animation */
-    .point-change {
-      animation: pointPulse 0.5s ease;
-    }
-    
-    @keyframes pointPulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.15); }
-      100% { transform: scale(1); }
-    }
-    
-    /* Broadcast Banner */
+    /* [Styles tetap sama seperti sebelumnya] */
+    * { font-family: 'Poppins', sans-serif; }
+    html, body { height: 100%; width: 100%; margin: 0; padding: 0; }
+    .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .card-shadow { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .toast { animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s; }
+    @keyframes slideIn { from { transform: translateY(-100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+    .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transition: all 0.3s; }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(102,126,234,0.3); }
+    .btn-danger { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+    .btn-success { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+    .menu-active { background: rgba(102,126,234,0.1); color: #667eea; }
+    .input-field { transition: all 0.3s; border: 1.5px solid #e2e8f0; }
+    .input-field:focus { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
+    .page { display: none !important; }
+    .page.active { display: block !important; }
+    .loading-spinner { border: 2px solid #f3f3f3; border-top: 2px solid #667eea; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .auth-container { display: flex; align-items: center; justify-content: center; min-height: 100%; }
+    .point-change { animation: pointPulse 0.5s ease; }
+    @keyframes pointPulse { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+    .pulse-animation { animation: pulse 1s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     .broadcast-banner {
       background: linear-gradient(90deg, #ff6b6b 0%, #ff8e72 100%);
       color: white;
@@ -130,7 +48,6 @@
       margin-bottom: 16px;
       position: relative;
     }
-    
     .broadcast-text {
       animation: scrollText 15s linear infinite;
       white-space: nowrap;
@@ -138,88 +55,55 @@
       font-size: 14px;
       display: inline-block;
     }
-    
     @keyframes scrollText {
       0% { transform: translateX(100%); }
       100% { transform: translateX(-100%); }
     }
-    
     .broadcast-banner.paused .broadcast-text {
       animation-play-state: paused;
     }
-    
-    /* Page Management */
-    .page {
-      display: none !important;
-    }
-    
-    .page.active {
-      display: block !important;
-    }
-    
-    /* Layout */
-    #main-app {
-      display: flex;
-      flex-direction: column;
-    }
-    
-    main {
-      padding-bottom: 100px;
-    }
-    
-    .auth-container {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100%;
-    }
+    #main-app { display: flex; flex-direction: column; }
+    main { padding-bottom: 100px; }
   </style>
 </head>
 
 <body class="bg-gray-50">
   <div id="app" class="w-full h-full overflow-auto">
-    
-    <!-- Toast Notification Container -->
+    <!-- Toast Container -->
     <div id="toast-container" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50"></div>
 
-    <!-- LOGIN PAGE -->
+    <!-- Login Page -->
     <div id="login-page" class="page active w-full h-full">
       <div class="auth-container">
         <div class="w-full max-w-sm px-4">
           <div class="text-center mb-6">
             <h1 id="app-title" class="text-3xl font-bold text-gray-800">Math Quiz</h1>
-            <p class="text-sm text-gray-500 mt-1">Jawab quiz & dapatkan reward!</p>
+            <p class="text-sm text-gray-500 mt-1">Jawab quiz &amp; dapatkan reward!</p>
           </div>
-          
           <div class="bg-white rounded-2xl p-6 card-shadow">
             <form id="login-form" class="space-y-3">
               <div>
                 <label class="block text-xs font-semibold text-gray-700 mb-2">Username</label>
-                <input type="text" id="login-username" class="input-field w-full px-3 py-2.5 rounded-lg text-sm" placeholder="Masukkan username" required>
+                <input type="text" id="login-username" class="input-field w-full px-3 py-2.5 rounded-lg outline-none text-sm" placeholder="Masukkan username" required>
               </div>
-              
               <div>
                 <label class="block text-xs font-semibold text-gray-700 mb-2">Password</label>
-                <input type="password" id="login-password" class="input-field w-full px-3 py-2.5 rounded-lg text-sm" placeholder="Masukkan password" required>
+                <input type="password" id="login-password" class="input-field w-full px-3 py-2.5 rounded-lg outline-none text-sm" placeholder="Masukkan password" required>
               </div>
-              
               <button type="submit" class="btn-primary w-full py-2.5 rounded-lg text-white font-semibold text-sm mt-4">
                 <span id="login-btn-text">Masuk</span>
               </button>
             </form>
-            
             <p class="text-center mt-4 text-gray-500 text-xs">
               Belum punya akun? 
-              <button type="button" onclick="showPage('register-page')" class="text-purple-600 font-semibold hover:underline">
-                Daftar
-              </button>
+              <button type="button" onclick="window.showPage('register-page')" class="text-purple-600 font-semibold hover:underline">Daftar</button>
             </p>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- REGISTER PAGE -->
+    <!-- Register Page -->
     <div id="register-page" class="page w-full h-full">
       <div class="auth-container">
         <div class="w-full max-w-sm px-4">
@@ -227,49 +111,44 @@
             <h1 class="text-3xl font-bold text-gray-800">Daftar Akun</h1>
             <p class="text-sm text-gray-500 mt-1">Buat akun baru untuk mulai bermain</p>
           </div>
-          
           <div class="bg-white rounded-2xl p-6 card-shadow">
             <form id="register-form" class="space-y-3">
               <div>
                 <label class="block text-xs font-semibold text-gray-700 mb-2">Username</label>
-                <input type="text" id="reg-username" class="input-field w-full px-3 py-2.5 rounded-lg text-sm" placeholder="Pilih username" required>
+                <input type="text" id="reg-username" class="input-field w-full px-3 py-2.5 rounded-lg outline-none text-sm" placeholder="Pilih username" required>
               </div>
-              
               <div>
                 <label class="block text-xs font-semibold text-gray-700 mb-2">Password</label>
-                <input type="password" id="reg-password" class="input-field w-full px-3 py-2.5 rounded-lg text-sm" placeholder="Buat password" required>
+                <input type="password" id="reg-password" class="input-field w-full px-3 py-2.5 rounded-lg outline-none text-sm" placeholder="Buat password" required>
               </div>
-              
               <div>
                 <label class="block text-xs font-semibold text-gray-700 mb-2">Negara</label>
-                <select id="reg-country" class="input-field w-full px-3 py-2.5 rounded-lg bg-white text-sm" required>
-                  <option value="">🔍 Mendeteksi lokasi...</option>
-                  <option value="Indonesia">🇮🇩 Indonesia</option>
-                  <option value="Malaysia">🇲🇾 Malaysia</option>
-                  <option value="Singapore">🇸🇬 Singapore</option>
-                  <option value="Thailand">🇹🇭 Thailand</option>
-                  <option value="Vietnam">🇻🇳 Vietnam</option>
-                  <option value="Philippines">🇵🇭 Philippines</option>
-                </select>
+                <div class="relative">
+                  <select id="reg-country" class="input-field w-full px-3 py-2.5 rounded-lg outline-none bg-white text-sm" required>
+                    <option value="">🔍 Mendeteksi lokasi...</option>
+                    <option value="Indonesia">🇮🇩 Indonesia</option>
+                    <option value="Malaysia">🇲🇾 Malaysia</option>
+                    <option value="Singapore">🇸🇬 Singapore</option>
+                    <option value="Thailand">🇹🇭 Thailand</option>
+                    <option value="Vietnam">🇻🇳 Vietnam</option>
+                    <option value="Philippines">🇵🇭 Philippines</option>
+                  </select>
+                </div>
               </div>
-              
               <button type="submit" class="btn-primary w-full py-2.5 rounded-lg text-white font-semibold text-sm mt-4">
                 <span id="reg-btn-text">Daftar</span>
               </button>
             </form>
-            
             <p class="text-center mt-4 text-gray-500 text-xs">
               Sudah punya akun? 
-              <button type="button" onclick="showPage('login-page')" class="text-purple-600 font-semibold hover:underline">
-                Masuk
-              </button>
+              <button type="button" onclick="window.showPage('login-page')" class="text-purple-600 font-semibold hover:underline">Masuk</button>
             </p>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- MAINTENANCE PAGE -->
+    <!-- Maintenance Page -->
     <div id="maintenance-page" class="page w-full h-full">
       <div class="auth-container">
         <div class="text-center px-4">
@@ -278,16 +157,15 @@
           </div>
           <h1 class="text-2xl font-bold text-gray-800 mb-2">Maintenance</h1>
           <p class="text-gray-500 max-w-xs text-sm">Aplikasi sedang dalam perbaikan. Silakan kembali beberapa saat lagi.</p>
-          <button type="button" onclick="handleLogout()" class="mt-6 px-4 py-2 bg-gray-200 rounded-lg text-gray-700 font-semibold hover:bg-gray-300 transition text-sm">
+          <button type="button" onclick="window.handleLogout()" class="mt-6 px-4 py-2 bg-gray-200 rounded-lg text-gray-700 font-semibold hover:bg-gray-300 transition text-sm">
             Logout
           </button>
         </div>
       </div>
     </div>
 
-    <!-- MAIN APPLICATION -->
+    <!-- Main App Container -->
     <div id="main-app" class="page w-full h-full">
-      
       <!-- Header -->
       <header class="gradient-bg text-white p-3 sticky top-0 z-40">
         <div class="max-w-2xl mx-auto flex items-center justify-between">
@@ -300,16 +178,15 @@
               <p id="header-points" class="text-xs opacity-80">0 Poin</p>
             </div>
           </div>
-          <button type="button" onclick="handleLogout()" class="px-3 py-1.5 bg-white/20 rounded-lg hover:bg-white/30 transition text-xs font-medium">
+          <button type="button" onclick="window.handleLogout()" class="px-3 py-1.5 bg-white/20 rounded-lg hover:bg-white/30 transition text-xs font-medium">
             Logout
           </button>
         </div>
       </header>
 
-      <!-- Main Content -->
+      <!-- Main Content Area -->
       <main class="flex-1 p-3 overflow-auto">
         <div class="max-w-2xl mx-auto">
-          
           <!-- Broadcast Banner -->
           <div id="broadcast-container" class="hidden">
             <div class="broadcast-banner" onmouseenter="this.classList.add('paused')" onmouseleave="this.classList.remove('paused')">
@@ -317,7 +194,7 @@
             </div>
           </div>
 
-          <!-- QUIZ SECTION -->
+          <!-- Quiz Section -->
           <div id="quiz-section" class="section">
             <div class="bg-white rounded-2xl p-4 card-shadow mb-3">
               <div class="flex items-center justify-between mb-4">
@@ -326,17 +203,14 @@
                   <span id="quiz-points" class="font-bold text-purple-600 text-sm">0 Poin</span>
                 </div>
               </div>
-              
               <div id="quiz-container">
                 <div class="text-center py-6 bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl mb-4">
                   <p class="text-gray-500 mb-1 text-xs">Berapa hasil dari:</p>
                   <p id="quiz-question" class="text-3xl font-bold text-gray-800">0 + 0 = ?</p>
                 </div>
-                
                 <div id="quiz-options" class="grid grid-cols-2 gap-2 mb-4"></div>
-                
                 <div id="claim-reward-container" class="hidden">
-                  <button type="button" id="claim-reward-btn" onclick="claimReward()" class="btn-success w-full py-3 rounded-lg text-white font-bold text-sm flex items-center justify-center gap-2">
+                  <button type="button" id="claim-reward-btn" onclick="window.claimReward()" class="btn-success w-full py-3 rounded-lg text-white font-bold text-sm flex items-center justify-center gap-2">
                     <span>🎁</span>
                     <span>Klaim Reward</span>
                   </button>
@@ -345,9 +219,8 @@
             </div>
           </div>
 
-          <!-- HISTORY SECTION -->
+          <!-- History Section -->
           <div id="history-section" class="section hidden">
-            <!-- Points Card -->
             <div class="bg-white rounded-2xl p-4 card-shadow mb-3">
               <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center gap-2">
@@ -358,41 +231,31 @@
                   <span id="history-points" class="font-bold text-green-600 text-sm">0 Poin</span>
                 </div>
               </div>
-              
-              <button type="button" onclick="showExchangeForm()" class="btn-primary w-full py-2.5 rounded-lg text-white font-semibold text-sm mb-3">
+              <button type="button" onclick="window.showExchangeForm()" class="btn-primary w-full py-2.5 rounded-lg text-white font-semibold text-sm mb-3">
                 Tukar Poin
               </button>
-              
               <p class="text-xs text-gray-500 text-center">Minimal: 50 Poin = Rp 50</p>
             </div>
 
             <!-- Exchange Form -->
             <div id="exchange-form-container" class="bg-white rounded-2xl p-4 card-shadow mb-3 hidden">
               <h3 class="text-base font-bold text-gray-800 mb-3">📝 Form Penukaran</h3>
-              
               <form id="exchange-form" class="space-y-2.5">
                 <div>
                   <label class="block text-xs font-semibold text-gray-700 mb-1.5">Jumlah Poin</label>
-                  <input type="number" id="exchange-amount" class="input-field w-full px-3 py-2 rounded-lg text-sm" placeholder="Min. 50 poin" min="50" required>
+                  <input type="number" id="exchange-amount" class="input-field w-full px-3 py-2 rounded-lg outline-none text-sm" placeholder="Min. 50 poin" min="50" required>
                 </div>
-                
                 <div>
                   <label class="block text-xs font-semibold text-gray-700 mb-1.5">Nama Akun DANA</label>
-                  <input type="text" id="dana-account" class="input-field w-full px-3 py-2 rounded-lg text-sm" placeholder="Nama lengkap" required>
+                  <input type="text" id="dana-account" class="input-field w-full px-3 py-2 rounded-lg outline-none text-sm" placeholder="Nama lengkap" required>
                 </div>
-                
                 <div>
                   <label class="block text-xs font-semibold text-gray-700 mb-1.5">Nomor HP DANA</label>
-                  <input type="tel" id="dana-phone" class="input-field w-full px-3 py-2 rounded-lg text-sm" placeholder="08xxxxxxxxxx" required>
+                  <input type="tel" id="dana-phone" class="input-field w-full px-3 py-2 rounded-lg outline-none text-sm" placeholder="08xxxxxxxxxx" required>
                 </div>
-                
                 <div class="flex gap-2 pt-2">
-                  <button type="button" onclick="hideExchangeForm()" class="flex-1 py-2 bg-gray-200 rounded-lg text-gray-700 font-semibold text-xs">
-                    Batal
-                  </button>
-                  <button type="submit" class="flex-1 btn-primary py-2 rounded-lg text-white font-semibold text-xs">
-                    Kirim
-                  </button>
+                  <button type="button" onclick="window.hideExchangeForm()" class="flex-1 py-2 bg-gray-200 rounded-lg text-gray-700 font-semibold text-xs">Batal</button>
+                  <button type="submit" class="flex-1 btn-primary py-2 rounded-lg text-white font-semibold text-xs">Kirim</button>
                 </div>
               </form>
             </div>
@@ -406,7 +269,7 @@
             </div>
           </div>
 
-          <!-- PROFILE SECTION -->
+          <!-- Profile Section -->
           <div id="profile-section" class="section hidden">
             <div class="bg-white rounded-2xl p-4 card-shadow">
               <div class="text-center mb-4">
@@ -414,22 +277,17 @@
                   <span class="text-2xl">👤</span>
                 </div>
                 <h2 id="profile-username" class="text-xl font-bold text-gray-800">Username</h2>
-                <span id="profile-role" class="inline-block mt-1.5 px-2.5 py-1 bg-purple-100 text-purple-600 rounded-full text-xs font-medium">
-                  User
-                </span>
+                <span id="profile-role" class="inline-block mt-1.5 px-2.5 py-1 bg-purple-100 text-purple-600 rounded-full text-xs font-medium">User</span>
               </div>
-              
               <div class="space-y-2">
                 <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <span class="text-gray-600 text-sm">🌍 Negara</span>
                   <span id="profile-country" class="font-semibold text-gray-800 text-sm">-</span>
                 </div>
-                
                 <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <span class="text-gray-600 text-sm">📱 Device ID</span>
                   <span id="profile-device" class="font-semibold text-gray-800 text-xs">-</span>
                 </div>
-                
                 <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <span class="text-gray-600 text-sm">💰 Total Poin</span>
                   <span id="profile-points" class="font-semibold text-green-600">0</span>
@@ -438,47 +296,40 @@
             </div>
           </div>
 
-          <!-- SETTINGS SECTION (Admin Only) -->
+          <!-- Settings Section (Admin Only) -->
           <div id="settings-section" class="section hidden">
             <div class="space-y-3">
-              
-              <!-- Database Status -->
+              <!-- Google Apps Script Status -->
               <div class="bg-white rounded-2xl p-4 card-shadow">
                 <h2 class="text-lg font-bold text-gray-800 mb-3">☁️ Database Status</h2>
-                
                 <div class="space-y-2">
                   <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <span class="text-gray-600 text-sm">🔗 Koneksi Google Sheets</span>
                     <span id="connection-status" class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-medium">✓ Connected</span>
                   </div>
-                  
                   <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <span class="text-gray-600 text-sm">📊 Total Records</span>
                     <span class="font-semibold text-gray-800 text-sm" id="total-records">0</span>
                   </div>
-                  
                   <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <span class="text-gray-600 text-sm">⏱️ Last Sync</span>
                     <span class="font-semibold text-gray-800 text-sm" id="last-sync">Baru saja</span>
                   </div>
                 </div>
-                
-                <button type="button" onclick="syncDataNow()" class="btn-success w-full py-2.5 rounded-lg text-white font-semibold text-sm mt-3">
-                  🔄 Sync ke Google Sheets
+                <button type="button" onclick="window.syncDataNow(event)" class="btn-success w-full py-2.5 rounded-lg text-white font-semibold text-sm mt-3">
+                  🔄 Sync Data Sekarang
                 </button>
               </div>
 
               <!-- Broadcast Message -->
               <div class="bg-white rounded-2xl p-4 card-shadow">
                 <h2 class="text-lg font-bold text-gray-800 mb-3">📢 Pesan Broadcast</h2>
-                
                 <form id="broadcast-form" class="space-y-2.5">
                   <div>
                     <label class="block text-xs font-semibold text-gray-700 mb-1.5">Pesan</label>
-                    <textarea id="broadcast-message" class="input-field w-full px-3 py-2 rounded-lg text-sm" rows="3" placeholder="Ketik pesan untuk semua user..." required maxlength="100"></textarea>
+                    <textarea id="broadcast-message" class="input-field w-full px-3 py-2 rounded-lg outline-none text-sm" rows="3" placeholder="Ketik pesan untuk semua user..." required maxlength="100"></textarea>
                     <p id="char-count" class="text-xs text-gray-500 mt-1">0/100</p>
                   </div>
-                  
                   <button type="submit" class="btn-primary w-full py-2.5 rounded-lg text-white font-semibold text-sm flex items-center justify-center gap-2">
                     <span>📤</span>
                     <span>Kirim Broadcast</span>
@@ -486,7 +337,7 @@
                 </form>
               </div>
 
-              <!-- Admin Settings -->
+              <!-- Admin Info -->
               <div class="bg-white rounded-2xl p-4 card-shadow">
                 <h2 class="text-lg font-bold text-gray-800 mb-3">⚙️ Pengaturan Admin</h2>
                 
@@ -497,19 +348,17 @@
                     <p class="text-xs text-gray-500">Nonaktifkan akses user</p>
                   </div>
                   <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" id="maintenance-toggle" class="sr-only peer" onchange="toggleMaintenance()">
+                    <input type="checkbox" id="maintenance-toggle" class="sr-only peer" onchange="window.toggleMaintenance()">
                     <div class="w-12 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
                   </label>
                 </div>
-                
+
                 <!-- Reward Points Setting -->
                 <div class="p-3 bg-gray-50 rounded-lg">
                   <p class="font-semibold text-gray-800 text-sm mb-2">Poin Reward per Klaim</p>
                   <div class="flex gap-2">
-                    <input type="number" id="reward-points-input" class="input-field flex-1 px-3 py-2 rounded-lg text-sm" value="50" min="1">
-                    <button type="button" onclick="updateRewardPoints()" class="px-3 py-2 btn-primary rounded-lg text-white font-semibold text-xs">
-                      Simpan
-                    </button>
+                    <input type="number" id="reward-points-input" class="input-field flex-1 px-3 py-2 rounded-lg outline-none text-sm" value="50" min="1">
+                    <button type="button" onclick="window.updateRewardPoints()" class="px-3 py-2 btn-primary rounded-lg text-white font-semibold text-xs">Simpan</button>
                   </div>
                 </div>
               </div>
@@ -537,22 +386,19 @@
       <!-- Bottom Navigation -->
       <nav class="bg-white border-t border-gray-200 px-4 py-2 mt-auto">
         <div class="flex justify-around max-w-2xl mx-auto">
-          <button type="button" onclick="showSection('quiz')" class="nav-btn flex flex-col items-center p-1.5 rounded-lg transition text-center" data-section="quiz">
+          <button type="button" onclick="window.showSection('quiz')" class="nav-btn flex flex-col items-center p-1.5 rounded-lg transition text-center" data-section="quiz">
             <span class="text-xl">🎯</span>
             <span class="text-xs font-medium text-gray-600">Quiz</span>
           </button>
-          
-          <button type="button" onclick="showSection('history')" class="nav-btn flex flex-col items-center p-1.5 rounded-lg transition text-center" data-section="history">
+          <button type="button" onclick="window.showSection('history')" class="nav-btn flex flex-col items-center p-1.5 rounded-lg transition text-center" data-section="history">
             <span class="text-xl">📋</span>
             <span class="text-xs font-medium text-gray-600">Riwayat</span>
           </button>
-          
-          <button type="button" onclick="showSection('profile')" class="nav-btn flex flex-col items-center p-1.5 rounded-lg transition text-center" data-section="profile">
+          <button type="button" onclick="window.showSection('profile')" class="nav-btn flex flex-col items-center p-1.5 rounded-lg transition text-center" data-section="profile">
             <span class="text-xl">👤</span>
             <span class="text-xs font-medium text-gray-600">Profil</span>
           </button>
-          
-          <button id="settings-nav-btn" type="button" onclick="showSection('settings')" class="nav-btn flex flex-col items-center p-1.5 rounded-lg transition hidden text-center" data-section="settings">
+          <button id="settings-nav-btn" type="button" onclick="window.showSection('settings')" class="nav-btn flex flex-col items-center p-1.5 rounded-lg transition hidden text-center" data-section="settings">
             <span class="text-xl">⚙️</span>
             <span class="text-xs font-medium text-gray-600">Setting</span>
           </button>
@@ -560,76 +406,58 @@
       </nav>
     </div>
 
-    <!-- EDIT USER MODAL -->
+    <!-- Edit User Modal -->
     <div id="edit-user-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
       <div class="bg-white rounded-2xl p-4 w-full max-w-sm max-h-[90%] overflow-auto">
         <h3 class="text-lg font-bold text-gray-800 mb-3">Edit User</h3>
-        
         <form id="edit-user-form" class="space-y-2.5">
           <input type="hidden" id="edit-user-id">
-          
           <div>
             <label class="block text-xs font-semibold text-gray-700 mb-1.5">Username</label>
-            <input type="text" id="edit-user-username" class="input-field w-full px-3 py-2 rounded-lg text-sm" readonly>
+            <input type="text" id="edit-user-username" class="input-field w-full px-3 py-2 rounded-lg outline-none text-sm" readonly>
           </div>
-          
           <div>
             <label class="block text-xs font-semibold text-gray-700 mb-1.5">Password Baru</label>
-            <input type="password" id="edit-user-password" class="input-field w-full px-3 py-2 rounded-lg text-sm" placeholder="Kosongkan jika tidak diubah">
+            <input type="password" id="edit-user-password" class="input-field w-full px-3 py-2 rounded-lg outline-none text-sm" placeholder="Kosongkan jika tidak diubah">
           </div>
-          
           <div class="p-3 bg-blue-50 rounded-lg">
             <p class="text-xs font-semibold text-gray-700 mb-1.5">Poin Saat Ini</p>
             <p id="edit-user-current-points" class="text-xl font-bold text-blue-600">0</p>
           </div>
-          
           <div>
             <label class="block text-xs font-semibold text-gray-700 mb-1.5">Total Poin Baru</label>
-            <input type="number" id="edit-user-new-points" class="input-field w-full px-3 py-2 rounded-lg text-sm" placeholder="0" min="0">
+            <input type="number" id="edit-user-new-points" class="input-field w-full px-3 py-2 rounded-lg outline-none text-sm" placeholder="0" min="0">
           </div>
-          
           <div class="flex gap-2 pt-2">
-            <button type="button" onclick="closeEditUserModal()" class="flex-1 py-2 bg-gray-200 rounded-lg text-gray-700 font-semibold text-xs">
-              Batal
-            </button>
-            <button type="submit" class="flex-1 btn-primary py-2 rounded-lg text-white font-semibold text-xs">
-              Simpan
-            </button>
+            <button type="button" onclick="window.closeEditUserModal()" class="flex-1 py-2 bg-gray-200 rounded-lg text-gray-700 font-semibold text-xs">Batal</button>
+            <button type="submit" class="flex-1 btn-primary py-2 rounded-lg text-white font-semibold text-xs">Simpan</button>
           </div>
         </form>
       </div>
     </div>
 
-    <!-- EXCHANGE STATUS MODAL -->
+    <!-- Exchange Status Modal -->
     <div id="exchange-status-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
       <div class="bg-white rounded-2xl p-4 w-full max-w-sm">
         <h3 class="text-lg font-bold text-gray-800 mb-3">Ubah Status Penukaran</h3>
-        
         <form id="exchange-status-form" class="space-y-2.5">
           <input type="hidden" id="exchange-status-id">
           <input type="hidden" id="exchange-status-user-id">
           <input type="hidden" id="exchange-status-amount">
-          
           <div>
             <label class="block text-xs font-semibold text-gray-700 mb-1.5">Status</label>
-            <select id="exchange-status-select" class="input-field w-full px-3 py-2 rounded-lg bg-white text-sm" required>
+            <select id="exchange-status-select" class="input-field w-full px-3 py-2 rounded-lg outline-none bg-white text-sm" required>
               <option value="success">Berhasil</option>
               <option value="rejected">Tolak</option>
             </select>
           </div>
-          
           <div>
             <label class="block text-xs font-semibold text-gray-700 mb-1.5">Catatan Admin</label>
-            <textarea id="exchange-status-note" class="input-field w-full px-3 py-2 rounded-lg text-sm" rows="2" placeholder="Tambahkan catatan..."></textarea>
+            <textarea id="exchange-status-note" class="input-field w-full px-3 py-2 rounded-lg outline-none text-sm" rows="2" placeholder="Tambahkan catatan..."></textarea>
           </div>
-          
           <div class="flex gap-2 pt-2">
-            <button type="button" onclick="closeExchangeStatusModal()" class="flex-1 py-2 bg-gray-200 rounded-lg text-gray-700 font-semibold text-xs">
-              Batal
-            </button>
-            <button type="submit" class="flex-1 btn-primary py-2 rounded-lg text-white font-semibold text-xs">
-              Simpan
-            </button>
+            <button type="button" onclick="window.closeExchangeStatusModal()" class="flex-1 py-2 bg-gray-200 rounded-lg text-gray-700 font-semibold text-xs">Batal</button>
+            <button type="submit" class="flex-1 btn-primary py-2 rounded-lg text-white font-semibold text-xs">Simpan</button>
           </div>
         </form>
       </div>
@@ -637,1107 +465,1439 @@
   </div>
 
   <script>
-    // ==================== APP STATE ====================
-    let currentUser = null;
-    let allUsers = [];
-    let allExchanges = [];
-    let allBroadcasts = [];
-    let appSettings = null;
-    let currentQuiz = null;
-    let isAnswerCorrect = false;
-    let historyRefreshInterval = null;
-    let detectedCountry = null;
-    let currentBroadcast = null;
-    let isLoading = false;
-    
-    // Ganti dengan URL Apps Script Anda setelah deploy
-    const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyniFIRSe-v7KM1jE7Hu101ko1T8eUZPCf17NHDpXllFi2mDOs5O9YKsvBPLUiQPD1P/exec';
-    
-    let lastSyncTime = new Date();
+    (function() {
+      // ==================== APP STATE ====================
+      let currentUser = null;
+      let allUsers = [];
+      let allExchanges = [];
+      let allBroadcasts = [];
+      let appSettings = null;
+      let currentQuiz = null;
+      let isAnswerCorrect = false;
+      let historyRefreshInterval = null;
+      let detectedCountry = null;
+      let currentBroadcast = null;
+      let gasWebAppUrl = 'https://script.google.com/macros/s/AKfycbzqdAFW6jru6IUGvcuWZb5Lk9eebAhfg8FoPo60d4H0kkPww3VZEIJ-J2JeLS5Npc_Iww/exec';
+      let lastSyncTime = new Date();
+      let isInitialized = false;
 
-    // Default Configuration
-    const defaultConfig = {
-      app_title: 'Math Quiz'
-    };
+      // ==================== DEFAULT CONFIG ====================
+      const defaultConfig = {
+        app_title: 'Math Quiz'
+      };
 
-    // ==================== UTILITY FUNCTIONS ====================
-    
-    // Generate Device ID
-    function generateDeviceId() {
-      const stored = localStorage.getItem('deviceId');
-      if (stored) return stored;
-      const id = 'DEV-' + Math.random().toString(36).substring(2, 10).toUpperCase();
-      localStorage.setItem('deviceId', id);
-      return id;
-    }
+      // ==================== UTILITY FUNCTIONS ====================
 
-    const deviceId = generateDeviceId();
-
-    // Detect Country by IP
-    async function detectCountry() {
-      try {
-        const countryMap = {
-          'ID': 'Indonesia', 'MY': 'Malaysia', 'SG': 'Singapore',
-          'TH': 'Thailand', 'VN': 'Vietnam', 'PH': 'Philippines'
-        };
-
+      // Generate unique Device ID
+      function generateDeviceId() {
         try {
-          const response = await fetch('https://ipapi.co/json/', { 
-            signal: AbortSignal.timeout(3000)
-          });
-          if (response.ok) {
-            const data = await response.json();
-            if (data.country_code && countryMap[data.country_code]) {
-              const country = countryMap[data.country_code];
-              detectedCountry = country;
-              document.getElementById('reg-country').value = country;
-              return;
+          const stored = localStorage.getItem('deviceId');
+          if (stored) return stored;
+          const id = 'DEV-' + Math.random().toString(36).substring(2, 10).toUpperCase();
+          localStorage.setItem('deviceId', id);
+          return id;
+        } catch (e) {
+          return 'DEV-' + Date.now();
+        }
+      }
+
+      const deviceId = generateDeviceId();
+
+      // Detect user's country by IP
+      async function detectCountry() {
+        try {
+          const countryMap = {
+            'ID': 'Indonesia',
+            'MY': 'Malaysia',
+            'SG': 'Singapore',
+            'TH': 'Thailand',
+            'VN': 'Vietnam',
+            'PH': 'Philippines'
+          };
+
+          try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 3000);
+            
+            const response = await fetch('https://ipapi.co/json/', {
+              signal: controller.signal
+            });
+            
+            clearTimeout(timeoutId);
+            
+            if (response.ok) {
+              const data = await response.json();
+              if (data.country_code && countryMap[data.country_code]) {
+                const country = countryMap[data.country_code];
+                detectedCountry = country;
+                const countrySelect = document.getElementById('reg-country');
+                if (countrySelect) {
+                  countrySelect.value = country;
+                }
+                return;
+              }
+            }
+          } catch (e) {
+            console.warn('Country detection fallback...');
+            // Fallback to Indonesia
+            const countrySelect = document.getElementById('reg-country');
+            if (countrySelect) {
+              countrySelect.value = 'Indonesia';
             }
           }
         } catch (e) {
-          console.warn('Country detection fallback...');
-        }
-      } catch (e) {
-        console.error('Country detection error:', e);
-      }
-      
-      // Default ke Indonesia jika gagal deteksi
-      document.getElementById('reg-country').value = 'Indonesia';
-    }
-
-    // ==================== GOOGLE SHEETS API FUNCTIONS ====================
-
-async function callGAS(action, data = null) {
-  try {
-    console.log(`Calling GAS: ${action}`, data);
-    
-    const response = await fetch(GAS_WEB_APP_URL, {
-      method: 'POST',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        action: action,
-        data: data
-      })
-    });
-
-    const result = await response.json();
-    console.log(`GAS Response [${action}]:`, result);
-    return result;
-    
-  } catch (error) {
-    console.error('GAS Error:', error);
-    return { 
-      success: false, 
-      error: error.message 
-    };
-  }
-}
-
-// Load all data from Google Sheets
-async function loadAllData() {
-  if (isLoading) return;
-  
-  isLoading = true;
-  try {
-    const result = await callGAS('getAllData');
-    
-    if (result.success && result.data) {
-      // Update data dari Google Sheets
-      allUsers = result.data.filter(d => d && d.type === 'user');
-      allExchanges = result.data.filter(d => d && d.type === 'exchange');
-      allBroadcasts = result.data.filter(d => d && d.type === 'broadcast');
-      appSettings = result.data.find(d => d && d.type === 'settings');
-      
-      lastSyncTime = new Date();
-      
-      // Log untuk debugging
-      console.log('All users loaded:', allUsers.map(u => ({ 
-        username: u.username, 
-        role: u.role, 
-        blocked: u.blocked,
-        points: u.points 
-      })));
-      
-      // Update current user jika ada
-      if (currentUser) {
-        const updated = allUsers.find(u => u && (u.__backendId === currentUser.__backendId || u.id === currentUser.id));
-        if (updated) {
-          currentUser = updated;
-          updatePointsDisplay();
+          console.error('Country detection error:', e);
         }
       }
-      
-      // Update UI untuk admin
-      if (currentUser?.role === 'admin') {
-        renderUserList();
-        renderAdminExchangeList();
+
+      // ==================== SESSION MANAGEMENT ====================
+
+      function saveSession(user) {
+        try {
+          const session = {
+            userId: user.__backendId,
+            username: user.username,
+            role: user.role,
+            loginTime: new Date().toISOString()
+          };
+          localStorage.setItem('userSession', JSON.stringify(session));
+        } catch (e) {
+          console.error('Failed to save session:', e);
+        }
       }
-      
-      updateDatabaseStatus();
-      displayBroadcast();
-      
-      return true;
-    } else {
-      console.error('Load data failed:', result.error);
-      return false;
-    }
-  } catch (error) {
-    console.error('Load data error:', error);
-    return false;
-  } finally {
-    isLoading = false;
-  }
-}
 
-    // ==================== SESSION MANAGEMENT ====================
-    
-    function saveSession(user) {
-      const session = {
-        userId: user.__backendId || user.id,
-        username: user.username,
-        role: user.role,
-        loginTime: new Date().toISOString()
-      };
-      localStorage.setItem('userSession', JSON.stringify(session));
-    }
+      function getSession() {
+        try {
+          const session = localStorage.getItem('userSession');
+          if (!session) return null;
 
-    function getSession() {
-      const session = localStorage.getItem('userSession');
-      if (!session) return null;
-      
-      try {
-        const parsed = JSON.parse(session);
-        const loginTime = new Date(parsed.loginTime);
-        const now = new Date();
-        const diffDays = (now - loginTime) / (1000 * 60 * 60 * 24);
-        
-        if (diffDays >= 2) {
-          localStorage.removeItem('userSession');
+          const parsed = JSON.parse(session);
+          const loginTime = new Date(parsed.loginTime);
+          const now = new Date();
+          const diffDays = (now - loginTime) / (1000 * 60 * 60 * 24);
+
+          if (diffDays >= 2) {
+            localStorage.removeItem('userSession');
+            return null;
+          }
+          return parsed;
+        } catch (e) {
           return null;
         }
-        return parsed;
-      } catch (e) {
-        return null;
       }
-    }
 
-    function clearSession() {
-      localStorage.removeItem('userSession');
-    }
-
-    // ==================== UI FUNCTIONS ====================
-    
-    // Toast Notification
-    function showToast(message, type = 'info') {
-      const container = document.getElementById('toast-container');
-      const toast = document.createElement('div');
-      const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
-      toast.className = `toast ${bgColor} text-white px-4 py-2 rounded-lg shadow-lg font-medium text-sm`;
-      toast.textContent = message;
-      container.appendChild(toast);
-      setTimeout(() => toast.remove(), 3000);
-    }
-
-    // Page Navigation
-    function showPage(pageId) {
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.getElementById(pageId).classList.add('active');
-    }
-
-    // Section Navigation
-    function showSection(section) {
-      document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
-      document.getElementById(`${section}-section`).classList.remove('hidden');
-      
-      document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.classList.remove('menu-active');
-        if (btn.dataset.section === section) {
-          btn.classList.add('menu-active');
-        }
-      });
-
-      stopHistoryRefresh();
-      
-      if (section === 'history') {
-        renderExchangeHistory();
-        startHistoryRefresh();
-      } else if (section === 'settings') {
-        renderUserList();
-        renderAdminExchangeList();
-        updateDatabaseStatus();
+      function clearSession() {
+        try {
+          localStorage.removeItem('userSession');
+        } catch (e) {}
       }
-    }
 
-    // History Auto-Refresh
-    function startHistoryRefresh() {
-      const indicator = document.getElementById('refresh-indicator');
-      indicator.classList.remove('opacity-0');
-      
-      if (historyRefreshInterval) clearInterval(historyRefreshInterval);
-      historyRefreshInterval = setInterval(() => {
-        loadAllData();
-        renderExchangeHistory();
-      }, 5000);
-    }
+      // ==================== TOAST NOTIFICATION ====================
 
-    function stopHistoryRefresh() {
-      if (historyRefreshInterval) {
-        clearInterval(historyRefreshInterval);
-        historyRefreshInterval = null;
-      }
-      const indicator = document.getElementById('refresh-indicator');
-      indicator.classList.add('opacity-0');
-    }
-
-    // ==================== BROADCAST ====================
-    
-    function displayBroadcast() {
-      const latestBroadcast = allBroadcasts
-        .filter(b => b && b.type === 'broadcast')
-        .sort((a, b) => new Date(b.sentAt || 0) - new Date(a.sentAt || 0))[0];
-      
-      if (latestBroadcast) {
-        currentBroadcast = latestBroadcast;
-        const container = document.getElementById('broadcast-container');
-        const textDisplay = document.getElementById('broadcast-text-display');
-        textDisplay.textContent = '📢 ' + (latestBroadcast.message || '');
-        container.classList.remove('hidden');
-      } else {
-        document.getElementById('broadcast-container').classList.add('hidden');
-      }
-    }
-
-    // ==================== SYNC FUNCTIONS ====================
-    
-    async function syncDataNow() {
-      const btn = event.target;
-      btn.disabled = true;
-      btn.innerHTML = '<div class="loading-spinner mx-auto"></div>';
-
-      try {
-        // Kirim semua data ke Google Sheets
-        await callGAS('syncUsers', allUsers);
-        await callGAS('syncExchanges', allExchanges);
-        await callGAS('syncBroadcasts', allBroadcasts);
-        await callGAS('syncSettings', appSettings ? [appSettings] : []);
-
-        showToast('✅ Data berhasil disync ke Google Sheets!', 'success');
-        await loadAllData(); // Refresh data
-      } catch (e) {
-        showToast('❌ Gagal sync data: ' + e.message, 'error');
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = '🔄 Sync ke Google Sheets';
-      }
-    }
-
-    function updateDatabaseStatus() {
-      const totalRecords = allUsers.length + allExchanges.length + allBroadcasts.length + (appSettings ? 1 : 0);
-      document.getElementById('total-records').textContent = totalRecords;
-      
-      const syncTime = lastSyncTime.toLocaleTimeString('id-ID');
-      document.getElementById('last-sync').textContent = syncTime;
-    }
-
-    // ==================== QUIZ LOGIC ====================
-    
-    function generateQuiz() {
-      const a = Math.floor(Math.random() * 100) + 1;
-      const b = Math.floor(Math.random() * 100) + 1;
-      const correct = a + b;
-      
-      const options = [correct];
-      while (options.length < 4) {
-        const wrong = correct + Math.floor(Math.random() * 21) - 10;
-        if (wrong !== correct && wrong > 0 && !options.includes(wrong)) {
-          options.push(wrong);
+      function showToast(message, type = 'info') {
+        try {
+          const container = document.getElementById('toast-container');
+          if (!container) return;
+          
+          const toast = document.createElement('div');
+          const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+          toast.className = `toast ${bgColor} text-white px-4 py-2 rounded-lg shadow-lg font-medium text-sm mb-2`;
+          toast.textContent = message;
+          container.appendChild(toast);
+          
+          setTimeout(() => {
+            if (toast.parentNode) {
+              toast.remove();
+            }
+          }, 3000);
+        } catch (e) {
+          console.error('Toast error:', e);
         }
       }
-      
-      for (let i = options.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [options[i], options[j]] = [options[j], options[i]];
-      }
-      
-      currentQuiz = { a, b, correct, options };
-      renderQuiz();
-    }
 
-    function renderQuiz() {
-      if (!currentQuiz) return;
-      
-      document.getElementById('quiz-question').textContent = `${currentQuiz.a} + ${currentQuiz.b} = ?`;
-      
-      const optionsContainer = document.getElementById('quiz-options');
-      optionsContainer.innerHTML = currentQuiz.options.map(opt => `
-        <button type="button" onclick="checkAnswer(${opt})" class="p-3 bg-gray-100 hover:bg-purple-100 rounded-lg text-lg font-bold text-gray-800 transition">
-          ${opt}
-        </button>
-      `).join('');
-      
-      document.getElementById('claim-reward-container').classList.add('hidden');
-      isAnswerCorrect = false;
-    }
+      // ==================== PAGE NAVIGATION ====================
 
-    function checkAnswer(answer) {
-      if (answer === currentQuiz.correct) {
-        showToast('🎉 Jawaban Benar!', 'success');
-        isAnswerCorrect = true;
-        document.getElementById('claim-reward-container').classList.remove('hidden');
-      } else {
-        showToast('❌ Jawaban Salah!', 'error');
-        setTimeout(generateQuiz, 1000);
-      }
-    }
-
-    async function claimReward() {
-      if (!isAnswerCorrect || !currentUser) return;
-      
-      const btn = document.getElementById('claim-reward-btn');
-      btn.disabled = true;
-      btn.innerHTML = '<div class="loading-spinner mx-auto"></div>';
-      
-      try {
-        if (typeof show_10547702 === 'function') {
-          await show_10547702();
+      function showPage(pageId) {
+        try {
+          document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+          const page = document.getElementById(pageId);
+          if (page) {
+            page.classList.add('active');
+          }
+        } catch (e) {
+          console.error('Page navigation error:', e);
         }
-        
-        const rewardAmount = appSettings?.rewardPoints || 50;
-        currentUser.points = (currentUser.points || 0) + rewardAmount;
-        
-        // Update ke Google Sheets
-        const result = await callGAS('updateUser', currentUser);
-        
-        if (result.success) {
-          showToast(`+${rewardAmount} Poin!`, 'success');
-          await loadAllData(); // Refresh data
-          updatePointsDisplay();
-        } else {
-          showToast('Gagal menyimpan poin', 'error');
+      }
+
+      // ==================== SECTION NAVIGATION ====================
+
+      function showSection(section) {
+        try {
+          document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+          const sectionEl = document.getElementById(`${section}-section`);
+          if (sectionEl) {
+            sectionEl.classList.remove('hidden');
+          }
+
+          document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.classList.remove('menu-active');
+            if (btn.dataset.section === section) {
+              btn.classList.add('menu-active');
+            }
+          });
+
+          stopHistoryRefresh();
+
+          if (section === 'history') {
+            renderExchangeHistory();
+            startHistoryRefresh();
+          } else if (section === 'settings') {
+            renderUserList();
+            renderAdminExchangeList();
+            updateDatabaseStatus();
+          }
+        } catch (e) {
+          console.error('Section navigation error:', e);
         }
-        
-        generateQuiz();
-      } catch (e) {
-        console.error('Claim reward error:', e);
-        showToast('Terjadi kesalahan', 'error');
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<span>🎁</span><span>Klaim Reward</span>';
       }
-    }
 
-    function updatePointsDisplay() {
-      if (!currentUser) return;
-      const points = currentUser.points || 0;
-      
-      const pointsElements = [
-        document.getElementById('header-points'),
-        document.getElementById('quiz-points'),
-        document.getElementById('history-points'),
-        document.getElementById('profile-points')
-      ];
-      
-      pointsElements.forEach(el => {
-        if (el) {
-          el.classList.remove('point-change');
-          void el.offsetWidth;
-          el.classList.add('point-change');
+      // ==================== HISTORY AUTO-REFRESH ====================
+
+      function startHistoryRefresh() {
+        try {
+          const indicator = document.getElementById('refresh-indicator');
+          if (indicator) {
+            indicator.classList.remove('opacity-0');
+          }
+
+          if (historyRefreshInterval) clearInterval(historyRefreshInterval);
+          historyRefreshInterval = setInterval(() => {
+            renderExchangeHistory();
+          }, 5000);
+        } catch (e) {
+          console.error('Start refresh error:', e);
         }
-      });
-      
-      document.getElementById('header-points').textContent = `${points} Poin`;
-      document.getElementById('quiz-points').textContent = `${points} Poin`;
-      document.getElementById('history-points').textContent = `${points} Poin`;
-      document.getElementById('profile-points').textContent = points;
-    }
-
-    // ==================== EXCHANGE FUNCTIONS ====================
-    
-    function showExchangeForm() {
-      document.getElementById('exchange-form-container').classList.remove('hidden');
-    }
-
-    function hideExchangeForm() {
-      document.getElementById('exchange-form-container').classList.add('hidden');
-      document.getElementById('exchange-form').reset();
-    }
-
-    async function submitExchange(e) {
-      e.preventDefault();
-      
-      const amount = parseInt(document.getElementById('exchange-amount').value);
-      const danaAccount = document.getElementById('dana-account').value;
-      const danaPhone = document.getElementById('dana-phone').value;
-      
-      if (amount < 50) {
-        showToast('Minimal penukaran 50 poin!', 'error');
-        return;
       }
-      
-      if ((currentUser.points || 0) < amount) {
-        showToast('Poin tidak mencukupi!', 'error');
-        return;
+
+      function stopHistoryRefresh() {
+        if (historyRefreshInterval) {
+          clearInterval(historyRefreshInterval);
+          historyRefreshInterval = null;
+        }
+        const indicator = document.getElementById('refresh-indicator');
+        if (indicator) {
+          indicator.classList.add('opacity-0');
+        }
       }
-      
-      currentUser.points = (currentUser.points || 0) - amount;
-      
-      const exchange = {
-        type: 'exchange',
-        exchangeId: 'EX-' + Date.now(),
-        userId: currentUser.__backendId || currentUser.id,
-        username: currentUser.username,
-        amount: amount,
-        danaAccount: danaAccount,
-        danaPhone: danaPhone,
-        status: 'pending',
-        adminNote: '',
-        requestedAt: new Date().toISOString()
-      };
-      
-      // Update user points di Google Sheets
-      await callGAS('updateUser', currentUser);
-      
-      // Create exchange di Google Sheets
-      const result = await callGAS('createExchange', exchange);
-      
-      if (result.success) {
-        hideExchangeForm();
-        await loadAllData(); // Refresh data
-        updatePointsDisplay();
-        showToast('Permintaan penukaran berhasil!', 'success');
+
+      // ==================== BROADCAST BANNER ====================
+
+      function displayBroadcast() {
+        try {
+          if (!allBroadcasts || allBroadcasts.length === 0) return;
+          
+          const latestBroadcast = allBroadcasts
+            .filter(b => b && b.type === 'broadcast')
+            .sort((a, b) => new Date(b.sentAt || 0) - new Date(a.sentAt || 0))[0];
+
+          if (latestBroadcast) {
+            currentBroadcast = latestBroadcast;
+            const container = document.getElementById('broadcast-container');
+            const textDisplay = document.getElementById('broadcast-text-display');
+            if (container && textDisplay) {
+              textDisplay.textContent = '📢 ' + (latestBroadcast.message || '');
+              container.classList.remove('hidden');
+            }
+          }
+        } catch (e) {
+          console.error('Display broadcast error:', e);
+        }
+      }
+
+      // ==================== GOOGLE APPS SCRIPT INTEGRATION ====================
+
+      async function sendDataToGAS(action, data) {
+        try {
+          if (!gasWebAppUrl) {
+            console.log('GAS URL not configured, skipping sync');
+            return false;
+          }
+
+          // Don't wait for response (no-cors mode)
+          await fetch(gasWebAppUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              action: action,
+              data: data,
+              timestamp: new Date().toISOString()
+            })
+          });
+
+          lastSyncTime = new Date();
+          return true;
+        } catch (e) {
+          console.error('GAS sync error:', e);
+          return false;
+        }
+      }
+
+      async function syncDataNow(event) {
+        if (event) event.preventDefault();
         
         try {
-          if (typeof show_10547702 === 'function') {
-            await show_10547702();
+          const btn = event?.target;
+          if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<div class="loading-spinner mx-auto"></div>';
           }
-        } catch (e) {}
-        
-        renderExchangeHistory();
-      } else {
-        // Rollback points jika gagal
-        currentUser.points = (currentUser.points || 0) + amount;
-        showToast('Gagal membuat permintaan', 'error');
-      }
-    }
 
-    function renderExchangeHistory() {
-      const container = document.getElementById('exchange-history');
-      const userExchanges = allExchanges.filter(ex => ex && (ex.userId === currentUser?.__backendId || ex.userId === currentUser?.id));
-      
-      if (userExchanges.length === 0) {
-        container.innerHTML = '<p class="text-gray-500 text-center py-3 text-xs">Belum ada riwayat</p>';
-        return;
-      }
-      
-      container.innerHTML = userExchanges.sort((a, b) => new Date(b.requestedAt || 0) - new Date(a.requestedAt || 0)).map(ex => {
-        const statusClass = ex.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : 
-                           ex.status === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
-        const statusText = ex.status === 'pending' ? 'Pending' : 
-                          ex.status === 'success' ? 'Berhasil' : 'Ditolak';
-        
-        return `
-          <div class="p-3 bg-gray-50 rounded-lg">
-            <div class="flex items-center justify-between mb-1.5">
-              <span class="font-semibold text-gray-800 text-sm">${ex.amount || 0} Poin = Rp ${ex.amount || 0}</span>
-              <span class="px-2 py-0.5 ${statusClass} rounded-lg text-xs font-medium">${statusText}</span>
-            </div>
-            <p class="text-xs text-gray-500">${ex.danaAccount || '-'} - ${ex.danaPhone || '-'}</p>
-            <p class="text-xs text-gray-400 mt-1">${ex.requestedAt ? new Date(ex.requestedAt).toLocaleString('id-ID') : '-'}</p>
-            ${ex.adminNote ? `<p class="text-xs text-blue-600 mt-1.5 p-1.5 bg-blue-50 rounded">📝 ${ex.adminNote}</p>` : ''}
-            ${ex.status === 'pending' ? `
-              <button type="button" onclick="deleteUserExchange('${ex.__backendId || ex.id}')" class="mt-1.5 text-xs text-red-500 hover:underline">Hapus</button>
-            ` : ''}
-          </div>
-        `;
-      }).join('');
-    }
+          // Sync all data types
+          await sendDataToGAS('syncUsers', allUsers);
+          await sendDataToGAS('syncExchanges', allExchanges);
+          await sendDataToGAS('syncBroadcasts', allBroadcasts);
+          await sendDataToGAS('syncSettings', appSettings ? [appSettings] : []);
 
-    async function deleteUserExchange(exchangeId) {
-      const exchange = allExchanges.find(ex => ex && (ex.__backendId === exchangeId || ex.id === exchangeId));
-      if (!exchange || exchange.status !== 'pending') return;
-      
-      currentUser.points = (currentUser.points || 0) + exchange.amount;
-      
-      await callGAS('updateUser', currentUser);
-      await callGAS('deleteExchange', exchange);
-      
-      await loadAllData(); // Refresh data
-      showToast('Permintaan dibatalkan, poin dikembalikan', 'success');
-      updatePointsDisplay();
-    }
-
-    // ==================== BROADCAST FUNCTIONS ====================
-    
-    async function submitBroadcast(e) {
-      e.preventDefault();
-      
-      const message = document.getElementById('broadcast-message').value.trim();
-      
-      if (!message) {
-        showToast('Pesan tidak boleh kosong!', 'error');
-        return;
-      }
-      
-      const broadcast = {
-        type: 'broadcast',
-        messageId: 'BC-' + Date.now(),
-        message: message,
-        sentAt: new Date().toISOString()
-      };
-      
-      const result = await callGAS('createBroadcast', broadcast);
-      
-      if (result.success) {
-        document.getElementById('broadcast-form').reset();
-        document.getElementById('char-count').textContent = '0/100';
-        showToast('Pesan broadcast berhasil dikirim!', 'success');
-        await loadAllData(); // Refresh data
-      } else {
-        showToast('Gagal mengirim broadcast', 'error');
-      }
-    }
-
-    // ==================== ADMIN FUNCTIONS ====================
-    
-    async function toggleMaintenance() {
-      const isEnabled = document.getElementById('maintenance-toggle').checked;
-      
-      if (!appSettings) {
-        appSettings = {
-          type: 'settings',
-          maintenanceMode: isEnabled,
-          rewardPoints: 50
-        };
-        await callGAS('updateSettings', appSettings);
-      } else {
-        appSettings.maintenanceMode = isEnabled;
-        await callGAS('updateSettings', appSettings);
-      }
-      
-      await loadAllData(); // Refresh data
-      
-      if (isEnabled) {
-        const session = getSession();
-        if (session && session.role !== 'admin') {
-          clearSession();
-          showToast('Aplikasi sedang maintenance', 'info');
-          setTimeout(() => handleLogout(), 500);
-          return;
+          showToast('✅ Data berhasil disync ke Google Sheets!', 'success');
+          updateDatabaseStatus();
+        } catch (e) {
+          showToast('❌ Gagal sync data: ' + e.message, 'error');
+        } finally {
+          const btn = event?.target;
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '🔄 Sync Data Sekarang';
+          }
         }
-        showToast('Mode maintenance aktif', 'success');
-      } else {
-        showToast('Mode maintenance nonaktif', 'success');
       }
-    }
 
-    async function updateRewardPoints() {
-      const points = parseInt(document.getElementById('reward-points-input').value) || 50;
-      
-      if (!appSettings) {
-        appSettings = {
-          type: 'settings',
-          maintenanceMode: false,
-          rewardPoints: points
-        };
-        await callGAS('updateSettings', appSettings);
-      } else {
-        appSettings.rewardPoints = points;
-        await callGAS('updateSettings', appSettings);
-      }
-      
-      await loadAllData(); // Refresh data
-      showToast('Poin reward berhasil diubah!', 'success');
-    }
+      function updateDatabaseStatus() {
+        try {
+          const totalRecords = (allUsers?.length || 0) + (allExchanges?.length || 0) + (allBroadcasts?.length || 0) + (appSettings ? 1 : 0);
+          const totalEl = document.getElementById('total-records');
+          if (totalEl) totalEl.textContent = totalRecords;
 
-    function renderUserList() {
-      const container = document.getElementById('user-list');
-      const users = allUsers.filter(u => u && u.type === 'user');
-      
-      if (users.length === 0) {
-        container.innerHTML = '<p class="text-gray-500 text-center py-3 text-xs">Tidak ada user terdaftar</p>';
-        return;
+          const syncTime = lastSyncTime.toLocaleTimeString('id-ID');
+          const lastSyncEl = document.getElementById('last-sync');
+          if (lastSyncEl) lastSyncEl.textContent = syncTime;
+        } catch (e) {
+          console.error('Update DB status error:', e);
+        }
       }
-      
-      container.innerHTML = users.map(user => {
-        const isBlocked = user.blocked;
-        return `
-          <div class="p-3 bg-gray-50 rounded-lg ${isBlocked ? 'opacity-50' : ''}">
-            <div class="flex items-center justify-between mb-2">
-              <div>
-                <p class="font-semibold text-gray-800 text-sm">${user.username || '-'}</p>
-                <p class="text-xs text-gray-500">${user.country || '-'} | <span class="text-green-600 font-medium">${user.points || 0} Poin</span></p>
-              </div>
-              ${isBlocked ? '<span class="px-1.5 py-0.5 bg-red-100 text-red-700 rounded text-xs">Blocked</span>' : ''}
-            </div>
-            <div class="flex gap-1.5 mt-2">
-              <button type="button" onclick="openEditUserModal('${user.__backendId || user.id}')" class="flex-1 py-1.5 bg-blue-100 text-blue-700 rounded text-xs font-medium hover:bg-blue-200">Edit</button>
-              <button type="button" onclick="toggleBlockUser('${user.__backendId || user.id}')" class="flex-1 py-1.5 ${isBlocked ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'} rounded text-xs font-medium hover:opacity-80">
-                ${isBlocked ? 'Unblock' : 'Block'}
+
+      // ==================== QUIZ LOGIC ====================
+
+      function generateQuiz() {
+        try {
+          const a = Math.floor(Math.random() * 100) + 1;
+          const b = Math.floor(Math.random() * 100) + 1;
+          const correct = a + b;
+
+          const options = [correct];
+          while (options.length < 4) {
+            const wrong = correct + Math.floor(Math.random() * 21) - 10;
+            if (wrong !== correct && wrong > 0 && !options.includes(wrong)) {
+              options.push(wrong);
+            }
+          }
+
+          // Shuffle options
+          for (let i = options.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [options[i], options[j]] = [options[j], options[i]];
+          }
+
+          currentQuiz = { a, b, correct, options };
+          renderQuiz();
+        } catch (e) {
+          console.error('Generate quiz error:', e);
+        }
+      }
+
+      function renderQuiz() {
+        try {
+          if (!currentQuiz) return;
+
+          const questionEl = document.getElementById('quiz-question');
+          if (questionEl) {
+            questionEl.textContent = `${currentQuiz.a} + ${currentQuiz.b} = ?`;
+          }
+
+          const optionsContainer = document.getElementById('quiz-options');
+          if (optionsContainer) {
+            optionsContainer.innerHTML = currentQuiz.options.map(opt => `
+              <button type="button" onclick="window.checkAnswer(${opt})" class="p-3 bg-gray-100 hover:bg-purple-100 rounded-lg text-lg font-bold text-gray-800 transition">
+                ${opt}
               </button>
-              <button type="button" onclick="deleteUser('${user.__backendId || user.id}')" class="flex-1 py-1.5 bg-red-100 text-red-700 rounded text-xs font-medium hover:bg-red-200">Hapus</button>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
+            `).join('');
+          }
 
-    function openEditUserModal(userId) {
-      const user = allUsers.find(u => u && (u.__backendId === userId || u.id === userId));
-      if (!user) return;
-      
-      document.getElementById('edit-user-id').value = userId;
-      document.getElementById('edit-user-username').value = user.username || '';
-      document.getElementById('edit-user-password').value = '';
-      document.getElementById('edit-user-current-points').textContent = user.points || 0;
-      document.getElementById('edit-user-new-points').value = user.points || 0;
-      document.getElementById('edit-user-modal').classList.remove('hidden');
-    }
-
-    function closeEditUserModal() {
-      document.getElementById('edit-user-modal').classList.add('hidden');
-    }
-
-    async function saveEditUser(e) {
-      e.preventDefault();
-      
-      const userId = document.getElementById('edit-user-id').value;
-      const newPassword = document.getElementById('edit-user-password').value;
-      const newPoints = parseInt(document.getElementById('edit-user-new-points').value) || 0;
-      
-      const user = allUsers.find(u => u && (u.__backendId === userId || u.id === userId));
-      if (!user) return;
-      
-      const oldPoints = user.points || 0;
-      
-      if (newPassword) {
-        user.password = newPassword;
-      }
-      
-      user.points = newPoints;
-      
-      await callGAS('updateUser', user);
-      await loadAllData(); // Refresh data
-      
-      closeEditUserModal();
-      showToast('User berhasil diperbarui!', 'success');
-      renderUserList();
-      
-      if (currentUser && (currentUser.__backendId === userId || currentUser.id === userId)) {
-        currentUser.points = newPoints;
-        updatePointsDisplay();
-        
-        const pointDiff = newPoints - oldPoints;
-        if (pointDiff !== 0) {
-          const message = pointDiff > 0 ? 
-            `✨ Poin Anda ditambah ${pointDiff}! Total: ${newPoints}` : 
-            `⚠️ Poin Anda dikurangi ${Math.abs(pointDiff)}. Total: ${newPoints}`;
-          showToast(message, 'success');
+          const claimContainer = document.getElementById('claim-reward-container');
+          if (claimContainer) {
+            claimContainer.classList.add('hidden');
+          }
+          isAnswerCorrect = false;
+        } catch (e) {
+          console.error('Render quiz error:', e);
         }
       }
-    }
 
-    async function toggleBlockUser(userId) {
-      const user = allUsers.find(u => u && (u.__backendId === userId || u.id === userId));
-      if (!user) return;
-      
-      user.blocked = !user.blocked;
-      await callGAS('updateUser', user);
-      await loadAllData(); // Refresh data
-      
-      showToast(user.blocked ? 'User diblokir' : 'User di-unblock', 'success');
-      renderUserList();
-    }
-
-    async function deleteUser(userId) {
-      if (!confirm('Yakin ingin menghapus user ini?')) return;
-      
-      const user = allUsers.find(u => u && (u.__backendId === userId || u.id === userId));
-      if (!user) return;
-      
-      await callGAS('deleteUser', user);
-      await loadAllData(); // Refresh data
-      
-      showToast('User berhasil dihapus!', 'success');
-    }
-
-    function renderAdminExchangeList() {
-      const container = document.getElementById('admin-exchange-list');
-      const allExchangesData = [...allExchanges].sort((a, b) => new Date(b.requestedAt || 0) - new Date(a.requestedAt || 0));
-      
-      if (allExchangesData.length === 0) {
-        container.innerHTML = '<p class="text-gray-500 text-center py-3 text-xs">Belum ada permintaan penukaran</p>';
-        return;
+      function checkAnswer(answer) {
+        try {
+          if (answer === currentQuiz.correct) {
+            showToast('🎉 Jawaban Benar!', 'success');
+            isAnswerCorrect = true;
+            const claimContainer = document.getElementById('claim-reward-container');
+            if (claimContainer) {
+              claimContainer.classList.remove('hidden');
+            }
+          } else {
+            showToast('❌ Jawaban Salah!', 'error');
+            setTimeout(() => generateQuiz(), 1000);
+          }
+        } catch (e) {
+          console.error('Check answer error:', e);
+        }
       }
-      
-      container.innerHTML = allExchangesData.map(ex => {
-        if (!ex) return '';
-        
-        const statusClass = ex.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : 
-                           ex.status === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
-        const statusText = ex.status === 'pending' ? 'Pending' : 
-                          ex.status === 'success' ? 'Berhasil' : 'Ditolak';
-        const canEdit = ex.status === 'pending';
-        
-        return `
-          <div class="p-3 bg-gray-50 rounded-lg ${!canEdit ? 'opacity-70' : ''}">
-            <div class="flex items-center justify-between mb-1.5">
-              <span class="font-semibold text-gray-800 text-sm">${ex.username || '-'}</span>
-              <span class="px-2 py-0.5 ${statusClass} rounded text-xs font-medium">${statusText}</span>
-            </div>
-            <div class="flex items-center justify-between mb-1">
-              <span class="text-green-600 font-bold text-sm">${ex.amount || 0} Poin</span>
-              <span class="text-xs text-gray-400">${ex.requestedAt ? new Date(ex.requestedAt).toLocaleString('id-ID') : '-'}</span>
-            </div>
-            <p class="text-xs text-gray-500">${ex.danaAccount || '-'}</p>
-            <p class="text-xs text-gray-500">${ex.danaPhone || '-'}</p>
-            ${ex.adminNote ? `<p class="text-xs text-blue-600 mt-1.5 p-1.5 bg-blue-50 rounded">📝 ${ex.adminNote}</p>` : ''}
-            <div class="flex gap-1.5 mt-2">
-              ${canEdit ? `
-                <button type="button" onclick="openExchangeStatusModal('${ex.__backendId || ex.id}')" class="flex-1 py-1.5 bg-blue-100 text-blue-700 rounded text-xs font-medium hover:bg-blue-200">Ubah</button>
-                <button type="button" onclick="deleteExchangeAdmin('${ex.__backendId || ex.id}')" class="flex-1 py-1.5 bg-red-100 text-red-700 rounded text-xs font-medium hover:bg-red-200">Hapus</button>
-              ` : `
-                <button type="button" onclick="deleteExchangeAdmin('${ex.__backendId || ex.id}')" class="flex-1 py-1.5 bg-red-100 text-red-700 rounded text-xs font-medium hover:bg-red-200">Hapus</button>
-              `}
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
 
-    function openExchangeStatusModal(exchangeId) {
-      const exchange = allExchanges.find(ex => ex && (ex.__backendId === exchangeId || ex.id === exchangeId));
-      if (!exchange) return;
-      
-      document.getElementById('exchange-status-id').value = exchangeId;
-      document.getElementById('exchange-status-user-id').value = exchange.userId || '';
-      document.getElementById('exchange-status-amount').value = exchange.amount || 0;
-      document.getElementById('exchange-status-select').value = 'success';
-      document.getElementById('exchange-status-note').value = '';
-      document.getElementById('exchange-status-modal').classList.remove('hidden');
-    }
+      async function claimReward() {
+        try {
+          if (!isAnswerCorrect || !currentUser) return;
 
-    function closeExchangeStatusModal() {
-      document.getElementById('exchange-status-modal').classList.add('hidden');
-    }
+          const btn = document.getElementById('claim-reward-btn');
+          if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<div class="loading-spinner mx-auto"></div>';
+          }
 
-    async function saveExchangeStatus(e) {
-      e.preventDefault();
-      
-      const exchangeId = document.getElementById('exchange-status-id').value;
-      const userId = document.getElementById('exchange-status-user-id').value;
-      const amount = parseInt(document.getElementById('exchange-status-amount').value);
-      const status = document.getElementById('exchange-status-select').value;
-      const note = document.getElementById('exchange-status-note').value;
-      
-      const exchange = allExchanges.find(ex => ex && (ex.__backendId === exchangeId || ex.id === exchangeId));
-      if (!exchange) return;
-      
-      if (status === 'rejected') {
-        const user = allUsers.find(u => u && (u.__backendId === userId || u.id === userId));
-        if (user) {
-          user.points = (user.points || 0) + amount;
-          await callGAS('updateUser', user);
+          // Call ad if available
+          if (typeof window.show_10547702 === 'function') {
+            try {
+              await window.show_10547702();
+            } catch (e) {
+              console.warn('Ad error:', e);
+            }
+          }
+
+          const rewardAmount = appSettings?.rewardPoints || 50;
+          currentUser.points = (currentUser.points || 0) + rewardAmount;
+
+          // Update via SDK
+          if (window.dataSdk && typeof window.dataSdk.update === 'function') {
+            await window.dataSdk.update(currentUser);
+          }
+
+          showToast(`+${rewardAmount} Poin!`, 'success');
+          updatePointsDisplay();
+
+          // Sync to GAS
+          await sendDataToGAS('updateUser', currentUser);
+
+          generateQuiz();
+        } catch (e) {
+          console.error('Claim reward error:', e);
+          showToast('Terjadi kesalahan, coba lagi', 'error');
+        } finally {
+          const btn = document.getElementById('claim-reward-btn');
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<span>🎁</span><span>Klaim Reward</span>';
+          }
+        }
+      }
+
+      function updatePointsDisplay() {
+        try {
+          if (!currentUser) return;
+          const points = currentUser.points || 0;
+
+          const pointsElements = [
+            document.getElementById('header-points'),
+            document.getElementById('quiz-points'),
+            document.getElementById('history-points'),
+            document.getElementById('profile-points')
+          ];
+
+          pointsElements.forEach(el => {
+            if (el) {
+              el.classList.remove('point-change');
+              void el.offsetWidth; // Trigger reflow
+              el.classList.add('point-change');
+            }
+          });
+
+          const headerPoints = document.getElementById('header-points');
+          if (headerPoints) headerPoints.textContent = `${points} Poin`;
           
-          if (currentUser && (currentUser.__backendId === userId || currentUser.id === userId)) {
-            currentUser.points = user.points;
-            updatePointsDisplay();
-            showToast(`✅ Poin ${amount} dikembalikan! Total: ${user.points}`, 'success');
-          } else {
-            showToast(`✅ Poin ${amount} dikembalikan ke ${user.username}`, 'success');
-          }
+          const quizPoints = document.getElementById('quiz-points');
+          if (quizPoints) quizPoints.textContent = `${points} Poin`;
+          
+          const historyPoints = document.getElementById('history-points');
+          if (historyPoints) historyPoints.textContent = `${points} Poin`;
+          
+          const profilePoints = document.getElementById('profile-points');
+          if (profilePoints) profilePoints.textContent = points;
+        } catch (e) {
+          console.error('Update points error:', e);
         }
       }
-      
-      exchange.status = status;
-      exchange.adminNote = note;
-      await callGAS('updateExchange', exchange);
-      await loadAllData(); // Refresh data
-      
-      closeExchangeStatusModal();
-      if (status !== 'rejected') {
-        showToast(`Status diubah ke Berhasil ✅`, 'success');
+
+      // ==================== EXCHANGE FUNCTIONS ====================
+
+      function showExchangeForm() {
+        try {
+          const form = document.getElementById('exchange-form-container');
+          if (form) form.classList.remove('hidden');
+        } catch (e) {
+          console.error('Show exchange form error:', e);
+        }
       }
-      renderAdminExchangeList();
-    }
 
-    async function deleteExchangeAdmin(exchangeId) {
-      if (!confirm('Yakin ingin menghapus riwayat ini?')) return;
-      
-      const exchange = allExchanges.find(ex => ex && (ex.__backendId === exchangeId || ex.id === exchangeId));
-      if (!exchange) return;
-      
-      await callGAS('deleteExchange', exchange);
-      await loadAllData(); // Refresh data
-      
-      showToast('Riwayat penukaran dihapus!', 'success');
-    }
-
-    // ==================== AUTH FUNCTIONS ====================
-
-async function handleLogin(e) {
-  e.preventDefault();
-  
-  const username = document.getElementById('login-username').value.trim();
-  const password = document.getElementById('login-password').value;
-  
-  if (!username || !password) {
-    showToast('Username dan password harus diisi!', 'error');
-    return;
-  }
-  
-  showToast('Mencoba login...', 'info');
-  
-  // Load fresh data dari Google Sheets
-  await loadAllData();
-  
-  // Cari user dengan username dan password yang cocok
-  // Gunakan trim() dan toLowerCase() untuk menghindari masalah spasi dan huruf besar/kecil
-  const user = allUsers.find(u => 
-    u && 
-    u.type === 'user' && 
-    u.username && 
-    u.password && 
-    u.username.toString().trim().toLowerCase() === username.toString().trim().toLowerCase() && 
-    u.password.toString().trim() === password.toString().trim()
-  );
-  
-  console.log('Login attempt:', { 
-    username, 
-    password,
-    found: user ? {
-      username: user.username,
-      role: user.role,
-      blocked: user.blocked
-    } : null,
-    allUsers: allUsers.map(u => ({ username: u.username, role: u.role }))
-  });
-  
-  if (!user) {
-    showToast('Username atau password salah!', 'error');
-    return;
-  }
-  
-  if (user.blocked) {
-    showToast('Akun Anda diblokir!', 'error');
-    return;
-  }
-  
-  // Update last login
-  user.lastLogin = new Date().toISOString();
-  const result = await callGAS('updateUser', user);
-  
-  if (result.success) {
-    currentUser = user;
-    saveSession(user);
-    showToast('Login berhasil!', 'success');
-    afterLogin();
-  } else {
-    showToast('Gagal update last login', 'error');
-  }
-}
-
-async function handleRegister(e) {
-  e.preventDefault();
-  
-  const username = document.getElementById('reg-username').value.trim();
-  const password = document.getElementById('reg-password').value;
-  const country = document.getElementById('reg-country').value;
-  
-  if (!username || !password || !country) {
-    showToast('Semua field harus diisi!', 'error');
-    return;
-  }
-  
-  if (username.length < 3) {
-    showToast('Username minimal 3 karakter!', 'error');
-    return;
-  }
-  
-  if (password.length < 4) {
-    showToast('Password minimal 4 karakter!', 'error');
-    return;
-  }
-  
-  showToast('Memproses pendaftaran...', 'info');
-  
-  // Load fresh data dari Google Sheets
-  await loadAllData();
-  
-  // Cek username sudah ada (case insensitive)
-  const exists = allUsers.find(u => 
-    u && 
-    u.username && 
-    u.username.toString().trim().toLowerCase() === username.toString().trim().toLowerCase()
-  );
-  
-  if (exists) {
-    showToast('Username sudah digunakan!', 'error');
-    return;
-  }
-  
-  if (allUsers.filter(u => u && u.type === 'user').length >= 900) {
-    showToast('Pendaftaran ditutup sementara', 'error');
-    return;
-  }
-  
-  const isFirstUser = allUsers.filter(u => u && u.type === 'user').length === 0;
-  
-  const newUser = {
-    type: 'user',
-    username: username,
-    password: password,
-    role: isFirstUser ? 'admin' : 'user',
-    country: country,
-    deviceId: deviceId,
-    points: 0,
-    blocked: false,
-    createdAt: new Date().toISOString(),
-    lastLogin: new Date().toISOString()
-  };
-  
-  console.log('Registering new user:', newUser);
-  
-  const result = await callGAS('createUser', newUser);
-  console.log('Registration result:', result);
-  
-  if (result.success && result.data) {
-    showToast(isFirstUser ? 'Selamat! Anda terdaftar sebagai Admin' : 'Pendaftaran berhasil! Silakan login', 'success');
-    document.getElementById('register-form').reset();
-    
-    // Refresh data
-    await loadAllData();
-    
-    showPage('login-page');
-  } else {
-    showToast('Pendaftaran gagal: ' + (result.error || 'Unknown error'), 'error');
-  }
-}
-
-// ==================== DEBUG FUNCTION ====================
-
-// Tambahkan fungsi untuk debug (bisa dipanggil dari console)
-window.debugUsers = function() {
-  console.log('=== DEBUG USERS ===');
-  console.log('Current User:', currentUser ? {
-    username: currentUser.username,
-    role: currentUser.role,
-    points: currentUser.points
-  } : 'Not logged in');
-  
-  console.log('All Users:', allUsers.map(u => ({
-    username: u.username,
-    password: u.password,
-    role: u.role,
-    blocked: u.blocked,
-    points: u.points
-  })));
-  
-  console.log('App Settings:', appSettings);
-  console.log('Total Exchanges:', allExchanges.length);
-  console.log('Total Broadcasts:', allBroadcasts.length);
-  
-  return 'Check console for debug info';
-};
-
-// Fungsi untuk test login langsung
-window.testLogin = function(username, password) {
-  const user = allUsers.find(u => 
-    u && 
-    u.type === 'user' && 
-    u.username && 
-    u.username.toString().trim().toLowerCase() === username.toString().trim().toLowerCase() && 
-    u.password && 
-    u.password.toString().trim() === password.toString().trim()
-  );
-  
-  console.log('Test login for:', username);
-  console.log('Found:', user ? {
-    username: user.username,
-    password: user.password,
-    match: user.password === password
-  } : 'Not found');
-  
-  return user ? 'User found!' : 'User not found!';
-};
-
-
-    // ==================== ELEMENT SDK HANDLER ====================
-    
-    async function onConfigChange(config) {
-      document.getElementById('app-title').textContent = config.app_title || defaultConfig.app_title;
-    }
-
-    // ==================== INITIALIZATION ====================
-    
-    async function init() {
-      // Initialize SDKs
-      if (window.elementSdk) {
-        await window.elementSdk.init({
-          defaultConfig,
-          onConfigChange,
-          mapToCapabilities: () => ({
-            recolorables: [],
-            borderables: [],
-            fontEditable: undefined,
-            fontSizeable: undefined
-          }),
-          mapToEditPanelValues: (config) => new Map([
-            ['app_title', config.app_title || defaultConfig.app_title]
-          ])
-        });
+      function hideExchangeForm() {
+        try {
+          const form = document.getElementById('exchange-form-container');
+          if (form) form.classList.add('hidden');
+          
+          const exchangeForm = document.getElementById('exchange-form');
+          if (exchangeForm) exchangeForm.reset();
+        } catch (e) {
+          console.error('Hide exchange form error:', e);
+        }
       }
-      
-      if (window.dataSdk) {
-        await window.dataSdk.init({
-          onDataChanged: (data) => {
-            loadAllData();
+
+      async function submitExchange(e) {
+        e.preventDefault();
+
+        try {
+          const amount = parseInt(document.getElementById('exchange-amount')?.value || '0');
+          const danaAccount = document.getElementById('dana-account')?.value || '';
+          const danaPhone = document.getElementById('dana-phone')?.value || '';
+
+          if (amount < 50) {
+            showToast('Minimal penukaran 50 poin!', 'error');
+            return;
           }
-        });
+
+          if ((currentUser?.points || 0) < amount) {
+            showToast('Poin tidak mencukupi!', 'error');
+            return;
+          }
+
+          currentUser.points = (currentUser.points || 0) - amount;
+          
+          if (window.dataSdk && typeof window.dataSdk.update === 'function') {
+            await window.dataSdk.update(currentUser);
+          }
+
+          const exchange = {
+            type: 'exchange',
+            exchangeId: 'EX-' + Date.now(),
+            userId: currentUser.__backendId,
+            username: currentUser.username,
+            amount: amount,
+            danaAccount: danaAccount,
+            danaPhone: danaPhone,
+            status: 'pending',
+            adminNote: '',
+            requestedAt: new Date().toISOString()
+          };
+
+          if (window.dataSdk && typeof window.dataSdk.create === 'function') {
+            await window.dataSdk.create(exchange);
+          }
+
+          // Sync to GAS
+          await sendDataToGAS('createExchange', exchange);
+          await sendDataToGAS('updateUser', currentUser);
+
+          hideExchangeForm();
+          updatePointsDisplay();
+          showToast('Permintaan penukaran berhasil!', 'success');
+
+          // Call ad if available
+          if (typeof window.show_10547702 === 'function') {
+            try {
+              await window.show_10547702();
+            } catch (e) {}
+          }
+
+          renderExchangeHistory();
+        } catch (e) {
+          console.error('Submit exchange error:', e);
+          showToast('Gagal mengirim permintaan', 'error');
+        }
       }
-      
-      // Load data dari Google Sheets
-      await loadAllData();
-      
-      // Detect country on page load
-      detectCountry();
-      
-      // Event Listeners
-      document.getElementById('login-form').addEventListener('submit', handleLogin);
-      document.getElementById('register-form').addEventListener('submit', handleRegister);
-      document.getElementById('exchange-form').addEventListener('submit', submitExchange);
-      document.getElementById('edit-user-form').addEventListener('submit', saveEditUser);
-      document.getElementById('exchange-status-form').addEventListener('submit', saveExchangeStatus);
-      document.getElementById('broadcast-form').addEventListener('submit', submitBroadcast);
-      
-      // Check existing session
-      const session = getSession();
-      if (session) {
-        setTimeout(async () => {
-          await loadAllData();
-          const user = allUsers.find(u => u && (u.__backendId === session.userId || u.id === session.userId));
-          if (user && !user.blocked) {
-            currentUser = user;
-            afterLogin();
+
+      function renderExchangeHistory() {
+        try {
+          const container = document.getElementById('exchange-history');
+          if (!container) return;
+
+          const userExchanges = allExchanges?.filter(ex => ex.userId === currentUser?.__backendId) || [];
+
+          if (userExchanges.length === 0) {
+            container.innerHTML = '<p class="text-gray-500 text-center py-3 text-xs">Belum ada riwayat</p>';
+            return;
+          }
+
+          container.innerHTML = userExchanges.map(ex => {
+            const statusClass = ex.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+              ex.status === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
+            const statusText = ex.status === 'pending' ? 'Pending' :
+              ex.status === 'success' ? 'Berhasil' : 'Ditolak';
+
+            return `
+            <div class="p-3 bg-gray-50 rounded-lg">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="font-semibold text-gray-800 text-sm">${ex.amount} Poin = Rp ${ex.amount}</span>
+                <span class="px-2 py-0.5 ${statusClass} rounded-lg text-xs font-medium">${statusText}</span>
+              </div>
+              <p class="text-xs text-gray-500">${ex.danaAccount || ''} - ${ex.danaPhone || ''}</p>
+              <p class="text-xs text-gray-400 mt-1">${ex.requestedAt ? new Date(ex.requestedAt).toLocaleString('id-ID') : '-'}</p>
+              ${ex.adminNote ? `<p class="text-xs text-blue-600 mt-1.5 p-1.5 bg-blue-50 rounded">📝 ${ex.adminNote}</p>` : ''}
+              ${ex.status === 'pending' ? `
+                <button type="button" onclick="window.deleteUserExchange('${ex.__backendId || ''}')" class="mt-1.5 text-xs text-red-500 hover:underline">Hapus</button>
+              ` : ''}
+            </div>
+          `;
+          }).join('');
+        } catch (e) {
+          console.error('Render exchange history error:', e);
+        }
+      }
+
+      async function deleteUserExchange(exchangeId) {
+        try {
+          const exchange = allExchanges?.find(ex => ex.__backendId === exchangeId);
+          if (!exchange || exchange.status !== 'pending') return;
+
+          currentUser.points = (currentUser.points || 0) + exchange.amount;
+          
+          if (window.dataSdk && typeof window.dataSdk.update === 'function') {
+            await window.dataSdk.update(currentUser);
+          }
+          
+          if (window.dataSdk && typeof window.dataSdk.delete === 'function') {
+            await window.dataSdk.delete(exchange);
+          }
+
+          // Sync to GAS
+          await sendDataToGAS('deleteExchange', exchange);
+          await sendDataToGAS('updateUser', currentUser);
+
+          showToast('Permintaan dibatalkan, poin dikembalikan', 'success');
+          updatePointsDisplay();
+        } catch (e) {
+          console.error('Delete exchange error:', e);
+          showToast('Gagal membatalkan permintaan', 'error');
+        }
+      }
+
+      // ==================== BROADCAST FUNCTIONS ====================
+
+      async function submitBroadcast(e) {
+        e.preventDefault();
+
+        try {
+          const message = document.getElementById('broadcast-message')?.value.trim();
+
+          if (!message) {
+            showToast('Pesan tidak boleh kosong!', 'error');
+            return;
+          }
+
+          const broadcast = {
+            type: 'broadcast',
+            messageId: 'BC-' + Date.now(),
+            message: message,
+            sentAt: new Date().toISOString()
+          };
+
+          if (window.dataSdk && typeof window.dataSdk.create === 'function') {
+            await window.dataSdk.create(broadcast);
+          }
+
+          // Sync to GAS
+          await sendDataToGAS('createBroadcast', broadcast);
+
+          const broadcastForm = document.getElementById('broadcast-form');
+          if (broadcastForm) broadcastForm.reset();
+          
+          const charCount = document.getElementById('char-count');
+          if (charCount) charCount.textContent = '0/100';
+          
+          showToast('Pesan broadcast berhasil dikirim!', 'success');
+        } catch (e) {
+          console.error('Submit broadcast error:', e);
+          showToast('Gagal mengirim broadcast', 'error');
+        }
+      }
+
+      // ==================== ADMIN FUNCTIONS ====================
+
+      async function toggleMaintenance() {
+        try {
+          const toggle = document.getElementById('maintenance-toggle');
+          if (!toggle) return;
+          
+          const isEnabled = toggle.checked;
+
+          if (!appSettings) {
+            appSettings = {
+              type: 'settings',
+              maintenanceMode: isEnabled,
+              rewardPoints: 50
+            };
+            if (window.dataSdk && typeof window.dataSdk.create === 'function') {
+              await window.dataSdk.create(appSettings);
+            }
           } else {
-            clearSession();
+            appSettings.maintenanceMode = isEnabled;
+            if (window.dataSdk && typeof window.dataSdk.update === 'function') {
+              await window.dataSdk.update(appSettings);
+            }
           }
-        }, 1000);
-      }
-    }
 
-    // Character counter for broadcast
-    document.addEventListener('input', function(e) {
-      if (e.target.id === 'broadcast-message') {
-        const count = e.target.value.length;
-        document.getElementById('char-count').textContent = `${count}/100`;
-      }
-    });
+          // Sync to GAS
+          await sendDataToGAS('updateSettings', appSettings);
 
-    // Start the app
-    init();
+          if (isEnabled) {
+            const session = getSession();
+            if (session && session.role !== 'admin') {
+              clearSession();
+              showToast('Aplikasi sedang maintenance', 'info');
+              setTimeout(() => {
+                handleLogout();
+              }, 500);
+              return;
+            }
+
+            showToast('Mode maintenance aktif', 'success');
+          } else {
+            showToast('Mode maintenance nonaktif', 'success');
+          }
+        } catch (e) {
+          console.error('Toggle maintenance error:', e);
+          showToast('Gagal mengubah mode maintenance', 'error');
+        }
+      }
+
+      async function updateRewardPoints() {
+        try {
+          const input = document.getElementById('reward-points-input');
+          if (!input) return;
+          
+          const points = parseInt(input.value) || 50;
+
+          if (!appSettings) {
+            appSettings = {
+              type: 'settings',
+              maintenanceMode: false,
+              rewardPoints: points
+            };
+            if (window.dataSdk && typeof window.dataSdk.create === 'function') {
+              await window.dataSdk.create(appSettings);
+            }
+          } else {
+            appSettings.rewardPoints = points;
+            if (window.dataSdk && typeof window.dataSdk.update === 'function') {
+              await window.dataSdk.update(appSettings);
+            }
+          }
+
+          // Sync to GAS
+          await sendDataToGAS('updateSettings', appSettings);
+
+          showToast('Poin reward berhasil diubah!', 'success');
+        } catch (e) {
+          console.error('Update reward points error:', e);
+          showToast('Gagal mengubah poin reward', 'error');
+        }
+      }
+
+      function renderUserList() {
+        try {
+          const container = document.getElementById('user-list');
+          if (!container) return;
+
+          const users = allUsers?.filter(u => u.type === 'user') || [];
+
+          if (users.length === 0) {
+            container.innerHTML = '<p class="text-gray-500 text-center py-3 text-xs">Tidak ada user terdaftar</p>';
+            return;
+          }
+
+          container.innerHTML = users.map(user => {
+            const isBlocked = user.blocked;
+            return `
+            <div class="p-3 bg-gray-50 rounded-lg ${isBlocked ? 'opacity-50' : ''}">
+              <div class="flex items-center justify-between mb-2">
+                <div>
+                  <p class="font-semibold text-gray-800 text-sm">${user.username || ''}</p>
+                  <p class="text-xs text-gray-500">${user.country || '-'} | <span class="text-green-600 font-medium">${user.points || 0} Poin</span></p>
+                </div>
+                ${isBlocked ? '<span class="px-1.5 py-0.5 bg-red-100 text-red-700 rounded text-xs">Blocked</span>' : ''}
+              </div>
+              <div class="flex gap-1.5 mt-2">
+                <button type="button" onclick="window.openEditUserModal('${user.__backendId || ''}')" class="flex-1 py-1.5 bg-blue-100 text-blue-700 rounded text-xs font-medium hover:bg-blue-200">Edit</button>
+                <button type="button" onclick="window.toggleBlockUser('${user.__backendId || ''}')" class="flex-1 py-1.5 ${isBlocked ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'} rounded text-xs font-medium hover:opacity-80">
+                  ${isBlocked ? 'Unblock' : 'Block'}
+                </button>
+                <button type="button" onclick="window.deleteUser('${user.__backendId || ''}')" class="flex-1 py-1.5 bg-red-100 text-red-700 rounded text-xs font-medium hover:bg-red-200">Hapus</button>
+              </div>
+            </div>
+          `;
+          }).join('');
+        } catch (e) {
+          console.error('Render user list error:', e);
+        }
+      }
+
+      function openEditUserModal(userId) {
+        try {
+          const user = allUsers?.find(u => u.__backendId === userId);
+          if (!user) return;
+
+          const idEl = document.getElementById('edit-user-id');
+          if (idEl) idEl.value = userId || '';
+          
+          const usernameEl = document.getElementById('edit-user-username');
+          if (usernameEl) usernameEl.value = user.username || '';
+          
+          const passwordEl = document.getElementById('edit-user-password');
+          if (passwordEl) passwordEl.value = '';
+          
+          const currentPointsEl = document.getElementById('edit-user-current-points');
+          if (currentPointsEl) currentPointsEl.textContent = user.points || 0;
+          
+          const newPointsEl = document.getElementById('edit-user-new-points');
+          if (newPointsEl) newPointsEl.value = user.points || 0;
+          
+          const modal = document.getElementById('edit-user-modal');
+          if (modal) modal.classList.remove('hidden');
+        } catch (e) {
+          console.error('Open edit modal error:', e);
+        }
+      }
+
+      function closeEditUserModal() {
+        try {
+          const modal = document.getElementById('edit-user-modal');
+          if (modal) modal.classList.add('hidden');
+        } catch (e) {
+          console.error('Close edit modal error:', e);
+        }
+      }
+
+      async function saveEditUser(e) {
+        e.preventDefault();
+
+        try {
+          const userId = document.getElementById('edit-user-id')?.value;
+          const newPassword = document.getElementById('edit-user-password')?.value;
+          const newPoints = parseInt(document.getElementById('edit-user-new-points')?.value || '0');
+
+          const user = allUsers?.find(u => u.__backendId === userId);
+          if (!user) return;
+
+          const oldPoints = user.points || 0;
+
+          if (newPassword) {
+            user.password = newPassword;
+          }
+
+          user.points = newPoints;
+
+          if (window.dataSdk && typeof window.dataSdk.update === 'function') {
+            await window.dataSdk.update(user);
+          }
+
+          // Sync to GAS
+          await sendDataToGAS('updateUser', user);
+
+          closeEditUserModal();
+          showToast('User berhasil diperbarui!', 'success');
+          renderUserList();
+
+          if (currentUser && currentUser.__backendId === userId) {
+            currentUser.points = newPoints;
+            updatePointsDisplay();
+
+            const pointDiff = newPoints - oldPoints;
+            if (pointDiff !== 0) {
+              const message = pointDiff > 0 ?
+                `✨ Poin Anda ditambah ${pointDiff}! Total: ${newPoints}` :
+                `⚠️ Poin Anda dikurangi ${Math.abs(pointDiff)}. Total: ${newPoints}`;
+              showToast(message, 'success');
+            }
+          }
+        } catch (e) {
+          console.error('Save edit user error:', e);
+          showToast('Gagal menyimpan perubahan', 'error');
+        }
+      }
+
+      async function toggleBlockUser(userId) {
+        try {
+          const user = allUsers?.find(u => u.__backendId === userId);
+          if (!user) return;
+
+          user.blocked = !user.blocked;
+          
+          if (window.dataSdk && typeof window.dataSdk.update === 'function') {
+            await window.dataSdk.update(user);
+          }
+
+          // Sync to GAS
+          await sendDataToGAS('updateUser', user);
+
+          showToast(user.blocked ? 'User diblokir' : 'User di-unblock', 'success');
+          renderUserList();
+        } catch (e) {
+          console.error('Toggle block error:', e);
+          showToast('Gagal mengubah status block', 'error');
+        }
+      }
+
+      async function deleteUser(userId) {
+        try {
+          const user = allUsers?.find(u => u.__backendId === userId);
+          if (!user) return;
+
+          if (window.dataSdk && typeof window.dataSdk.delete === 'function') {
+            await window.dataSdk.delete(user);
+          }
+
+          // Sync to GAS
+          await sendDataToGAS('deleteUser', user);
+
+          showToast('User berhasil dihapus!', 'success');
+        } catch (e) {
+          console.error('Delete user error:', e);
+          showToast('Gagal menghapus user', 'error');
+        }
+      }
+
+      function renderAdminExchangeList() {
+        try {
+          const container = document.getElementById('admin-exchange-list');
+          if (!container) return;
+
+          const allExchangesData = (allExchanges || []).sort((a, b) => 
+            new Date(b.requestedAt || 0) - new Date(a.requestedAt || 0)
+          );
+
+          if (allExchangesData.length === 0) {
+            container.innerHTML = '<p class="text-gray-500 text-center py-3 text-xs">Belum ada permintaan penukaran</p>';
+            return;
+          }
+
+          container.innerHTML = allExchangesData.map(ex => {
+            const statusClass = ex.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+              ex.status === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
+            const statusText = ex.status === 'pending' ? 'Pending' :
+              ex.status === 'success' ? 'Berhasil' : 'Ditolak';
+            const canEdit = ex.status === 'pending';
+
+            return `
+            <div class="p-3 bg-gray-50 rounded-lg ${!canEdit ? 'opacity-70' : ''}">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="font-semibold text-gray-800 text-sm">${ex.username || ''}</span>
+                <span class="px-2 py-0.5 ${statusClass} rounded text-xs font-medium">${statusText}</span>
+              </div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-green-600 font-bold text-sm">${ex.amount || 0} Poin</span>
+                <span class="text-xs text-gray-400">${ex.requestedAt ? new Date(ex.requestedAt).toLocaleString('id-ID') : '-'}</span>
+              </div>
+              <p class="text-xs text-gray-500">${ex.danaAccount || ''}</p>
+              <p class="text-xs text-gray-500">${ex.danaPhone || ''}</p>
+              ${ex.adminNote ? `<p class="text-xs text-blue-600 mt-1.5 p-1.5 bg-blue-50 rounded">📝 ${ex.adminNote}</p>` : ''}
+              <div class="flex gap-1.5 mt-2">
+                ${canEdit ? `
+                  <button type="button" onclick="window.openExchangeStatusModal('${ex.__backendId || ''}')" class="flex-1 py-1.5 bg-blue-100 text-blue-700 rounded text-xs font-medium hover:bg-blue-200">Ubah</button>
+                  <button type="button" onclick="window.deleteExchangeAdmin('${ex.__backendId || ''}')" class="flex-1 py-1.5 bg-red-100 text-red-700 rounded text-xs font-medium hover:bg-red-200">Hapus</button>
+                ` : `
+                  <button type="button" onclick="window.deleteExchangeAdmin('${ex.__backendId || ''}')" class="flex-1 py-1.5 bg-red-100 text-red-700 rounded text-xs font-medium hover:bg-red-200">Hapus</button>
+                `}
+              </div>
+            </div>
+          `;
+          }).join('');
+        } catch (e) {
+          console.error('Render admin exchange list error:', e);
+        }
+      }
+
+      function openExchangeStatusModal(exchangeId) {
+        try {
+          const exchange = allExchanges?.find(ex => ex.__backendId === exchangeId);
+          if (!exchange) return;
+
+          const idEl = document.getElementById('exchange-status-id');
+          if (idEl) idEl.value = exchangeId || '';
+          
+          const userIdEl = document.getElementById('exchange-status-user-id');
+          if (userIdEl) userIdEl.value = exchange.userId || '';
+          
+          const amountEl = document.getElementById('exchange-status-amount');
+          if (amountEl) amountEl.value = exchange.amount || 0;
+          
+          const selectEl = document.getElementById('exchange-status-select');
+          if (selectEl) selectEl.value = 'success';
+          
+          const noteEl = document.getElementById('exchange-status-note');
+          if (noteEl) noteEl.value = '';
+          
+          const modal = document.getElementById('exchange-status-modal');
+          if (modal) modal.classList.remove('hidden');
+        } catch (e) {
+          console.error('Open exchange status modal error:', e);
+        }
+      }
+
+      function closeExchangeStatusModal() {
+        try {
+          const modal = document.getElementById('exchange-status-modal');
+          if (modal) modal.classList.add('hidden');
+        } catch (e) {
+          console.error('Close exchange status modal error:', e);
+        }
+      }
+
+      async function saveExchangeStatus(e) {
+        e.preventDefault();
+
+        try {
+          const exchangeId = document.getElementById('exchange-status-id')?.value;
+          const userId = document.getElementById('exchange-status-user-id')?.value;
+          const amount = parseInt(document.getElementById('exchange-status-amount')?.value || '0');
+          const status = document.getElementById('exchange-status-select')?.value;
+          const note = document.getElementById('exchange-status-note')?.value || '';
+
+          const exchange = allExchanges?.find(ex => ex.__backendId === exchangeId);
+          if (!exchange) return;
+
+          if (status === 'rejected') {
+            const user = allUsers?.find(u => u.__backendId === userId);
+            if (user) {
+              user.points = (user.points || 0) + amount;
+              
+              if (window.dataSdk && typeof window.dataSdk.update === 'function') {
+                await window.dataSdk.update(user);
+              }
+
+              // Sync to GAS
+              await sendDataToGAS('updateUser', user);
+
+              if (currentUser && currentUser.__backendId === userId) {
+                currentUser.points = user.points;
+                updatePointsDisplay();
+                showToast(`✅ Poin ${amount} dikembalikan! Total: ${user.points}`, 'success');
+              } else {
+                showToast(`✅ Poin ${amount} dikembalikan ke ${user.username || ''}`, 'success');
+              }
+            }
+          }
+
+          exchange.status = status;
+          exchange.adminNote = note;
+          
+          if (window.dataSdk && typeof window.dataSdk.update === 'function') {
+            await window.dataSdk.update(exchange);
+          }
+
+          // Sync to GAS
+          await sendDataToGAS('updateExchange', exchange);
+
+          closeExchangeStatusModal();
+          if (status !== 'rejected') {
+            showToast(`Status diubah ke Berhasil ✅`, 'success');
+          }
+          renderAdminExchangeList();
+        } catch (e) {
+          console.error('Save exchange status error:', e);
+          showToast('Gagal mengubah status', 'error');
+        }
+      }
+
+      async function deleteExchangeAdmin(exchangeId) {
+        try {
+          const exchange = allExchanges?.find(ex => ex.__backendId === exchangeId);
+          if (!exchange) return;
+
+          if (window.dataSdk && typeof window.dataSdk.delete === 'function') {
+            await window.dataSdk.delete(exchange);
+          }
+
+          // Sync to GAS
+          await sendDataToGAS('deleteExchange', exchange);
+
+          showToast('Riwayat penukaran dihapus!', 'success');
+        } catch (e) {
+          console.error('Delete exchange admin error:', e);
+          showToast('Gagal menghapus riwayat', 'error');
+        }
+      }
+
+      // ==================== AUTH FUNCTIONS ====================
+
+      async function handleLogin(e) {
+        e.preventDefault();
+
+        try {
+          const username = document.getElementById('login-username')?.value.trim();
+          const password = document.getElementById('login-password')?.value;
+
+          const user = allUsers?.find(u => u.type === 'user' && u.username === username && u.password === password);
+
+          if (!user) {
+            showToast('Username atau password salah!', 'error');
+            return;
+          }
+
+          if (user.blocked) {
+            showToast('Akun Anda diblokir!', 'error');
+            return;
+          }
+
+          user.lastLogin = new Date().toISOString();
+          
+          if (window.dataSdk && typeof window.dataSdk.update === 'function') {
+            await window.dataSdk.update(user);
+          }
+
+          // Sync to GAS
+          await sendDataToGAS('updateUser', user);
+
+          currentUser = user;
+          saveSession(user);
+
+          afterLogin();
+        } catch (e) {
+          console.error('Login error:', e);
+          showToast('Gagal login, coba lagi', 'error');
+        }
+      }
+
+      async function handleRegister(e) {
+        e.preventDefault();
+
+        try {
+          const username = document.getElementById('reg-username')?.value.trim();
+          const password = document.getElementById('reg-password')?.value;
+          const country = document.getElementById('reg-country')?.value;
+
+          if (!username || !password || !country) {
+            showToast('Semua field harus diisi!', 'error');
+            return;
+          }
+
+          const exists = allUsers?.find(u => u.username === username);
+          if (exists) {
+            showToast('Username sudah digunakan!', 'error');
+            return;
+          }
+
+          if ((allUsers?.filter(u => u.type === 'user').length || 0) >= 900) {
+            showToast('Pendaftaran ditutup sementara', 'error');
+            return;
+          }
+
+          const isFirstUser = (allUsers?.filter(u => u.type === 'user').length || 0) === 0;
+
+          const newUser = {
+            type: 'user',
+            username: username,
+            password: password,
+            role: isFirstUser ? 'admin' : 'user',
+            country: country,
+            deviceId: deviceId,
+            points: 0,
+            blocked: false,
+            createdAt: new Date().toISOString(),
+            lastLogin: new Date().toISOString()
+          };
+
+          if (window.dataSdk && typeof window.dataSdk.create === 'function') {
+            await window.dataSdk.create(newUser);
+          }
+
+          // Sync to GAS
+          await sendDataToGAS('createUser', newUser);
+
+          showToast(isFirstUser ? 'Selamat! Anda terdaftar sebagai Admin' : 'Pendaftaran berhasil! Silakan login', 'success');
+          showPage('login-page');
+        } catch (e) {
+          console.error('Register error:', e);
+          showToast('Gagal mendaftar, coba lagi', 'error');
+        }
+      }
+
+      function handleLogout() {
+        try {
+          clearSession();
+          currentUser = null;
+          stopHistoryRefresh();
+          showPage('login-page');
+          
+          const loginForm = document.getElementById('login-form');
+          if (loginForm) loginForm.reset();
+        } catch (e) {
+          console.error('Logout error:', e);
+        }
+      }
+
+      function afterLogin() {
+        try {
+          if (!currentUser) return;
+
+          if (appSettings?.maintenanceMode && currentUser.role !== 'admin') {
+            showPage('maintenance-page');
+            return;
+          }
+
+          const headerUsername = document.getElementById('header-username');
+          if (headerUsername) headerUsername.textContent = currentUser.username || '';
+          
+          const profileUsername = document.getElementById('profile-username');
+          if (profileUsername) profileUsername.textContent = currentUser.username || '';
+          
+          const profileRole = document.getElementById('profile-role');
+          if (profileRole) profileRole.textContent = currentUser.role === 'admin' ? 'Admin' : 'User';
+          
+          const profileCountry = document.getElementById('profile-country');
+          if (profileCountry) profileCountry.textContent = currentUser.country || '-';
+          
+          const profileDevice = document.getElementById('profile-device');
+          if (profileDevice) profileDevice.textContent = currentUser.deviceId || deviceId;
+
+          updatePointsDisplay();
+          displayBroadcast();
+
+          const settingsNavBtn = document.getElementById('settings-nav-btn');
+          if (settingsNavBtn) {
+            if (currentUser.role === 'admin') {
+              settingsNavBtn.classList.remove('hidden');
+              if (appSettings) {
+                const maintToggle = document.getElementById('maintenance-toggle');
+                if (maintToggle) maintToggle.checked = appSettings.maintenanceMode || false;
+                
+                const rewardInput = document.getElementById('reward-points-input');
+                if (rewardInput) rewardInput.value = appSettings.rewardPoints || 50;
+              }
+            } else {
+              settingsNavBtn.classList.add('hidden');
+            }
+          }
+
+          showPage('main-app');
+          showSection('quiz');
+          generateQuiz();
+        } catch (e) {
+          console.error('After login error:', e);
+        }
+      }
+
+      // ==================== DATA HANDLER ====================
+
+      const dataHandler = {
+        onDataChanged(data) {
+          try {
+            if (!data || !Array.isArray(data)) return;
+            
+            allUsers = data.filter(d => d && d.type === 'user') || [];
+            allExchanges = data.filter(d => d && d.type === 'exchange') || [];
+            allBroadcasts = data.filter(d => d && d.type === 'broadcast') || [];
+            appSettings = data.find(d => d && d.type === 'settings');
+
+            if (currentUser) {
+              const updated = allUsers.find(u => u && u.__backendId === currentUser.__backendId);
+              if (updated) {
+                const pointsChanged = currentUser.points !== updated.points;
+                currentUser = updated;
+
+                if (pointsChanged) {
+                  updatePointsDisplay();
+                }
+              }
+
+              displayBroadcast();
+
+              if (appSettings?.maintenanceMode && currentUser.role !== 'admin') {
+                const mainApp = document.getElementById('main-app');
+                if (mainApp && mainApp.classList.contains('active')) {
+                  handleLogout();
+                  showPage('maintenance-page');
+                  showToast('Aplikasi sedang maintenance', 'info');
+                }
+              }
+            }
+
+            if (currentUser?.role === 'admin') {
+              if (appSettings) {
+                const maintToggle = document.getElementById('maintenance-toggle');
+                if (maintToggle) maintToggle.checked = appSettings.maintenanceMode || false;
+                
+                const rewardInput = document.getElementById('reward-points-input');
+                if (rewardInput) rewardInput.value = appSettings.rewardPoints || 50;
+              }
+            }
+          } catch (e) {
+            console.error('Data handler error:', e);
+          }
+        }
+      };
+
+      // ==================== ELEMENT SDK HANDLER ====================
+
+      async function onConfigChange(config) {
+        try {
+          const titleEl = document.getElementById('app-title');
+          if (titleEl) {
+            titleEl.textContent = config?.app_title || defaultConfig.app_title;
+          }
+        } catch (e) {
+          console.error('Config change error:', e);
+        }
+      }
+
+      // ==================== INITIALIZATION ====================
+
+      async function init() {
+        if (isInitialized) return;
+        
+        try {
+          // Initialize SDKs
+          if (window.elementSdk && typeof window.elementSdk.init === 'function') {
+            await window.elementSdk.init({
+              defaultConfig,
+              onConfigChange,
+              mapToCapabilities: () => ({
+                recolorables: [],
+                borderables: [],
+                fontEditable: undefined,
+                fontSizeable: undefined
+              }),
+              mapToEditPanelValues: (config) => new Map([
+                ['app_title', config?.app_title || defaultConfig.app_title]
+              ])
+            });
+          }
+
+          if (window.dataSdk && typeof window.dataSdk.init === 'function') {
+            await window.dataSdk.init(dataHandler);
+          }
+
+          // Set up event listeners (remove old ones first)
+          const loginForm = document.getElementById('login-form');
+          if (loginForm) {
+            loginForm.removeEventListener('submit', handleLogin);
+            loginForm.addEventListener('submit', handleLogin);
+          }
+
+          const registerForm = document.getElementById('register-form');
+          if (registerForm) {
+            registerForm.removeEventListener('submit', handleRegister);
+            registerForm.addEventListener('submit', handleRegister);
+          }
+
+          const exchangeForm = document.getElementById('exchange-form');
+          if (exchangeForm) {
+            exchangeForm.removeEventListener('submit', submitExchange);
+            exchangeForm.addEventListener('submit', submitExchange);
+          }
+
+          const editUserForm = document.getElementById('edit-user-form');
+          if (editUserForm) {
+            editUserForm.removeEventListener('submit', saveEditUser);
+            editUserForm.addEventListener('submit', saveEditUser);
+          }
+
+          const exchangeStatusForm = document.getElementById('exchange-status-form');
+          if (exchangeStatusForm) {
+            exchangeStatusForm.removeEventListener('submit', saveExchangeStatus);
+            exchangeStatusForm.addEventListener('submit', saveExchangeStatus);
+          }
+
+          const broadcastForm = document.getElementById('broadcast-form');
+          if (broadcastForm) {
+            broadcastForm.removeEventListener('submit', submitBroadcast);
+            broadcastForm.addEventListener('submit', submitBroadcast);
+          }
+
+          // Character count for broadcast
+          const broadcastMessage = document.getElementById('broadcast-message');
+          if (broadcastMessage) {
+            broadcastMessage.removeEventListener('input', updateCharCount);
+            broadcastMessage.addEventListener('input', updateCharCount);
+          }
+
+          // Detect country on page load
+          detectCountry();
+
+          // Check for existing session
+          const session = getSession();
+          if (session) {
+            // Wait a bit for data to load
+            setTimeout(() => {
+              const user = allUsers?.find(u => u && u.__backendId === session.userId);
+              if (user && !user.blocked) {
+                currentUser = user;
+                afterLogin();
+              } else {
+                clearSession();
+              }
+            }, 1000);
+          }
+
+          isInitialized = true;
+        } catch (e) {
+          console.error('Init error:', e);
+        }
+      }
+
+      function updateCharCount(e) {
+        try {
+          const count = e.target.value.length;
+          const charCount = document.getElementById('char-count');
+          if (charCount) {
+            charCount.textContent = `${count}/100`;
+          }
+        } catch (e) {
+          console.error('Update char count error:', e);
+        }
+      }
+
+      // Attach functions to window for global access
+      window.showPage = showPage;
+      window.showSection = showSection;
+      window.handleLogout = handleLogout;
+      window.checkAnswer = checkAnswer;
+      window.claimReward = claimReward;
+      window.showExchangeForm = showExchangeForm;
+      window.hideExchangeForm = hideExchangeForm;
+      window.syncDataNow = syncDataNow;
+      window.toggleMaintenance = toggleMaintenance;
+      window.updateRewardPoints = updateRewardPoints;
+      window.openEditUserModal = openEditUserModal;
+      window.closeEditUserModal = closeEditUserModal;
+      window.toggleBlockUser = toggleBlockUser;
+      window.deleteUser = deleteUser;
+      window.openExchangeStatusModal = openExchangeStatusModal;
+      window.closeExchangeStatusModal = closeExchangeStatusModal;
+      window.deleteExchangeAdmin = deleteExchangeAdmin;
+      window.deleteUserExchange = deleteUserExchange;
+
+      // Start the app when DOM is ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+    })();
   </script>
 </body>
 </html>
