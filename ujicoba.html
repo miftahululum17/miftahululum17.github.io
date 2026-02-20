@@ -14,31 +14,141 @@
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
   
+  <!-- Main Styles -->
   <style>
-    /* [Styles tetap sama seperti sebelumnya] */
-    * { font-family: 'Poppins', sans-serif; }
-    html, body { height: 100%; width: 100%; margin: 0; padding: 0; }
-    .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-    .card-shadow { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-    .toast { animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s; }
-    @keyframes slideIn { from { transform: translateY(-100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
-    .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transition: all 0.3s; }
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(102,126,234,0.3); }
-    .btn-danger { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-    .btn-success { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
-    .menu-active { background: rgba(102,126,234,0.1); color: #667eea; }
-    .input-field { transition: all 0.3s; border: 1.5px solid #e2e8f0; }
-    .input-field:focus { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
-    .page { display: none !important; }
-    .page.active { display: block !important; }
-    .loading-spinner { border: 2px solid #f3f3f3; border-top: 2px solid #667eea; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    .auth-container { display: flex; align-items: center; justify-content: center; min-height: 100%; }
-    .point-change { animation: pointPulse 0.5s ease; }
-    @keyframes pointPulse { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
-    .pulse-animation { animation: pulse 1s infinite; }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    /* Global Styles */
+    * {
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    html, body {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    
+    /* Gradient Background */
+    .gradient-bg {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    /* Card Shadow */
+    .card-shadow {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    
+    /* Toast Animations */
+    .toast {
+      animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateY(-100px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+    
+    /* Button Styles */
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      transition: all 0.3s;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(102,126,234,0.3);
+    }
+    
+    .btn-danger {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .btn-success {
+      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+    
+    /* Menu Active State */
+    .menu-active {
+      background: rgba(102,126,234,0.1);
+      color: #667eea;
+    }
+    
+    /* Input Field */
+    .input-field {
+      transition: all 0.3s;
+      border: 1.5px solid #e2e8f0;
+    }
+    
+    .input-field:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+    }
+    
+    /* Page Navigation */
+    .page {
+      display: none !important;
+    }
+    
+    .page.active {
+      display: block !important;
+    }
+    
+    /* Loading Spinner */
+    .loading-spinner {
+      border: 2px solid #f3f3f3;
+      border-top: 2px solid #667eea;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Auth Container */
+    .auth-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100%;
+    }
+    
+    /* Point Animation */
+    .point-change {
+      animation: pointPulse 0.5s ease;
+    }
+    
+    @keyframes pointPulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+    
+    /* Pulse Animation */
+    .pulse-animation {
+      animation: pulse 1s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    /* Broadcast Banner */
     .broadcast-banner {
       background: linear-gradient(90deg, #ff6b6b 0%, #ff8e72 100%);
       color: white;
@@ -48,6 +158,7 @@
       margin-bottom: 16px;
       position: relative;
     }
+    
     .broadcast-text {
       animation: scrollText 15s linear infinite;
       white-space: nowrap;
@@ -55,21 +166,38 @@
       font-size: 14px;
       display: inline-block;
     }
+    
     @keyframes scrollText {
       0% { transform: translateX(100%); }
       100% { transform: translateX(-100%); }
     }
+    
     .broadcast-banner.paused .broadcast-text {
       animation-play-state: paused;
     }
-    #main-app { display: flex; flex-direction: column; }
-    main { padding-bottom: 100px; }
+    
+    /* Main App Layout */
+    #main-app {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    main {
+      padding-bottom: 100px;
+    }
+  </style>
+  
+  <style>
+    body {
+      box-sizing: border-box;
+    }
   </style>
 </head>
 
 <body class="bg-gray-50">
   <div id="app" class="w-full h-full overflow-auto">
-    <!-- Toast Container -->
+    
+    <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50"></div>
 
     <!-- Login Page -->
@@ -477,7 +605,10 @@
       let historyRefreshInterval = null;
       let detectedCountry = null;
       let currentBroadcast = null;
-      let gasWebAppUrl = 'https://script.google.com/macros/s/AKfycbzqdAFW6jru6IUGvcuWZb5Lk9eebAhfg8FoPo60d4H0kkPww3VZEIJ-J2JeLS5Npc_Iww/exec';
+      
+      // === GOOGLE APPS SCRIPT URL - SUDAH DIISI ===
+      const gasWebAppUrl = 'https://script.google.com/macros/s/AKfycby_timWbxYc1ynHGcyFpA69zqpkrfHW0vw3hw5SPY84cCmFZ2-U3RfSs6qIzau_oDz8/exec';
+      
       let lastSyncTime = new Date();
       let isInitialized = false;
 
@@ -723,6 +854,8 @@
             return false;
           }
 
+          console.log(`Sending ${action} to GAS...`);
+          
           // Don't wait for response (no-cors mode)
           await fetch(gasWebAppUrl, {
             method: 'POST',
@@ -738,6 +871,7 @@
           });
 
           lastSyncTime = new Date();
+          console.log(`${action} sent successfully`);
           return true;
         } catch (e) {
           console.error('GAS sync error:', e);
@@ -755,6 +889,8 @@
             btn.innerHTML = '<div class="loading-spinner mx-auto"></div>';
           }
 
+          showToast('Menyinkronkan data...', 'info');
+
           // Sync all data types
           await sendDataToGAS('syncUsers', allUsers);
           await sendDataToGAS('syncExchanges', allExchanges);
@@ -764,6 +900,7 @@
           showToast('✅ Data berhasil disync ke Google Sheets!', 'success');
           updateDatabaseStatus();
         } catch (e) {
+          console.error('Sync error:', e);
           showToast('❌ Gagal sync data: ' + e.message, 'error');
         } finally {
           const btn = event?.target;
@@ -1770,6 +1907,8 @@
         if (isInitialized) return;
         
         try {
+          console.log('Initializing app with GAS URL:', gasWebAppUrl);
+          
           // Initialize SDKs
           if (window.elementSdk && typeof window.elementSdk.init === 'function') {
             await window.elementSdk.init({
@@ -1838,6 +1977,9 @@
           // Detect country on page load
           detectCountry();
 
+          // Test GAS connection
+          testGASConnection();
+
           // Check for existing session
           const session = getSession();
           if (session) {
@@ -1868,6 +2010,26 @@
           }
         } catch (e) {
           console.error('Update char count error:', e);
+        }
+      }
+
+      // Test GAS connection
+      async function testGASConnection() {
+        try {
+          const response = await fetch(gasWebAppUrl, {
+            method: 'GET',
+            mode: 'cors'
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            console.log('GAS connection successful:', data);
+            showToast('✅ Terhubung ke Google Sheets', 'success');
+          } else {
+            console.warn('GAS connection failed');
+          }
+        } catch (e) {
+          console.warn('GAS connection test failed (expected for no-cors mode)');
         }
       }
 
