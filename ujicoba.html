@@ -601,7 +601,7 @@
       let currentBroadcast = null;
       
       // === GOOGLE APPS SCRIPT URL - GANTI DENGAN URL DEPLOYMENT ANDA ===
-      const gasWebAppUrl = 'https://script.google.com/macros/s/AKfycbxfJXsZpI6CYQODylGsHwBhBbHy7Pwm109tgTk9jx4xrzDls7ai88PHIZ84-Wgt5f67/exec';
+      const gasWebAppUrl = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
       
       let lastSyncTime = new Date();
       let isInitialized = false;
@@ -792,7 +792,7 @@
         }
       }
 
-      // ==================== GOOGLE APPS SCRIPT INTEGRATION ====================
+      // ==================== GOOGLE APPS SCRIPT INTEGRATION DENGAN CORS ====================
 
       async function fetchDataFromGAS() {
         try {
@@ -1750,7 +1750,7 @@
         }
       }
 
-      // ==================== REGISTER FUNCTION YANG DIPERBAIKI ====================
+      // ==================== REGISTER FUNCTION ====================
 
       async function handleRegister(e) {
         e.preventDefault();
