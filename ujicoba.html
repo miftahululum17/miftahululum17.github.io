@@ -14,31 +14,141 @@
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
   
+  <!-- Main Styles -->
   <style>
-    /* [Styles tetap sama] */
-    * { font-family: 'Poppins', sans-serif; }
-    html, body { height: 100%; width: 100%; margin: 0; padding: 0; }
-    .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-    .card-shadow { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-    .toast { animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s; }
-    @keyframes slideIn { from { transform: translateY(-100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
-    .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transition: all 0.3s; }
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(102,126,234,0.3); }
-    .btn-danger { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-    .btn-success { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
-    .menu-active { background: rgba(102,126,234,0.1); color: #667eea; }
-    .input-field { transition: all 0.3s; border: 1.5px solid #e2e8f0; }
-    .input-field:focus { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
-    .page { display: none !important; }
-    .page.active { display: block !important; }
-    .loading-spinner { border: 2px solid #f3f3f3; border-top: 2px solid #667eea; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    .auth-container { display: flex; align-items: center; justify-content: center; min-height: 100%; }
-    .point-change { animation: pointPulse 0.5s ease; }
-    @keyframes pointPulse { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
-    .pulse-animation { animation: pulse 1s infinite; }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    /* Global Styles */
+    * {
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    html, body {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    
+    /* Gradient Background */
+    .gradient-bg {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    /* Card Shadow */
+    .card-shadow {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    
+    /* Toast Animations */
+    .toast {
+      animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateY(-100px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+    
+    /* Button Styles */
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      transition: all 0.3s;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(102,126,234,0.3);
+    }
+    
+    .btn-danger {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .btn-success {
+      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+    
+    /* Menu Active State */
+    .menu-active {
+      background: rgba(102,126,234,0.1);
+      color: #667eea;
+    }
+    
+    /* Input Field */
+    .input-field {
+      transition: all 0.3s;
+      border: 1.5px solid #e2e8f0;
+    }
+    
+    .input-field:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+    }
+    
+    /* Page Navigation */
+    .page {
+      display: none !important;
+    }
+    
+    .page.active {
+      display: block !important;
+    }
+    
+    /* Loading Spinner */
+    .loading-spinner {
+      border: 2px solid #f3f3f3;
+      border-top: 2px solid #667eea;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Auth Container */
+    .auth-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100%;
+    }
+    
+    /* Point Animation */
+    .point-change {
+      animation: pointPulse 0.5s ease;
+    }
+    
+    @keyframes pointPulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+    
+    /* Pulse Animation */
+    .pulse-animation {
+      animation: pulse 1s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    /* Broadcast Banner */
     .broadcast-banner {
       background: linear-gradient(90deg, #ff6b6b 0%, #ff8e72 100%);
       color: white;
@@ -48,6 +158,7 @@
       margin-bottom: 16px;
       position: relative;
     }
+    
     .broadcast-text {
       animation: scrollText 15s linear infinite;
       white-space: nowrap;
@@ -55,21 +166,32 @@
       font-size: 14px;
       display: inline-block;
     }
+    
     @keyframes scrollText {
       0% { transform: translateX(100%); }
       100% { transform: translateX(-100%); }
     }
+    
     .broadcast-banner.paused .broadcast-text {
       animation-play-state: paused;
     }
-    #main-app { display: flex; flex-direction: column; }
-    main { padding-bottom: 100px; }
+    
+    /* Main App Layout */
+    #main-app {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    main {
+      padding-bottom: 100px;
+    }
   </style>
 </head>
 
 <body class="bg-gray-50">
   <div id="app" class="w-full h-full overflow-auto">
-    <!-- Toast Container -->
+    
+    <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50"></div>
 
     <!-- Login Page -->
@@ -478,7 +600,7 @@
       let detectedCountry = null;
       let currentBroadcast = null;
       
-      // === GOOGLE APPS SCRIPT URL ===
+      // === GOOGLE APPS SCRIPT URL - GANTI DENGAN URL DEPLOYMENT ANDA ===
       const gasWebAppUrl = 'https://script.google.com/macros/s/AKfycby_timWbxYc1ynHGcyFpA69zqpkrfHW0vw3hw5SPY84cCmFZ2-U3RfSs6qIzau_oDz8/exec';
       
       let lastSyncTime = new Date();
@@ -676,7 +798,6 @@
         try {
           console.log('Fetching data from GAS...');
           
-          // Gunakan JSONP atau proxy untuk mengatasi CORS
           const response = await fetch(gasWebAppUrl + '?action=getAllData&t=' + Date.now(), {
             method: 'GET',
             mode: 'cors',
@@ -685,31 +806,35 @@
             }
           });
           
-          if (response.ok) {
-            const data = await response.json();
-            console.log('Data received from GAS:', data);
-            
-            if (data && data.success && data.data) {
-              // Update all data arrays
-              if (data.data.users) allUsers = data.data.users;
-              if (data.data.exchanges) allExchanges = data.data.exchanges;
-              if (data.data.broadcasts) allBroadcasts = data.data.broadcasts;
-              if (data.data.settings) appSettings = data.data.settings[0];
-              
-              showToast('✅ Data berhasil dimuat dari server', 'success');
-              updateDatabaseStatus();
-              
-              // Trigger data handler
-              if (window.dataSdk && typeof window.dataSdk.notifyDataChanged === 'function') {
-                window.dataSdk.notifyDataChanged([...allUsers, ...allExchanges, ...allBroadcasts, appSettings].filter(Boolean));
-              }
-              
-              return true;
-            }
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
           }
-          return false;
+          
+          const result = await response.json();
+          console.log('GAS Response:', result);
+          
+          if (result && result.success && result.data) {
+            // Update all data arrays
+            if (result.data.users) {
+              allUsers = result.data.users;
+              console.log('Users loaded:', allUsers.length);
+            }
+            if (result.data.exchanges) allExchanges = result.data.exchanges;
+            if (result.data.broadcasts) allBroadcasts = result.data.broadcasts;
+            if (result.data.settings && result.data.settings.length > 0) {
+              appSettings = result.data.settings[0];
+            }
+            
+            showToast(`✅ Data berhasil dimuat (${allUsers.length} users)`, 'success');
+            updateDatabaseStatus();
+            
+            return true;
+          } else {
+            throw new Error(result.error || 'Invalid response');
+          }
         } catch (e) {
           console.error('Fetch data error:', e);
+          showToast('⚠️ Gagal memuat data dari server', 'error');
           return false;
         }
       }
@@ -721,14 +846,14 @@
             return false;
           }
 
-          console.log(`Sending ${action} to GAS...`);
-          
-          // Gunakan POST dengan CORS
+          console.log(`Sending ${action} to GAS...`, data);
+
           const response = await fetch(gasWebAppUrl, {
             method: 'POST',
             mode: 'cors',
             headers: {
               'Content-Type': 'application/json',
+              'Accept': 'application/json'
             },
             body: JSON.stringify({
               action: action,
@@ -737,23 +862,27 @@
             })
           });
 
-          if (response.ok) {
-            const result = await response.json();
-            console.log(`${action} response:`, result);
-            
-            if (result.success) {
-              lastSyncTime = new Date();
-              
-              // Jika action adalah createUser, tambahkan user ke allUsers
-              if (action === 'createUser' && result.data) {
-                allUsers.push(result.data);
-              }
-              
-              return true;
-            }
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
           }
-          
-          return false;
+
+          const result = await response.json();
+          console.log(`${action} response:`, result);
+
+          if (result.success) {
+            lastSyncTime = new Date();
+            
+            // If createUser, add to allUsers
+            if (action === 'createUser' && result.data) {
+              allUsers.push(result.data);
+              console.log('User added to allUsers:', result.data);
+            }
+            
+            return true;
+          } else {
+            console.error('GAS error:', result.error);
+            return false;
+          }
         } catch (e) {
           console.error('GAS sync error:', e);
           return false;
@@ -1631,15 +1760,10 @@
             return;
           }
 
-          // Cek apakah username sudah ada
+          // Cek apakah username sudah ada di allUsers
           const exists = allUsers?.find(u => u.username === username);
           if (exists) {
             showToast('Username sudah digunakan!', 'error');
-            return;
-          }
-
-          if ((allUsers?.filter(u => u.type === 'user').length || 0) >= 900) {
-            showToast('Pendaftaran ditutup sementara', 'error');
             return;
           }
 
@@ -1658,20 +1782,10 @@
             lastLogin: new Date().toISOString()
           };
 
-          // Simpan ke SDK
-          let savedUser = newUser;
-          if (window.dataSdk && typeof window.dataSdk.create === 'function') {
-            const result = await window.dataSdk.create(newUser);
-            if (result && result.data) {
-              savedUser = result.data;
-            }
-          }
+          showToast('Mendaftarkan akun...', 'info');
 
-          // Tambahkan ke allUsers
-          allUsers.push(savedUser);
-
-          // Sync ke GAS
-          const gasResult = await sendDataToGAS('createUser', savedUser);
+          // Kirim ke Google Apps Script
+          const gasResult = await sendDataToGAS('createUser', newUser);
           
           if (gasResult) {
             showToast(isFirstUser ? 'Selamat! Anda terdaftar sebagai Admin' : 'Pendaftaran berhasil! Silakan login', 'success');
@@ -1684,11 +1798,11 @@
               showPage('login-page');
             }, 1500);
           } else {
-            showToast('Pendaftaran berhasil tapi gagal sync ke server', 'warning');
+            showToast('Pendaftaran gagal, coba lagi', 'error');
           }
         } catch (e) {
           console.error('Register error:', e);
-          showToast('Gagal mendaftar, coba lagi', 'error');
+          showToast('Gagal mendaftar: ' + e.message, 'error');
         }
       }
 
@@ -1832,6 +1946,24 @@
         try {
           console.log('Initializing app with GAS URL:', gasWebAppUrl);
           
+          // Test koneksi dulu
+          showToast('Menguji koneksi ke server...', 'info');
+          
+          try {
+            const testResponse = await fetch(gasWebAppUrl + '?t=' + Date.now(), {
+              method: 'GET',
+              mode: 'cors'
+            });
+            
+            if (testResponse.ok) {
+              const testData = await testResponse.json();
+              console.log('Server test response:', testData);
+              showToast('✅ Terhubung ke server', 'success');
+            }
+          } catch (testError) {
+            console.warn('Server test failed:', testError);
+          }
+          
           // Initialize SDKs
           if (window.elementSdk && typeof window.elementSdk.init === 'function') {
             await window.elementSdk.init({
@@ -1860,7 +1992,6 @@
           detectCountry();
 
           // Fetch initial data from GAS
-          showToast('Memuat data dari server...', 'info');
           await fetchDataFromGAS();
 
           // Check for existing session
@@ -1878,7 +2009,7 @@
           isInitialized = true;
         } catch (e) {
           console.error('Init error:', e);
-          showToast('Gagal memuat aplikasi', 'error');
+          showToast('❌ Gagal memuat aplikasi: ' + e.message, 'error');
         }
       }
 
@@ -1968,6 +2099,8 @@
               const data = await response.json();
               if (data.country_code && countryMap[data.country_code]) {
                 countrySelect.value = countryMap[data.country_code];
+                return;
+                           countrySelect.value = countryMap[data.country_code];
                 return;
               }
             }
