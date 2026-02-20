@@ -813,15 +813,15 @@
           const result = await response.json();
           console.log('GAS Response:', result);
           
-          if (result && result.success && result.data) {
+          if (result && result.success) {
             // Update all data arrays
-            if (result.data.users) {
+            if (result.data && result.data.users) {
               allUsers = result.data.users;
               console.log('Users loaded:', allUsers.length);
             }
-            if (result.data.exchanges) allExchanges = result.data.exchanges;
-            if (result.data.broadcasts) allBroadcasts = result.data.broadcasts;
-            if (result.data.settings && result.data.settings.length > 0) {
+            if (result.data && result.data.exchanges) allExchanges = result.data.exchanges;
+            if (result.data && result.data.broadcasts) allBroadcasts = result.data.broadcasts;
+            if (result.data && result.data.settings && result.data.settings.length > 0) {
               appSettings = result.data.settings[0];
             }
             
@@ -843,6 +843,7 @@
         try {
           if (!gasWebAppUrl) {
             console.log('GAS URL not configured, skipping sync');
+            showToast('URL server tidak dikonfigurasi', 'error');
             return false;
           }
 
@@ -881,10 +882,12 @@
             return true;
           } else {
             console.error('GAS error:', result.error);
+            showToast('Server error: ' + (result.error || 'Unknown error'), 'error');
             return false;
           }
         } catch (e) {
           console.error('GAS sync error:', e);
+          showToast('Koneksi ke server gagal: ' + e.message, 'error');
           return false;
         }
       }
@@ -1747,6 +1750,8 @@
         }
       }
 
+      // ==================== REGISTER FUNCTION YANG DIPERBAIKI ====================
+
       async function handleRegister(e) {
         e.preventDefault();
 
@@ -1757,6 +1762,12 @@
 
           if (!username || !password || !country) {
             showToast('Semua field harus diisi!', 'error');
+            return;
+          }
+
+          // Validasi panjang password minimal 3 karakter
+          if (password.length < 3) {
+            showToast('Password minimal 3 karakter!', 'error');
             return;
           }
 
@@ -1782,7 +1793,28 @@
             lastLogin: new Date().toISOString()
           };
 
+          console.log('Registering new user:', newUser);
           showToast('Mendaftarkan akun...', 'info');
+
+          // Test koneksi dulu
+          try {
+            const testResponse = await fetch(gasWebAppUrl + '?action=test&t=' + Date.now(), {
+              method: 'GET',
+              mode: 'cors',
+              headers: {
+                'Accept': 'application/json'
+              }
+            });
+            
+            if (testResponse.ok) {
+              const testData = await testResponse.json();
+              console.log('Server test response:', testData);
+            } else {
+              console.warn('Server test failed with status:', testResponse.status);
+            }
+          } catch (testError) {
+            console.warn('Server test error:', testError);
+          }
 
           // Kirim ke Google Apps Script
           const gasResult = await sendDataToGAS('createUser', newUser);
@@ -1793,10 +1825,10 @@
             // Reset form
             document.getElementById('register-form').reset();
             
-            // Pindah ke halaman login
+            // Pindah ke halaman login setelah 2 detik
             setTimeout(() => {
               showPage('login-page');
-            }, 1500);
+            }, 2000);
           } else {
             showToast('Pendaftaran gagal, coba lagi', 'error');
           }
@@ -2099,8 +2131,6 @@
               const data = await response.json();
               if (data.country_code && countryMap[data.country_code]) {
                 countrySelect.value = countryMap[data.country_code];
-                return;
-                           countrySelect.value = countryMap[data.country_code];
                 return;
               }
             }
