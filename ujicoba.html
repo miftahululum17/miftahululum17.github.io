@@ -755,7 +755,7 @@
           
           // Update current user jika ada
           if (currentUser) {
-            const updated = allUsers.find(u => u && u.__backendId === currentUser.__backendId);
+            const updated = allUsers.find(u => u && (u.__backendId === currentUser.__backendId || u.id === currentUser.id));
             if (updated) {
               currentUser = updated;
               updatePointsDisplay();
@@ -770,12 +770,16 @@
           
           updateDatabaseStatus();
           displayBroadcast();
+          
+          console.log('Data loaded:', { users: allUsers.length, exchanges: allExchanges.length, broadcasts: allBroadcasts.length });
+          return true;
         } else {
           console.error('Load data failed:', result.error);
-          showToast('Gagal memuat data dari server', 'error');
+          return false;
         }
       } catch (error) {
         console.error('Load data error:', error);
+        return false;
       } finally {
         isLoading = false;
       }
@@ -785,7 +789,7 @@
     
     function saveSession(user) {
       const session = {
-        userId: user.__backendId,
+        userId: user.__backendId || user.id,
         username: user.username,
         role: user.role,
         loginTime: new Date().toISOString()
@@ -1076,7 +1080,7 @@
       const exchange = {
         type: 'exchange',
         exchangeId: 'EX-' + Date.now(),
-        userId: currentUser.__backendId,
+        userId: currentUser.__backendId || currentUser.id,
         username: currentUser.username,
         amount: amount,
         danaAccount: danaAccount,
@@ -1114,7 +1118,7 @@
 
     function renderExchangeHistory() {
       const container = document.getElementById('exchange-history');
-      const userExchanges = allExchanges.filter(ex => ex && ex.userId === currentUser?.__backendId);
+      const userExchanges = allExchanges.filter(ex => ex && (ex.userId === currentUser?.__backendId || ex.userId === currentUser?.id));
       
       if (userExchanges.length === 0) {
         container.innerHTML = '<p class="text-gray-500 text-center py-3 text-xs">Belum ada riwayat</p>';
@@ -1137,7 +1141,7 @@
             <p class="text-xs text-gray-400 mt-1">${ex.requestedAt ? new Date(ex.requestedAt).toLocaleString('id-ID') : '-'}</p>
             ${ex.adminNote ? `<p class="text-xs text-blue-600 mt-1.5 p-1.5 bg-blue-50 rounded">📝 ${ex.adminNote}</p>` : ''}
             ${ex.status === 'pending' ? `
-              <button type="button" onclick="deleteUserExchange('${ex.__backendId}')" class="mt-1.5 text-xs text-red-500 hover:underline">Hapus</button>
+              <button type="button" onclick="deleteUserExchange('${ex.__backendId || ex.id}')" class="mt-1.5 text-xs text-red-500 hover:underline">Hapus</button>
             ` : ''}
           </div>
         `;
@@ -1145,7 +1149,7 @@
     }
 
     async function deleteUserExchange(exchangeId) {
-      const exchange = allExchanges.find(ex => ex && ex.__backendId === exchangeId);
+      const exchange = allExchanges.find(ex => ex && (ex.__backendId === exchangeId || ex.id === exchangeId));
       if (!exchange || exchange.status !== 'pending') return;
       
       currentUser.points = (currentUser.points || 0) + exchange.amount;
@@ -1262,11 +1266,11 @@
               ${isBlocked ? '<span class="px-1.5 py-0.5 bg-red-100 text-red-700 rounded text-xs">Blocked</span>' : ''}
             </div>
             <div class="flex gap-1.5 mt-2">
-              <button type="button" onclick="openEditUserModal('${user.__backendId}')" class="flex-1 py-1.5 bg-blue-100 text-blue-700 rounded text-xs font-medium hover:bg-blue-200">Edit</button>
-              <button type="button" onclick="toggleBlockUser('${user.__backendId}')" class="flex-1 py-1.5 ${isBlocked ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'} rounded text-xs font-medium hover:opacity-80">
+              <button type="button" onclick="openEditUserModal('${user.__backendId || user.id}')" class="flex-1 py-1.5 bg-blue-100 text-blue-700 rounded text-xs font-medium hover:bg-blue-200">Edit</button>
+              <button type="button" onclick="toggleBlockUser('${user.__backendId || user.id}')" class="flex-1 py-1.5 ${isBlocked ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'} rounded text-xs font-medium hover:opacity-80">
                 ${isBlocked ? 'Unblock' : 'Block'}
               </button>
-              <button type="button" onclick="deleteUser('${user.__backendId}')" class="flex-1 py-1.5 bg-red-100 text-red-700 rounded text-xs font-medium hover:bg-red-200">Hapus</button>
+              <button type="button" onclick="deleteUser('${user.__backendId || user.id}')" class="flex-1 py-1.5 bg-red-100 text-red-700 rounded text-xs font-medium hover:bg-red-200">Hapus</button>
             </div>
           </div>
         `;
@@ -1274,7 +1278,7 @@
     }
 
     function openEditUserModal(userId) {
-      const user = allUsers.find(u => u && u.__backendId === userId);
+      const user = allUsers.find(u => u && (u.__backendId === userId || u.id === userId));
       if (!user) return;
       
       document.getElementById('edit-user-id').value = userId;
@@ -1296,7 +1300,7 @@
       const newPassword = document.getElementById('edit-user-password').value;
       const newPoints = parseInt(document.getElementById('edit-user-new-points').value) || 0;
       
-      const user = allUsers.find(u => u && u.__backendId === userId);
+      const user = allUsers.find(u => u && (u.__backendId === userId || u.id === userId));
       if (!user) return;
       
       const oldPoints = user.points || 0;
@@ -1314,7 +1318,7 @@
       showToast('User berhasil diperbarui!', 'success');
       renderUserList();
       
-      if (currentUser && currentUser.__backendId === userId) {
+      if (currentUser && (currentUser.__backendId === userId || currentUser.id === userId)) {
         currentUser.points = newPoints;
         updatePointsDisplay();
         
@@ -1329,7 +1333,7 @@
     }
 
     async function toggleBlockUser(userId) {
-      const user = allUsers.find(u => u && u.__backendId === userId);
+      const user = allUsers.find(u => u && (u.__backendId === userId || u.id === userId));
       if (!user) return;
       
       user.blocked = !user.blocked;
@@ -1343,7 +1347,7 @@
     async function deleteUser(userId) {
       if (!confirm('Yakin ingin menghapus user ini?')) return;
       
-      const user = allUsers.find(u => u && u.__backendId === userId);
+      const user = allUsers.find(u => u && (u.__backendId === userId || u.id === userId));
       if (!user) return;
       
       await callGAS('deleteUser', user);
@@ -1385,10 +1389,10 @@
             ${ex.adminNote ? `<p class="text-xs text-blue-600 mt-1.5 p-1.5 bg-blue-50 rounded">📝 ${ex.adminNote}</p>` : ''}
             <div class="flex gap-1.5 mt-2">
               ${canEdit ? `
-                <button type="button" onclick="openExchangeStatusModal('${ex.__backendId}')" class="flex-1 py-1.5 bg-blue-100 text-blue-700 rounded text-xs font-medium hover:bg-blue-200">Ubah</button>
-                <button type="button" onclick="deleteExchangeAdmin('${ex.__backendId}')" class="flex-1 py-1.5 bg-red-100 text-red-700 rounded text-xs font-medium hover:bg-red-200">Hapus</button>
+                <button type="button" onclick="openExchangeStatusModal('${ex.__backendId || ex.id}')" class="flex-1 py-1.5 bg-blue-100 text-blue-700 rounded text-xs font-medium hover:bg-blue-200">Ubah</button>
+                <button type="button" onclick="deleteExchangeAdmin('${ex.__backendId || ex.id}')" class="flex-1 py-1.5 bg-red-100 text-red-700 rounded text-xs font-medium hover:bg-red-200">Hapus</button>
               ` : `
-                <button type="button" onclick="deleteExchangeAdmin('${ex.__backendId}')" class="flex-1 py-1.5 bg-red-100 text-red-700 rounded text-xs font-medium hover:bg-red-200">Hapus</button>
+                <button type="button" onclick="deleteExchangeAdmin('${ex.__backendId || ex.id}')" class="flex-1 py-1.5 bg-red-100 text-red-700 rounded text-xs font-medium hover:bg-red-200">Hapus</button>
               `}
             </div>
           </div>
@@ -1397,7 +1401,7 @@
     }
 
     function openExchangeStatusModal(exchangeId) {
-      const exchange = allExchanges.find(ex => ex && ex.__backendId === exchangeId);
+      const exchange = allExchanges.find(ex => ex && (ex.__backendId === exchangeId || ex.id === exchangeId));
       if (!exchange) return;
       
       document.getElementById('exchange-status-id').value = exchangeId;
@@ -1421,16 +1425,16 @@
       const status = document.getElementById('exchange-status-select').value;
       const note = document.getElementById('exchange-status-note').value;
       
-      const exchange = allExchanges.find(ex => ex && ex.__backendId === exchangeId);
+      const exchange = allExchanges.find(ex => ex && (ex.__backendId === exchangeId || ex.id === exchangeId));
       if (!exchange) return;
       
       if (status === 'rejected') {
-        const user = allUsers.find(u => u && u.__backendId === userId);
+        const user = allUsers.find(u => u && (u.__backendId === userId || u.id === userId));
         if (user) {
           user.points = (user.points || 0) + amount;
           await callGAS('updateUser', user);
           
-          if (currentUser && currentUser.__backendId === userId) {
+          if (currentUser && (currentUser.__backendId === userId || currentUser.id === userId)) {
             currentUser.points = user.points;
             updatePointsDisplay();
             showToast(`✅ Poin ${amount} dikembalikan! Total: ${user.points}`, 'success');
@@ -1455,7 +1459,7 @@
     async function deleteExchangeAdmin(exchangeId) {
       if (!confirm('Yakin ingin menghapus riwayat ini?')) return;
       
-      const exchange = allExchanges.find(ex => ex && ex.__backendId === exchangeId);
+      const exchange = allExchanges.find(ex => ex && (ex.__backendId === exchangeId || ex.id === exchangeId));
       if (!exchange) return;
       
       await callGAS('deleteExchange', exchange);
@@ -1488,12 +1492,15 @@
       }
       
       user.lastLogin = new Date().toISOString();
-      await callGAS('updateUser', user);
+      const result = await callGAS('updateUser', user);
       
-      currentUser = user;
-      saveSession(user);
-      
-      afterLogin();
+      if (result.success) {
+        currentUser = user;
+        saveSession(user);
+        afterLogin();
+      } else {
+        showToast('Gagal update last login', 'error');
+      }
     }
 
     async function handleRegister(e) {
@@ -1553,9 +1560,13 @@
       const result = await callGAS('createUser', newUser);
       console.log('Registration result:', result);
       
-      if (result.success) {
+      if (result.success && result.data) {
         showToast(isFirstUser ? 'Selamat! Anda terdaftar sebagai Admin' : 'Pendaftaran berhasil! Silakan login', 'success');
         document.getElementById('register-form').reset();
+        
+        // Refresh data
+        await loadAllData();
+        
         showPage('login-page');
       } else {
         showToast('Pendaftaran gagal: ' + (result.error || 'Unknown error'), 'error');
@@ -1657,7 +1668,7 @@
       if (session) {
         setTimeout(async () => {
           await loadAllData();
-          const user = allUsers.find(u => u && u.__backendId === session.userId);
+          const user = allUsers.find(u => u && (u.__backendId === session.userId || u.id === session.userId));
           if (user && !user.blocked) {
             currentUser = user;
             afterLogin();
