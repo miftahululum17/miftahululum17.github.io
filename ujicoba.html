@@ -706,84 +706,91 @@
     }
 
     // ==================== GOOGLE SHEETS API FUNCTIONS ====================
+
+async function callGAS(action, data = null) {
+  try {
+    console.log(`Calling GAS: ${action}`, data);
     
-    async function callGAS(action, data = null) {
-      try {
-        console.log(`Calling GAS: ${action}`, data);
-        
-        const response = await fetch(GAS_WEB_APP_URL, {
-          method: 'POST',
-          mode: 'cors',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            action: action,
-            data: data
-          })
-        });
+    const response = await fetch(GAS_WEB_APP_URL, {
+      method: 'POST',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        action: action,
+        data: data
+      })
+    });
 
-        const result = await response.json();
-        console.log(`GAS Response [${action}]:`, result);
-        return result;
-        
-      } catch (error) {
-        console.error('GAS Error:', error);
-        return { 
-          success: false, 
-          error: error.message 
-        };
-      }
-    }
+    const result = await response.json();
+    console.log(`GAS Response [${action}]:`, result);
+    return result;
+    
+  } catch (error) {
+    console.error('GAS Error:', error);
+    return { 
+      success: false, 
+      error: error.message 
+    };
+  }
+}
 
-    // Load all data from Google Sheets
-    async function loadAllData() {
-      if (isLoading) return;
+// Load all data from Google Sheets
+async function loadAllData() {
+  if (isLoading) return;
+  
+  isLoading = true;
+  try {
+    const result = await callGAS('getAllData');
+    
+    if (result.success && result.data) {
+      // Update data dari Google Sheets
+      allUsers = result.data.filter(d => d && d.type === 'user');
+      allExchanges = result.data.filter(d => d && d.type === 'exchange');
+      allBroadcasts = result.data.filter(d => d && d.type === 'broadcast');
+      appSettings = result.data.find(d => d && d.type === 'settings');
       
-      isLoading = true;
-      try {
-        const result = await callGAS('getAllData');
-        
-        if (result.success && result.data) {
-          // Update data dari Google Sheets
-          allUsers = result.data.filter(d => d && d.type === 'user');
-          allExchanges = result.data.filter(d => d && d.type === 'exchange');
-          allBroadcasts = result.data.filter(d => d && d.type === 'broadcast');
-          appSettings = result.data.find(d => d && d.type === 'settings');
-          
-          lastSyncTime = new Date();
-          
-          // Update current user jika ada
-          if (currentUser) {
-            const updated = allUsers.find(u => u && (u.__backendId === currentUser.__backendId || u.id === currentUser.id));
-            if (updated) {
-              currentUser = updated;
-              updatePointsDisplay();
-            }
-          }
-          
-          // Update UI untuk admin
-          if (currentUser?.role === 'admin') {
-            renderUserList();
-            renderAdminExchangeList();
-          }
-          
-          updateDatabaseStatus();
-          displayBroadcast();
-          
-          console.log('Data loaded:', { users: allUsers.length, exchanges: allExchanges.length, broadcasts: allBroadcasts.length });
-          return true;
-        } else {
-          console.error('Load data failed:', result.error);
-          return false;
+      lastSyncTime = new Date();
+      
+      // Log untuk debugging
+      console.log('All users loaded:', allUsers.map(u => ({ 
+        username: u.username, 
+        role: u.role, 
+        blocked: u.blocked,
+        points: u.points 
+      })));
+      
+      // Update current user jika ada
+      if (currentUser) {
+        const updated = allUsers.find(u => u && (u.__backendId === currentUser.__backendId || u.id === currentUser.id));
+        if (updated) {
+          currentUser = updated;
+          updatePointsDisplay();
         }
-      } catch (error) {
-        console.error('Load data error:', error);
-        return false;
-      } finally {
-        isLoading = false;
       }
+      
+      // Update UI untuk admin
+      if (currentUser?.role === 'admin') {
+        renderUserList();
+        renderAdminExchangeList();
+      }
+      
+      updateDatabaseStatus();
+      displayBroadcast();
+      
+      return true;
+    } else {
+      console.error('Load data failed:', result.error);
+      return false;
     }
+  } catch (error) {
+    console.error('Load data error:', error);
+    return false;
+  } finally {
+    isLoading = false;
+  }
+}
 
     // ==================== SESSION MANAGEMENT ====================
     
@@ -1469,151 +1476,193 @@
     }
 
     // ==================== AUTH FUNCTIONS ====================
+
+async function handleLogin(e) {
+  e.preventDefault();
+  
+  const username = document.getElementById('login-username').value.trim();
+  const password = document.getElementById('login-password').value;
+  
+  if (!username || !password) {
+    showToast('Username dan password harus diisi!', 'error');
+    return;
+  }
+  
+  showToast('Mencoba login...', 'info');
+  
+  // Load fresh data dari Google Sheets
+  await loadAllData();
+  
+  // Cari user dengan username dan password yang cocok
+  // Gunakan trim() dan toLowerCase() untuk menghindari masalah spasi dan huruf besar/kecil
+  const user = allUsers.find(u => 
+    u && 
+    u.type === 'user' && 
+    u.username && 
+    u.password && 
+    u.username.toString().trim().toLowerCase() === username.toString().trim().toLowerCase() && 
+    u.password.toString().trim() === password.toString().trim()
+  );
+  
+  console.log('Login attempt:', { 
+    username, 
+    password,
+    found: user ? {
+      username: user.username,
+      role: user.role,
+      blocked: user.blocked
+    } : null,
+    allUsers: allUsers.map(u => ({ username: u.username, role: u.role }))
+  });
+  
+  if (!user) {
+    showToast('Username atau password salah!', 'error');
+    return;
+  }
+  
+  if (user.blocked) {
+    showToast('Akun Anda diblokir!', 'error');
+    return;
+  }
+  
+  // Update last login
+  user.lastLogin = new Date().toISOString();
+  const result = await callGAS('updateUser', user);
+  
+  if (result.success) {
+    currentUser = user;
+    saveSession(user);
+    showToast('Login berhasil!', 'success');
+    afterLogin();
+  } else {
+    showToast('Gagal update last login', 'error');
+  }
+}
+
+async function handleRegister(e) {
+  e.preventDefault();
+  
+  const username = document.getElementById('reg-username').value.trim();
+  const password = document.getElementById('reg-password').value;
+  const country = document.getElementById('reg-country').value;
+  
+  if (!username || !password || !country) {
+    showToast('Semua field harus diisi!', 'error');
+    return;
+  }
+  
+  if (username.length < 3) {
+    showToast('Username minimal 3 karakter!', 'error');
+    return;
+  }
+  
+  if (password.length < 4) {
+    showToast('Password minimal 4 karakter!', 'error');
+    return;
+  }
+  
+  showToast('Memproses pendaftaran...', 'info');
+  
+  // Load fresh data dari Google Sheets
+  await loadAllData();
+  
+  // Cek username sudah ada (case insensitive)
+  const exists = allUsers.find(u => 
+    u && 
+    u.username && 
+    u.username.toString().trim().toLowerCase() === username.toString().trim().toLowerCase()
+  );
+  
+  if (exists) {
+    showToast('Username sudah digunakan!', 'error');
+    return;
+  }
+  
+  if (allUsers.filter(u => u && u.type === 'user').length >= 900) {
+    showToast('Pendaftaran ditutup sementara', 'error');
+    return;
+  }
+  
+  const isFirstUser = allUsers.filter(u => u && u.type === 'user').length === 0;
+  
+  const newUser = {
+    type: 'user',
+    username: username,
+    password: password,
+    role: isFirstUser ? 'admin' : 'user',
+    country: country,
+    deviceId: deviceId,
+    points: 0,
+    blocked: false,
+    createdAt: new Date().toISOString(),
+    lastLogin: new Date().toISOString()
+  };
+  
+  console.log('Registering new user:', newUser);
+  
+  const result = await callGAS('createUser', newUser);
+  console.log('Registration result:', result);
+  
+  if (result.success && result.data) {
+    showToast(isFirstUser ? 'Selamat! Anda terdaftar sebagai Admin' : 'Pendaftaran berhasil! Silakan login', 'success');
+    document.getElementById('register-form').reset();
     
-    async function handleLogin(e) {
-      e.preventDefault();
-      
-      const username = document.getElementById('login-username').value.trim();
-      const password = document.getElementById('login-password').value;
-      
-      // Load fresh data dari Google Sheets
-      await loadAllData();
-      
-      const user = allUsers.find(u => u && u.type === 'user' && u.username === username && u.password === password);
-      
-      if (!user) {
-        showToast('Username atau password salah!', 'error');
-        return;
-      }
-      
-      if (user.blocked) {
-        showToast('Akun Anda diblokir!', 'error');
-        return;
-      }
-      
-      user.lastLogin = new Date().toISOString();
-      const result = await callGAS('updateUser', user);
-      
-      if (result.success) {
-        currentUser = user;
-        saveSession(user);
-        afterLogin();
-      } else {
-        showToast('Gagal update last login', 'error');
-      }
-    }
+    // Refresh data
+    await loadAllData();
+    
+    showPage('login-page');
+  } else {
+    showToast('Pendaftaran gagal: ' + (result.error || 'Unknown error'), 'error');
+  }
+}
 
-    async function handleRegister(e) {
-      e.preventDefault();
-      
-      const username = document.getElementById('reg-username').value.trim();
-      const password = document.getElementById('reg-password').value;
-      const country = document.getElementById('reg-country').value;
-      
-      if (!username || !password || !country) {
-        showToast('Semua field harus diisi!', 'error');
-        return;
-      }
-      
-      if (username.length < 3) {
-        showToast('Username minimal 3 karakter!', 'error');
-        return;
-      }
-      
-      if (password.length < 4) {
-        showToast('Password minimal 4 karakter!', 'error');
-        return;
-      }
-      
-      // Load fresh data dari Google Sheets
-      await loadAllData();
-      
-      // Cek username sudah ada
-      const exists = allUsers.find(u => u && u.username === username);
-      if (exists) {
-        showToast('Username sudah digunakan!', 'error');
-        return;
-      }
-      
-      if (allUsers.filter(u => u && u.type === 'user').length >= 900) {
-        showToast('Pendaftaran ditutup sementara', 'error');
-        return;
-      }
-      
-      const isFirstUser = allUsers.filter(u => u && u.type === 'user').length === 0;
-      
-      const newUser = {
-        type: 'user',
-        username: username,
-        password: password,
-        role: isFirstUser ? 'admin' : 'user',
-        country: country,
-        deviceId: deviceId,
-        points: 0,
-        blocked: false,
-        createdAt: new Date().toISOString(),
-        lastLogin: new Date().toISOString()
-      };
-      
-      console.log('Registering new user:', newUser);
-      
-      const result = await callGAS('createUser', newUser);
-      console.log('Registration result:', result);
-      
-      if (result.success && result.data) {
-        showToast(isFirstUser ? 'Selamat! Anda terdaftar sebagai Admin' : 'Pendaftaran berhasil! Silakan login', 'success');
-        document.getElementById('register-form').reset();
-        
-        // Refresh data
-        await loadAllData();
-        
-        showPage('login-page');
-      } else {
-        showToast('Pendaftaran gagal: ' + (result.error || 'Unknown error'), 'error');
-      }
-    }
+// ==================== DEBUG FUNCTION ====================
 
-    function handleLogout() {
-      clearSession();
-      currentUser = null;
-      stopHistoryRefresh();
-      showPage('login-page');
-      document.getElementById('login-form').reset();
-    }
+// Tambahkan fungsi untuk debug (bisa dipanggil dari console)
+window.debugUsers = function() {
+  console.log('=== DEBUG USERS ===');
+  console.log('Current User:', currentUser ? {
+    username: currentUser.username,
+    role: currentUser.role,
+    points: currentUser.points
+  } : 'Not logged in');
+  
+  console.log('All Users:', allUsers.map(u => ({
+    username: u.username,
+    password: u.password,
+    role: u.role,
+    blocked: u.blocked,
+    points: u.points
+  })));
+  
+  console.log('App Settings:', appSettings);
+  console.log('Total Exchanges:', allExchanges.length);
+  console.log('Total Broadcasts:', allBroadcasts.length);
+  
+  return 'Check console for debug info';
+};
 
-    function afterLogin() {
-      if (!currentUser) return;
-      
-      if (appSettings?.maintenanceMode && currentUser.role !== 'admin') {
-        showPage('maintenance-page');
-        return;
-      }
-      
-      document.getElementById('header-username').textContent = currentUser.username || 'Username';
-      document.getElementById('profile-username').textContent = currentUser.username || 'Username';
-      document.getElementById('profile-role').textContent = currentUser.role === 'admin' ? 'Admin' : 'User';
-      document.getElementById('profile-country').textContent = currentUser.country || '-';
-      document.getElementById('profile-device').textContent = currentUser.deviceId || deviceId;
-      
-      updatePointsDisplay();
-      displayBroadcast();
-      
-      if (currentUser.role === 'admin') {
-        document.getElementById('settings-nav-btn').classList.remove('hidden');
-        if (appSettings) {
-          document.getElementById('maintenance-toggle').checked = appSettings.maintenanceMode || false;
-          document.getElementById('reward-points-input').value = appSettings.rewardPoints || 50;
-        }
-        renderUserList();
-        renderAdminExchangeList();
-      } else {
-        document.getElementById('settings-nav-btn').classList.add('hidden');
-      }
-      
-      showPage('main-app');
-      showSection('quiz');
-      generateQuiz();
-    }
+// Fungsi untuk test login langsung
+window.testLogin = function(username, password) {
+  const user = allUsers.find(u => 
+    u && 
+    u.type === 'user' && 
+    u.username && 
+    u.username.toString().trim().toLowerCase() === username.toString().trim().toLowerCase() && 
+    u.password && 
+    u.password.toString().trim() === password.toString().trim()
+  );
+  
+  console.log('Test login for:', username);
+  console.log('Found:', user ? {
+    username: user.username,
+    password: user.password,
+    match: user.password === password
+  } : 'Not found');
+  
+  return user ? 'User found!' : 'User not found!';
+};
+
 
     // ==================== ELEMENT SDK HANDLER ====================
     
