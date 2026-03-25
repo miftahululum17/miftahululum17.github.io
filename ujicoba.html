@@ -14,18 +14,25 @@
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .card-custom { border: none; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .marquee-box { background: #333; color: #fff; padding: 5px 0; overflow: hidden; white-space: nowrap; }
+        .marquee-box { background: #333; color: #fff; padding: 5px 0; overflow: hidden; white-space: nowrap; z-index: 1000; }
         .marquee-content { display: inline-block; padding-left: 100%; animation: marquee 20s linear infinite; }
         @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
         #loadingOverlay { position: fixed; inset: 0; background: rgba(255,255,255,0.8); z-index: 9999; display: none; justify-content: center; align-items: center; }
         .point-badge { background: #ffc107; color: #000; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; cursor: pointer; }
-        .status-badge { font-size: 0.75rem; padding: 4px 8px; border-radius: 10px; }
         .profile-icon { font-size: 4rem; background: #e9ecef; width: 100px; height: 100px; line-height: 100px; border-radius: 50%; margin: 0 auto 20px; }
+        .admin-card { border-left: 4px solid #0d6efd; margin-bottom: 10px; }
+        #maintenance-screen { position: fixed; inset: 0; background: white; z-index: 10000; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 30px; }
     </style>
 </head>
 <body>
 
 <div id="loadingOverlay"><div class="spinner-border text-primary"></div></div>
+
+<div id="maintenance-screen">
+    <h1 class="display-1">🛠️</h1>
+    <h2 class="fw-bold">Mode Pemeliharaan</h2>
+    <p class="text-muted">Aplikasi sedang dalam perbaikan. Silakan kembali lagi nanti.</p>
+</div>
 
 <div class="app-container">
     <!-- Marquee -->
@@ -66,7 +73,7 @@
             <div class="col-6"><div class="card card-custom p-4 text-center h-100" onclick="loadHistory()"><div class="fs-2 mb-2">📜</div><div class="fw-bold">Riwayat</div></div></div>
             <div class="col-6"><div class="card card-custom p-4 text-center h-100" onclick="loadProfile()"><div class="fs-2 mb-2">👤</div><div class="fw-bold">Profil</div></div></div>
             <div id="admin-menu-btn" class="col-6 d-none">
-                <div class="card card-custom p-4 text-center h-100 bg-dark text-white" onclick="openAdminPanel()"><div class="fs-2 mb-2">⚙️</div><div class="fw-bold">Admin</div></div>
+                <div class="card card-custom p-4 text-center h-100 bg-dark text-white" onclick="showPage('page-admin')"><div class="fs-2 mb-2">⚙️</div><div class="fw-bold">Setting</div></div>
             </div>
         </div>
         <button onclick="logout()" class="btn btn-outline-danger w-100 mt-5">Logout</button>
@@ -112,16 +119,45 @@
     <div id="page-admin" class="page">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <button onclick="showPage('page-home')" class="btn btn-light btn-sm">← Kembali</button>
-            <h5 class="mb-0 fw-bold">ADMIN PANEL</h5>
-            <button onclick="loadAdmin()" class="btn btn-outline-primary btn-sm">🔄</button>
+            <h5 class="mb-0 fw-bold">ADMIN SETTING</h5>
+            <button onclick="loadAdminData()" class="btn btn-outline-primary btn-sm">🔄</button>
         </div>
-        <ul class="nav nav-tabs mb-3">
+        
+        <ul class="nav nav-tabs mb-3" id="adminTabs">
             <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-users">User</button></li>
             <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-withdraw">WD</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-system">Sistem</button></li>
         </ul>
+
         <div class="tab-content">
-            <div class="tab-pane fade show active" id="tab-users"><div id="admin-user-list"></div></div>
-            <div class="tab-pane fade" id="tab-withdraw"><div id="admin-wd-list"></div></div>
+            <!-- Manajemen User -->
+            <div class="tab-pane fade show active" id="tab-users">
+                <div class="input-group mb-3">
+                    <input type="text" id="search-user" class="form-control form-control-sm" placeholder="Cari username...">
+                </div>
+                <div id="admin-user-list"></div>
+            </div>
+
+            <!-- Riwayat Penukaran -->
+            <div class="tab-pane fade" id="tab-withdraw">
+                <div id="admin-wd-list"></div>
+            </div>
+
+            <!-- Pengaturan Sistem -->
+            <div class="tab-pane fade" id="tab-system">
+                <div class="card card-custom p-3 mb-3">
+                    <h6 class="fw-bold">Mode Maintenance</h6>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="switch-maintenance" onchange="updateSystemSetting('maintenance', this.checked)">
+                        <label class="form-check-label" for="switch-maintenance">Aktifkan (User tidak bisa akses)</label>
+                    </div>
+                </div>
+                <div class="card card-custom p-3">
+                    <h6 class="fw-bold">Broadcast Pesan (Marquee)</h6>
+                    <textarea id="input-broadcast" class="form-control mb-2" rows="2" placeholder="Tulis pesan pengumuman..."></textarea>
+                    <button onclick="updateSystemSetting('broadcast', document.getElementById('input-broadcast').value)" class="btn btn-primary btn-sm w-100">Update Broadcast</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -148,6 +184,29 @@
     </div>
 </div>
 
+<!-- Modal Edit User -->
+<div class="modal fade" id="modalEditUser" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Edit User</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <input type="hidden" id="edit-u-id">
+                <div class="mb-2"><label class="small">Username</label><input type="text" id="edit-u-name" class="form-control"></div>
+                <div class="mb-2"><label class="small">Password Baru (kosongkan jika tidak ganti)</label><input type="text" id="edit-u-pass" class="form-control"></div>
+                <div class="mb-2"><label class="small">Poin</label><input type="number" id="edit-u-poin" class="form-control"></div>
+                <div class="form-check form-switch mt-3">
+                    <input class="form-check-input" type="checkbox" id="edit-u-status">
+                    <label class="form-check-label">Blokir Akun</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger btn-sm me-auto" onclick="confirmDeleteUser()">Hapus Akun</button>
+                <button type="button" class="btn btn-primary btn-sm" onclick="saveUserEdit()">Simpan Perubahan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbxHZl7ZiCe7OyepIzK__6NXTDPM5sdnpLCKsWSY-9KVmyTKQSoKrVJ4PN_DHaHSUabFBg/exec"; 
@@ -157,51 +216,62 @@
     const tg = window.Telegram.WebApp;
     let currentUser = JSON.parse(localStorage.getItem('user')) || null;
     let currentQuiz = null;
+    let systemSettings = { maintenance: false, broadcast_message: "" };
 
     window.onload = () => {
         if (!API_URL || API_URL.includes("URL_WEB_APP")) return;
-        if (currentUser) { showPage('page-home'); syncPoin(); } 
-        else { showPage('page-login'); }
-        loadSettings();
+        loadSettings().then(() => {
+            if (currentUser) { 
+                showPage('page-home'); 
+                syncPoin(); 
+            } else { 
+                showPage('page-login'); 
+            }
+        });
     };
-
-    function showToast(msg, type = 'primary') {
-        const el = document.getElementById('appToast');
-        if(!el) return;
-        el.className = `toast align-items-center text-white border-0 bg-${type}`;
-        document.getElementById('toastMsg').innerText = msg;
-        new bootstrap.Toast(el).show();
-    }
 
     async function callAPI(action, payload = {}) {
         document.getElementById('loadingOverlay').style.display = 'flex';
         try {
             const r = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action, payload }) });
-            return await r.json();
-        } catch (e) { return { success: false }; } 
+            const data = await r.json();
+            return data;
+        } catch (e) { return { success: false, message: "Koneksi Error" }; } 
         finally { document.getElementById('loadingOverlay').style.display = 'none'; }
     }
 
-    // --- NAVIGASI & IKLAN ---
-    async function showAd() {
-        if(!document.getElementById('ad-script')) {
-            const s = document.createElement('script');
-            s.id = 'ad-script';
-            s.src = '//libtl.com/sdk.js';
-            s.setAttribute('data-zone', AD_ZONE_ID);
-            s.setAttribute('data-sdk', AD_FUNCTION_NAME);
-            document.body.appendChild(s);
+    // --- SYSTEM & MAINTENANCE ---
+    async function loadSettings() {
+        const res = await callAPI('getSettings');
+        if(res && res.success) {
+            systemSettings = res.settings;
+            // Cek Maintenance
+            if(systemSettings.maintenance && (!currentUser || currentUser.role !== 'admin')) {
+                document.getElementById('maintenance-screen').style.display = 'flex';
+                return;
+            }
+            // Update Marquee
+            const b = systemSettings.broadcast_message || "";
+            document.getElementById('broadcast-text').innerText = `${b} • ${b} • ${b}`;
+            document.getElementById('global-broadcast').classList.toggle('d-none', !b);
+            
+            // Sync Admin Inputs
+            const sw = document.getElementById('switch-maintenance');
+            if(sw) sw.checked = systemSettings.maintenance;
+            const ib = document.getElementById('input-broadcast');
+            if(ib) ib.value = b;
         }
-        return new Promise((resolve) => {
-            setTimeout(async () => {
-                if(typeof window[AD_FUNCTION_NAME] === 'function') {
-                    try { await window[AD_FUNCTION_NAME](); } catch(e){}
-                }
-                resolve();
-            }, 1000);
-        });
     }
 
+    async function updateSystemSetting(key, value) {
+        const res = await callAPI('updateSettings', { key, value });
+        if(res.success) {
+            alert('Setting berhasil diperbarui');
+            loadSettings();
+        }
+    }
+
+    // --- NAVIGASI ---
     function showPage(id) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         const target = document.getElementById(id);
@@ -216,10 +286,113 @@
         }
 
         if(id === 'page-dashboard') generateQuiz();
-        document.getElementById('global-broadcast').classList.toggle('d-none', ['page-login', 'page-register'].includes(id));
+        if(id === 'page-admin') loadAdminData();
+        
+        const isAuthPage = ['page-login', 'page-register'].includes(id);
+        document.getElementById('global-broadcast').classList.toggle('d-none', isAuthPage || !systemSettings.broadcast_message);
     }
 
-    // --- PROFIL ---
+    // --- ADMIN LOGIC ---
+    let allUsers = [];
+    async function loadAdminData() {
+        const res = await callAPI('adminGetData');
+        if(res && res.success) {
+            allUsers = res.users;
+            renderUserList(allUsers);
+            renderWdList(res.transactions);
+        }
+    }
+
+    function renderUserList(users) {
+        const container = document.getElementById('admin-user-list');
+        container.innerHTML = users.map(u => `
+            <div class="card card-custom admin-card p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="fw-bold">${u.username}</span> 
+                        <span class="badge bg-secondary ms-1" style="font-size:0.6rem">${u.role}</span>
+                        ${u.status === 'blocked' ? '<span class="badge bg-danger ms-1" style="font-size:0.6rem">BLOKIR</span>' : ''}
+                        <div class="text-muted small">ID: ${u.id} | Poin: ${u.poin}</div>
+                    </div>
+                    <button class="btn btn-sm btn-outline-primary" onclick="openEditUserModal('${u.id}')">Edit</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function renderWdList(txs) {
+        const container = document.getElementById('admin-wd-list');
+        container.innerHTML = txs.reverse().map(t => `
+            <div class="card card-custom p-3 mb-2 small shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <b>${t.nama}</b> (${t.no})<br>
+                        <span class="text-muted">User ID: ${t.userId}</span><br>
+                        <b>${t.poin} Poin</b>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-${t.status==='pending'?'warning':t.status==='berhasil'?'success':'danger'} mb-2 d-block">${t.status.toUpperCase()}</span>
+                        <div class="btn-group btn-group-sm">
+                            <button onclick="updateWdStatus('${t.id}', 'berhasil')" class="btn btn-success">✓</button>
+                            <button onclick="updateWdStatus('${t.id}', 'tolak')" class="btn btn-warning">✕</button>
+                            <button onclick="deleteWdHistory('${t.id}')" class="btn btn-danger">🗑️</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function openEditUserModal(uid) {
+        const u = allUsers.find(x => x.id == uid);
+        if(!u) return;
+        document.getElementById('edit-u-id').value = u.id;
+        document.getElementById('edit-u-name').value = u.username;
+        document.getElementById('edit-u-pass').value = '';
+        document.getElementById('edit-u-poin').value = u.poin;
+        document.getElementById('edit-u-status').checked = (u.status === 'blocked');
+        new bootstrap.Modal(document.getElementById('modalEditUser')).show();
+    }
+
+    async function saveUserEdit() {
+        const payload = {
+            id: document.getElementById('edit-u-id').value,
+            username: document.getElementById('edit-u-name').value,
+            password: document.getElementById('edit-u-pass').value,
+            poin: parseInt(document.getElementById('edit-u-poin').value),
+            status: document.getElementById('edit-u-status').checked ? 'blocked' : 'active'
+        };
+        const res = await callAPI('adminUpdateUser', payload);
+        if(res.success) {
+            bootstrap.Modal.getInstance(document.getElementById('modalEditUser')).hide();
+            loadAdminData();
+        }
+    }
+
+    async function confirmDeleteUser() {
+        if(confirm("Hapus akun ini secara permanen?")) {
+            const uid = document.getElementById('edit-u-id').value;
+            const res = await callAPI('adminDeleteUser', { id: uid });
+            if(res.success) {
+                bootstrap.Modal.getInstance(document.getElementById('modalEditUser')).hide();
+                loadAdminData();
+            }
+        }
+    }
+
+    async function updateWdStatus(id, status) {
+        const res = await callAPI('adminUpdateWd', { id, status });
+        if(res.success) loadAdminData();
+    }
+
+    async function deleteWdHistory(id) {
+        if(confirm("Hapus riwayat ini? Data akan hilang di sisi user juga.")) {
+            const res = await callAPI('adminDeleteWd', { id });
+            if(res.success) loadAdminData();
+        }
+    }
+
+    // --- USER LOGIC ---
     function loadProfile() {
         showPage('page-profile');
         document.getElementById('p-username').innerText = currentUser.username;
@@ -229,10 +402,10 @@
         document.getElementById('p-device').innerText = tg.initDataUnsafe?.user?.id || 'Browser Mode';
     }
 
-    // --- REDEEM DENGAN IKLAN ---
     async function submitRedeem() {
         const p = parseInt(document.getElementById('wd-poin').value);
         if(!p || p < 50) return alert('Min. 50 poin');
+        if(p > currentUser.poin) return alert('Poin tidak cukup');
 
         const res = await callAPI('redeemPoin', { 
             userId: currentUser.id, 
@@ -244,13 +417,46 @@
         if(res && res.success) {
             currentUser.poin = res.newPoin;
             localStorage.setItem('user', JSON.stringify(currentUser));
-            alert('Penukaran dikirim! Tonton iklan untuk melanjutkan.');
-            await showAd(); // Tampilkan Iklan setelah berhasil kirim
+            alert('Penukaran dikirim! Tonton iklan sebentar.');
+            await showAd();
             loadHistory();
         } else alert(res.message || 'Gagal redeem');
     }
 
-    // --- QUIZ & LAINNYA ---
+    async function loadHistory() {
+        showPage('page-history');
+        const res = await callAPI('getHistory', { userId: currentUser.id });
+        if(res && res.success) {
+            document.getElementById('history-container').innerHTML = res.history.reverse().map(h => `
+                <div class="card card-custom p-3 mb-2 small shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div><b>${h.nama}</b><br>${h.no}</div>
+                        <div class="text-end"><b>${h.poin} Poin</b><br><span class="badge bg-${h.status==='pending'?'warning':h.status==='berhasil'?'success':'danger'}">${h.status}</span></div>
+                    </div>
+                </div>
+            `).join('');
+        }
+    }
+
+    // --- IKLAN & QUIZ ---
+    async function showAd() {
+        if(!document.getElementById('ad-script')) {
+            const s = document.createElement('script');
+            s.id = 'ad-script'; s.src = '//libtl.com/sdk.js';
+            s.setAttribute('data-zone', AD_ZONE_ID);
+            s.setAttribute('data-sdk', AD_FUNCTION_NAME);
+            document.body.appendChild(s);
+        }
+        return new Promise((resolve) => {
+            setTimeout(async () => {
+                if(typeof window[AD_FUNCTION_NAME] === 'function') {
+                    try { await window[AD_FUNCTION_NAME](); } catch(e){}
+                }
+                resolve();
+            }, 1000);
+        });
+    }
+
     async function claimPrize() {
         document.getElementById('btn-claim').disabled = true;
         await showAd();
@@ -281,56 +487,29 @@
 
     async function handleLogin() {
         const res = await callAPI('login', { username: document.getElementById('login-username').value, password: document.getElementById('login-password').value });
-        if(res && res.success) { currentUser = res.user; localStorage.setItem('user', JSON.stringify(currentUser)); showPage('page-home'); }
-        else alert('Login Gagal');
+        if(res && res.success) { 
+            if(res.user.status === 'blocked') return alert('Akun Anda sedang diblokir.');
+            currentUser = res.user; 
+            localStorage.setItem('user', JSON.stringify(currentUser)); 
+            location.reload(); 
+        } else alert('Login Gagal');
     }
 
     async function handleRegister() {
-        const res = await callAPI('register', { username: document.getElementById('reg-username').value, password: document.getElementById('reg-password').value, device_id: 'Device' });
+        const res = await callAPI('register', { username: document.getElementById('reg-username').value, password: document.getElementById('reg-password').value, device_id: tg.initDataUnsafe?.user?.id || 'Browser' });
         if(res && res.success) showPage('page-login');
+        else alert(res.message);
     }
 
     async function syncPoin() {
         if(!currentUser) return;
         const res = await callAPI('getUserData', { userId: currentUser.id });
         if(res && res.success) {
+            if(res.user.status === 'blocked') { logout(); return alert('Akun diblokir'); }
             currentUser.poin = res.user.poin;
             currentUser.role = res.user.role;
             localStorage.setItem('user', JSON.stringify(currentUser));
             document.querySelectorAll('.global-poin').forEach(el => el.innerText = currentUser.poin);
-        }
-    }
-
-    async function loadHistory() {
-        showPage('page-history');
-        const res = await callAPI('getHistory', { userId: currentUser.id });
-        if(res && res.success) {
-            document.getElementById('history-container').innerHTML = res.history.reverse().map(h => `
-                <div class="card card-custom p-3 mb-2 small shadow-sm">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div><b>${h.nama}</b><br>${h.no}</div>
-                        <div class="text-end"><b>${h.poin} Poin</b><br><span class="badge bg-${h.status==='pending'?'warning':'success'}">${h.status}</span></div>
-                    </div>
-                </div>
-            `).join('');
-        }
-    }
-
-    function openAdminPanel() { showPage('page-admin'); loadAdmin(); }
-    async function loadAdmin() {
-        const res = await callAPI('adminGetData');
-        if(res && res.success) {
-            document.getElementById('admin-user-list').innerHTML = res.users.map(u => `<div class="p-2 border-bottom small">${u[1]} - ${u[4]} Poin</div>`).join('');
-            document.getElementById('admin-wd-list').innerHTML = res.transactions.filter(t=>t.status==='pending').map(t => `<div class="p-2 border-bottom small">${t.nama} - ${t.poin} Poin <button class="btn btn-sm btn-success">Setuju</button></div>`).join('');
-        }
-    }
-
-    async function loadSettings() {
-        const res = await callAPI('getSettings');
-        if(res && res.success) {
-            const b = res.settings.broadcast_message || "";
-            document.getElementById('broadcast-text').innerText = `${b} • ${b} • ${b}`;
-            document.getElementById('global-broadcast').classList.toggle('d-none', !b);
         }
     }
 
