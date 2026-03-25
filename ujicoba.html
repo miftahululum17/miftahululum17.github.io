@@ -9,7 +9,7 @@
     <style>
         :root { --tg-theme-bg: #f8f9fa; }
         body { background-color: var(--tg-theme-bg); font-family: sans-serif; overflow-x: hidden; }
-        .app-container { max-width: 500px; margin: auto; min-height: 100vh; }
+        .app-container { max-width: 500px; margin: auto; min-height: 100vh; position: relative; }
         .page { display: none; padding: 20px; animation: fadeIn 0.3s ease; }
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -18,9 +18,11 @@
         .marquee-content { display: inline-block; padding-left: 100%; animation: marquee 20s linear infinite; }
         @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
         #loadingOverlay { position: fixed; inset: 0; background: rgba(255,255,255,0.8); z-index: 9999; display: none; justify-content: center; align-items: center; }
-        .point-badge { background: #ffc107; color: #000; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; }
+        .point-badge { background: #ffc107; color: #000; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; cursor: pointer; }
         .status-badge { font-size: 0.75rem; padding: 4px 8px; border-radius: 10px; }
         .api-warning { background: #fee2e2; color: #dc2626; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #fca5a5; font-size: 0.85rem; }
+        .admin-item { border-bottom: 1px solid #eee; padding: 10px 0; }
+        .admin-item:last-child { border-bottom: none; }
     </style>
 </head>
 <body>
@@ -28,140 +30,124 @@
 <div id="loadingOverlay"><div class="spinner-border text-primary"></div></div>
 
 <div class="app-container">
-    <!-- Peringatan Jika API URL Kosong -->
-    <div id="api-config-alert" class="page active" style="display: none;">
-        <div class="api-warning mx-3 mt-4">
+    <!-- Peringatan API -->
+    <div id="api-config-alert" class="page">
+        <div class="api-warning mx-3 mt-4 text-center">
             <h6 class="fw-bold">Konfigurasi Diperlukan!</h6>
-            <p class="mb-0">Aplikasi belum terhubung ke database. Harap masukkan <b>URL Web App</b> dari Google Apps Script ke variabel <code>API_URL</code> di dalam kode.</p>
+            <p>Masukkan URL Web App dari Google Apps Script ke variabel <code>API_URL</code>.</p>
         </div>
     </div>
 
-    <!-- Marquee Global -->
+    <!-- Marquee -->
     <div id="global-broadcast" class="marquee-box d-none">
-        <div class="marquee-content" id="broadcast-text">Memuat pengumuman...</div>
+        <div class="marquee-content" id="broadcast-text">Memuat pesan sistem...</div>
     </div>
 
-    <!-- Halaman Login -->
+    <!-- Login -->
     <div id="page-login" class="page">
-        <div class="text-center my-4"><h2 class="fw-bold text-primary">CuanQuiz</h2></div>
+        <div class="text-center my-5"><h2 class="fw-bold text-primary">CuanQuiz</h2><p class="text-muted">Main Quiz, Dapat Cuan</p></div>
         <div class="card card-custom p-4">
-            <input type="text" id="login-username" class="form-control mb-2" placeholder="Username">
-            <input type="password" id="login-password" class="form-control mb-3" placeholder="Password">
-            <button onclick="handleLogin()" class="btn btn-primary w-100 py-2">LOGIN</button>
-            <p class="text-center mt-3 small">Belum punya akun? <a href="#" onclick="showPage('page-register')">Daftar</a></p>
+            <div class="mb-3"><label class="small fw-bold">Username</label><input type="text" id="login-username" class="form-control" placeholder="Masukkan username"></div>
+            <div class="mb-4"><label class="small fw-bold">Password</label><input type="password" id="login-password" class="form-control" placeholder="Masukkan password"></div>
+            <button onclick="handleLogin()" class="btn btn-primary w-100 py-2 fw-bold">MASUK</button>
+            <p class="text-center mt-3 small">Belum ada akun? <a href="#" onclick="showPage('page-register')">Daftar Sekarang</a></p>
         </div>
     </div>
 
-    <!-- Halaman Register -->
+    <!-- Register -->
     <div id="page-register" class="page">
-        <div class="card card-custom p-4 mt-4">
-            <h4>Daftar Baru</h4>
-            <input type="text" id="reg-username" class="form-control mb-2" placeholder="Username">
-            <input type="password" id="reg-password" class="form-control mb-3" placeholder="Password">
-            <button onclick="handleRegister()" class="btn btn-success w-100 py-2">DAFTAR</button>
-            <button onclick="showPage('page-login')" class="btn btn-link w-100 mt-2">Batal</button>
+        <div class="card card-custom p-4 mt-5">
+            <h4 class="fw-bold mb-3">Pendaftaran</h4>
+            <div class="mb-3"><label class="small fw-bold">Username</label><input type="text" id="reg-username" class="form-control"></div>
+            <div class="mb-4"><label class="small fw-bold">Password</label><input type="password" id="reg-password" class="form-control"></div>
+            <button onclick="handleRegister()" class="btn btn-success w-100 py-2 fw-bold">BUAT AKUN</button>
+            <button onclick="showPage('page-login')" class="btn btn-link w-100 mt-2 text-decoration-none">Kembali ke Login</button>
         </div>
     </div>
 
-    <!-- Halaman Utama -->
+    <!-- Home -->
     <div id="page-home" class="page">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <div><h5>Halo, <span id="display-name">...</span></h5></div>
+            <div><p class="mb-0 text-muted small">Selamat Datang,</p><h5 class="fw-bold" id="display-name">User</h5></div>
             <div class="point-badge" onclick="syncPoin()">Poin: <span class="global-poin">0</span> 🔄</div>
         </div>
         <div class="row g-3">
-            <div class="col-6"><div class="card card-custom p-3 text-center" onclick="showPage('page-dashboard')">🎮 Main Quiz</div></div>
-            <div class="col-6"><div class="card card-custom p-3 text-center" onclick="loadHistory()">📜 Riwayat</div></div>
-            <div class="col-6"><div class="card card-custom p-3 text-center" onclick="loadProfile()">👤 Profil</div></div>
+            <div class="col-6"><div class="card card-custom p-4 text-center h-100" onclick="showPage('page-dashboard')"><div class="fs-2 mb-2">🎮</div><div class="fw-bold">Main Quiz</div></div></div>
+            <div class="col-6"><div class="card card-custom p-4 text-center h-100" onclick="loadHistory()"><div class="fs-2 mb-2">📜</div><div class="fw-bold">Riwayat</div></div></div>
+            <div class="col-6"><div class="card card-custom p-4 text-center h-100" onclick="loadProfile()"><div class="fs-2 mb-2">👤</div><div class="fw-bold">Profil</div></div></div>
             <div id="admin-menu-btn" class="col-6 d-none">
-                <div class="card card-custom p-3 text-center bg-dark text-white" onclick="loadAdmin()">⚙️ Panel Admin</div>
+                <div class="card card-custom p-4 text-center h-100 bg-dark text-white" onclick="openAdminPanel()"><div class="fs-2 mb-2">⚙️</div><div class="fw-bold">Panel Admin</div></div>
             </div>
         </div>
-        <button onclick="logout()" class="btn btn-outline-danger w-100 mt-5">Logout</button>
+        <button onclick="logout()" class="btn btn-outline-danger w-100 mt-5">Keluar Aplikasi</button>
     </div>
 
-    <!-- Halaman Quiz -->
+    <!-- Dashboard Quiz -->
     <div id="page-dashboard" class="page">
-        <div class="d-flex justify-content-between mb-3 align-items-center">
-            <button onclick="showPage('page-home')" class="btn btn-light btn-sm">← Menu</button>
+        <div class="d-flex justify-content-between mb-4">
+            <button onclick="showPage('page-home')" class="btn btn-light btn-sm">← Kembali</button>
             <div class="point-badge">Poin: <span class="global-poin">0</span></div>
         </div>
-        <div class="card card-custom p-4 text-center">
-            <p class="text-muted small">Selesaikan Matematika Dasar</p>
-            <h1 id="quiz-question" class="display-4 fw-bold">...</h1>
-            <div id="quiz-options" class="d-grid gap-2 mt-4"></div>
+        <div class="card card-custom p-5 text-center">
+            <p class="text-muted small">Berapa hasil dari:</p>
+            <h1 id="quiz-question" class="display-3 fw-bold my-4">...</h1>
+            <div id="quiz-options" class="d-grid gap-2"></div>
             <div id="prize-section" class="mt-4 d-none">
-                <p class="text-success fw-bold">Jawaban Benar!</p>
-                <button id="btn-claim" onclick="claimPrize()" class="btn btn-warning w-100 py-3 fw-bold">🎁 AMBIL 5 POIN (IKLAN)</button>
+                <div class="alert alert-success py-2">Jawaban Tepat!</div>
+                <button id="btn-claim" onclick="claimPrize()" class="btn btn-warning w-100 py-3 fw-bold shadow">🎁 KLAIM +5 POIN (IKLAN)</button>
             </div>
         </div>
     </div>
 
-    <!-- Halaman Riwayat -->
-    <div id="page-history" class="page">
-        <div class="d-flex justify-content-between mb-3 align-items-center">
-            <button onclick="showPage('page-home')" class="btn btn-light btn-sm">← Menu</button>
-            <div class="point-badge">Poin: <span class="global-poin">0</span></div>
-        </div>
-        <button onclick="showPage('page-redeem')" class="btn btn-primary w-100 mb-3 fw-bold">TARIK POIN</button>
-        <div id="history-list"></div>
-    </div>
-
-    <!-- Halaman Redeem -->
-    <div id="page-redeem" class="page">
-        <div class="d-flex justify-content-between mb-3">
-            <button onclick="showPage('page-history')" class="btn btn-light btn-sm">← Batal</button>
-            <div class="point-badge">Poin: <span class="global-poin">0</span></div>
-        </div>
-        <div class="card card-custom p-4">
-            <h5 class="mb-3">Tarik ke DANA</h5>
-            <input type="text" id="wd-nama" class="form-control mb-2" placeholder="Nama Akun DANA">
-            <input type="number" id="wd-no" class="form-control mb-2" placeholder="Nomor HP DANA">
-            <input type="number" id="wd-poin" class="form-control mb-3" placeholder="Jumlah Poin (Kelipatan 50)">
-            <button onclick="submitRedeem()" class="btn btn-primary w-100 py-2">KIRIM PENGAJUAN</button>
-        </div>
-    </div>
-
-    <!-- Halaman Profil -->
-    <div id="page-profile" class="page">
-        <div class="d-flex justify-content-between mb-4 align-items-center">
-            <button onclick="showPage('page-home')" class="btn btn-light btn-sm">← Menu</button>
-            <div class="point-badge">Poin: <span class="global-poin">0</span></div>
-        </div>
-        <div class="text-center card card-custom p-4">
-            <div class="fs-1 mb-2">👤</div>
-            <h4 id="prof-name" class="fw-bold">...</h4>
-            <hr>
-            <div class="text-start small">
-                <p><b>ID User:</b> <span id="prof-id"></span></p>
-                <p><b>Device:</b> <span id="prof-device"></span></p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Halaman Admin -->
+    <!-- Admin Panel -->
     <div id="page-admin" class="page">
-        <div class="d-flex justify-content-between mb-3">
-            <button onclick="showPage('page-home')" class="btn btn-light btn-sm">← Menu</button>
-            <button onclick="loadAdmin()" class="btn btn-dark btn-sm">Refresh 🔄</button>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <button onclick="showPage('page-home')" class="btn btn-light btn-sm">← Kembali</button>
+            <h5 class="mb-0 fw-bold text-primary">ADMIN PANEL</h5>
+            <button onclick="loadAdmin()" class="btn btn-outline-primary btn-sm">🔄</button>
         </div>
-        <ul class="nav nav-pills mb-3" id="adminTab">
-            <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-users">Users</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-trans">Tukar</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-sys">Sistem</button></li>
+        
+        <ul class="nav nav-tabs mb-3" id="adminTabs">
+            <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-users">Pengguna</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-withdraw">Penarikan</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-config">Sistem</button></li>
         </ul>
+
         <div class="tab-content">
-            <div class="tab-pane fade show active" id="tab-users"><div id="admin-user-list"></div></div>
-            <div class="tab-pane fade" id="tab-trans"><div id="admin-trans-list"></div></div>
-            <div class="tab-pane fade" id="tab-sys">
-                <div class="card card-custom p-3">
-                    <label class="small fw-bold">Maintenance Mode</label>
-                    <select id="set-maint" class="form-select mb-2"><option value="OFF">OFF</option><option value="ON">ON</option></select>
-                    <label class="small fw-bold">Pesan Broadcast</label>
-                    <textarea id="set-broad" class="form-control mb-3" rows="3"></textarea>
-                    <button onclick="saveSettings()" class="btn btn-primary w-100">SIMPAN SETTING</button>
+            <!-- Tab Users -->
+            <div class="tab-pane fade show active" id="tab-users">
+                <div id="admin-user-list" class="mt-2"></div>
+            </div>
+            <!-- Tab WD -->
+            <div class="tab-pane fade" id="tab-withdraw">
+                <div id="admin-wd-list" class="mt-2"></div>
+            </div>
+            <!-- Tab Config -->
+            <div class="tab-pane fade" id="tab-config">
+                <div class="card card-custom p-3 mt-2">
+                    <div class="mb-3"><label class="small fw-bold">Status Pemeliharaan</label><select id="sys-maint" class="form-select"><option value="OFF">OFF</option><option value="ON">ON</option></select></div>
+                    <div class="mb-3"><label class="small fw-bold">Pesan Pengumuman</label><textarea id="sys-broad" class="form-control" rows="3"></textarea></div>
+                    <button onclick="saveAdminSettings()" class="btn btn-primary w-100 fw-bold">UPDATE SISTEM</button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Halaman Lainnya (History & Profile) -->
+    <div id="page-history" class="page">
+        <div class="mb-4"><button onclick="showPage('page-home')" class="btn btn-light btn-sm">← Kembali</button></div>
+        <button onclick="showPage('page-redeem')" class="btn btn-primary w-100 mb-4 fw-bold shadow">TUKAR POIN KE DANA</button>
+        <div id="history-container"></div>
+    </div>
+
+    <div id="page-redeem" class="page">
+        <div class="mb-4"><button onclick="showPage('page-history')" class="btn btn-light btn-sm">← Batal</button></div>
+        <div class="card card-custom p-4">
+            <h5 class="fw-bold mb-3">Tarik Saldo DANA</h5>
+            <div class="mb-2"><input type="text" id="wd-nama" class="form-control" placeholder="Nama Akun DANA"></div>
+            <div class="mb-2"><input type="number" id="wd-no" class="form-control" placeholder="Nomor HP DANA"></div>
+            <div class="mb-3"><input type="number" id="wd-poin" class="form-control" placeholder="Poin (Kelipatan 50)"></div>
+            <button onclick="submitRedeem()" class="btn btn-primary w-100 py-2">KIRIM PERMINTAAN</button>
         </div>
     </div>
 </div>
@@ -170,26 +156,20 @@
 <div class="modal fade" id="editUserModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 card-custom">
-            <div class="modal-header border-0"><h5>Kelola Akun</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-            <div class="modal-body">
-                <input type="hidden" id="edit-id">
-                <label class="small fw-bold">Password Baru</label><input type="text" id="edit-pass" class="form-control mb-2">
-                <label class="small fw-bold">Atur Poin</label><input type="number" id="edit-poin" class="form-control mb-2">
-                <label class="small fw-bold">Status Akun</label>
-                <select id="edit-status" class="form-select mb-4">
-                    <option value="active">Active</option>
-                    <option value="blocked">Blocked</option>
-                </select>
-                <div class="d-grid gap-2">
-                    <button onclick="saveUserEdit()" class="btn btn-primary py-2">SIMPAN PERUBAHAN</button>
-                    <button onclick="deleteUser()" class="btn btn-outline-danger btn-sm mt-2">HAPUS AKUN PERMANEN</button>
-                </div>
+            <div class="modal-header border-0"><h5>Kelola Akun User</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body p-4 pt-0">
+                <input type="hidden" id="e-id">
+                <div class="mb-3"><label class="small fw-bold">Password Akun</label><input type="text" id="e-pass" class="form-control"></div>
+                <div class="mb-3"><label class="small fw-bold">Total Poin</label><input type="number" id="e-poin" class="form-control"></div>
+                <div class="mb-4"><label class="small fw-bold">Status Akses</label><select id="e-status" class="form-select"><option value="active">Aktif</option><option value="blocked">Diblokir</option></select></div>
+                <button onclick="submitUserEdit()" class="btn btn-primary w-100 py-2 fw-bold">SIMPAN PERUBAHAN</button>
+                <button onclick="confirmDeleteUser()" class="btn btn-outline-danger btn-sm w-100 mt-3 border-0">Hapus Permanen</button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Toast -->
+<!-- Toast Notif -->
 <div class="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3">
     <div id="appToast" class="toast align-items-center text-white border-0" role="alert">
         <div class="d-flex"><div class="toast-body" id="toastMsg"></div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>
@@ -206,22 +186,20 @@
     let currentUser = JSON.parse(localStorage.getItem('user')) || null;
     let currentQuiz = null;
 
+    // --- INISIALISASI ---
     window.onload = () => {
-        if (API_URL === "URL_WEB_APP_GAS_ANDA" || API_URL.trim() === "") {
-            document.getElementById('api-config-alert').style.display = 'block';
+        if (!API_URL || API_URL.includes("URL_WEB_APP")) {
+            showPage('api-config-alert');
             return;
         }
 
         if (currentUser) {
-            updateUIPoints();
             showPage('page-home');
             syncPoin(); 
         } else {
             showPage('page-login');
         }
-        
         loadSettings();
-        setInterval(syncPoin, 30000);
     };
 
     function showToast(msg, type = 'primary') {
@@ -232,101 +210,54 @@
     }
 
     async function callAPI(action, payload = {}) {
-        if (API_URL === "URL_WEB_APP_GAS_ANDA") return { success: false };
-        if(action !== 'getUserData') document.getElementById('loadingOverlay').style.display = 'flex';
+        document.getElementById('loadingOverlay').style.display = 'flex';
         try {
             const r = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action, payload }) });
-            return await r.json();
+            const data = await r.json();
+            return data;
         } catch (e) {
-            return { success: false, message: "Server Error" };
+            showToast('Gagal terhubung ke server', 'danger');
+            return { success: false };
         } finally { document.getElementById('loadingOverlay').style.display = 'none'; }
     }
 
+    // --- NAVIGASI ---
     function showPage(id) {
-        if(id === 'page-admin' && (!currentUser || currentUser.role !== 'admin')) {
-            showToast('Akses Ditolak', 'danger');
-            showPage('page-home');
-            return;
-        }
-
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        const p = document.getElementById(id);
-        if(p) p.classList.add('active');
+        const target = document.getElementById(id);
+        if(target) target.classList.add('active');
 
-        const marquee = document.getElementById('global-broadcast');
-        if(!['page-login', 'page-register', 'api-config-alert'].includes(id)) {
-            marquee.classList.remove('d-none');
-        } else {
-            marquee.classList.add('d-none');
+        // Update UI info global
+        if(currentUser) {
+            document.querySelectorAll('.global-poin').forEach(el => el.innerText = currentUser.poin);
+            document.getElementById('display-name').innerText = currentUser.username;
+            
+            const btn = document.getElementById('admin-menu-btn');
+            if(currentUser.role === 'admin') btn.classList.remove('d-none');
+            else btn.classList.add('d-none');
         }
 
         if(id === 'page-dashboard') generateQuiz();
-        updateUIPoints();
-    }
-
-    function updateUIPoints() {
-        if(!currentUser) return;
-        document.querySelectorAll('.global-poin').forEach(el => el.innerText = currentUser.poin);
-        document.getElementById('display-name').innerText = currentUser.username;
         
-        const adminBtn = document.getElementById('admin-menu-btn');
-        if(adminBtn) {
-            currentUser.role === 'admin' ? adminBtn.classList.remove('d-none') : adminBtn.classList.add('d-none');
+        // Atur visibilitas pengumuman
+        const broad = document.getElementById('global-broadcast');
+        if(['page-home', 'page-dashboard', 'page-history', 'page-profile'].includes(id)) {
+            broad.classList.remove('d-none');
+        } else {
+            broad.classList.add('d-none');
         }
-    }
-
-    // --- IKLAN ---
-    async function claimPrize() {
-        const btn = document.getElementById('btn-claim');
-        btn.disabled = true;
-        btn.innerText = "MEMUAT IKLAN...";
-
-        if (!document.getElementById('ad-sdk')) {
-            const script = document.createElement('script');
-            script.id = 'ad-sdk';
-            script.src = `//libtl.com/sdk.js`;
-            script.setAttribute('data-zone', AD_ZONE_ID);
-            script.setAttribute('data-sdk', AD_FUNCTION_NAME);
-            document.body.appendChild(script);
-        }
-
-        setTimeout(async () => {
-            if (typeof window[AD_FUNCTION_NAME] === 'function') {
-                try {
-                    await window[AD_FUNCTION_NAME]();
-                    processClaim();
-                } catch (err) {
-                    processClaim(); 
-                }
-            } else {
-                processClaim();
-            }
-        }, 1500);
-    }
-
-    async function processClaim() {
-        const res = await callAPI('submitQuiz', { userId: currentUser.id });
-        if(res && res.success) { 
-            currentUser.poin = res.newPoin; 
-            localStorage.setItem('user', JSON.stringify(currentUser)); 
-            showToast('Poin bertambah!', 'success');
-            generateQuiz(); 
-            updateUIPoints(); 
-        }
-        const btn = document.getElementById('btn-claim');
-        btn.disabled = false;
-        btn.innerText = "🎁 AMBIL 5 POIN (IKLAN)";
     }
 
     // --- LOGIN & REGISTER ---
     async function handleLogin() {
         const u = document.getElementById('login-username').value;
         const p = document.getElementById('login-password').value;
+        if(!u || !p) return showToast('Isi semua kolom', 'warning');
+
         const res = await callAPI('login', { username: u, password: p });
         if(res && res.success) {
             currentUser = res.user;
             localStorage.setItem('user', JSON.stringify(currentUser));
-            updateUIPoints();
             showPage('page-home');
         } else showToast(res.message || 'Login Gagal', 'danger');
     }
@@ -334,74 +265,139 @@
     async function handleRegister() {
         const u = document.getElementById('reg-username').value;
         const p = document.getElementById('reg-password').value;
-        const res = await callAPI('register', { username: u, password: p, device_id: tg.initDataUnsafe?.user?.id || 'Browser' });
-        if(res && res.success) { showToast('Berhasil daftar!', 'success'); showPage('page-login'); }
-        else showToast(res.message || 'Gagal daftar', 'danger');
+        if(!u || !p) return showToast('Isi semua kolom', 'warning');
+
+        const res = await callAPI('register', { username: u, password: p, device_id: 'Device' });
+        if(res && res.success) { showToast('Daftar Berhasil!', 'success'); showPage('page-login'); }
+        else showToast(res.message || 'Pendaftaran Gagal', 'danger');
     }
 
-    // --- ADMIN PANEL FUNCTIONS ---
+    // --- ADMIN PANEL LOGIC ---
+    function openAdminPanel() {
+        // Pengecekan keamanan tambahan
+        if(currentUser && currentUser.role === 'admin') {
+            showPage('page-admin');
+            loadAdmin();
+        } else {
+            showToast('Akses Terbatas!', 'danger');
+        }
+    }
+
     async function loadAdmin() {
         const res = await callAPI('adminGetData');
         if(res && res.success) {
+            // Render Users
             document.getElementById('admin-user-list').innerHTML = res.users.map(u => `
-                <div class="card p-2 mb-2 small d-flex flex-row justify-content-between align-items-center shadow-sm">
-                    <div><b>${u[1]}</b><br>Poin: ${u[4]} | ${u[7]}</div>
-                    <button class="btn btn-sm btn-primary" onclick="openEditUser('${u[0]}','${u[2]}',${u[4]},'${u[7]}')">Edit</button>
+                <div class="card card-custom p-3 mb-2 admin-item d-flex flex-row justify-content-between align-items-center">
+                    <div>
+                        <div class="fw-bold">${u[1]} <span class="badge bg-secondary">${u[7]}</span></div>
+                        <div class="small text-muted">Poin: ${u[4]} | Role: ${u[3]}</div>
+                    </div>
+                    <button onclick="openEditModal('${u[0]}','${u[2]}',${u[4]},'${u[7]}')" class="btn btn-sm btn-primary">Edit</button>
                 </div>
             `).join('');
-            
-            document.getElementById('admin-trans-list').innerHTML = res.transactions.filter(t=>t.status==='pending').map(t => `
-                <div class="card p-2 mb-2 small shadow-sm">
-                    <b>${t.nama}</b> - ${t.poin} Poin (${t.no})
-                    <div class="d-flex gap-2 mt-2">
-                        <button class="btn btn-success btn-sm w-100" onclick="processTrans('${t.id}','berhasil')">✓ Setujui</button>
-                        <button class="btn btn-danger btn-sm w-100" onclick="processTrans('${t.id}','tolak')">✗ Tolak</button>
+
+            // Render Withdraws
+            const wdPending = res.transactions.filter(t => t.status === 'pending');
+            document.getElementById('admin-wd-list').innerHTML = wdPending.length ? wdPending.map(t => `
+                <div class="card card-custom p-3 mb-2">
+                    <div class="d-flex justify-content-between"><b>${t.nama}</b> <span class="text-primary fw-bold">${t.poin} Poin</span></div>
+                    <div class="small text-muted mb-2">DANA: ${t.no}</div>
+                    <div class="d-flex gap-2">
+                        <button onclick="processWd('${t.id}','berhasil')" class="btn btn-success btn-sm w-100">Setujui</button>
+                        <button onclick="processWd('${t.id}','tolak')" class="btn btn-danger btn-sm w-100">Tolak</button>
                     </div>
                 </div>
-            `).join('') || '<p class="text-center p-3">Tidak ada transaksi tertunda.</p>';
+            `).join('') : '<p class="text-center p-4 small text-muted">Tidak ada penarikan tertunda</p>';
         }
     }
 
-    function openEditUser(id, pass, poin, status) {
-        document.getElementById('edit-id').value = id;
-        document.getElementById('edit-pass').value = pass;
-        document.getElementById('edit-poin').value = poin;
-        document.getElementById('edit-status').value = status;
+    function openEditModal(id, pass, poin, status) {
+        document.getElementById('e-id').value = id;
+        document.getElementById('e-pass').value = pass;
+        document.getElementById('e-poin').value = poin;
+        document.getElementById('e-status').value = status;
         new bootstrap.Modal(document.getElementById('editUserModal')).show();
     }
 
-    async function saveUserEdit() {
-        const res = await callAPI('updateUser', { 
-            id: document.getElementById('edit-id').value, 
-            password: document.getElementById('edit-pass').value, 
-            poin: document.getElementById('edit-poin').value, 
-            status: document.getElementById('edit-status').value 
-        });
-        if(res && res.success) { 
-            showToast('User diperbarui', 'success'); 
-            bootstrap.Modal.getInstance(document.getElementById('editUserModal')).hide(); 
-            loadAdmin(); 
-        }
-    }
-
-    async function processTrans(id, status) {
-        const catatan = prompt('Masukkan catatan (opsional):');
-        const res = await callAPI('updateTransaction', { id, status, catatan: catatan || "" });
-        if(res && res.success) { showToast('Transaksi diproses', 'success'); loadAdmin(); }
-    }
-
-    async function saveSettings() {
-        const res = await callAPI('updateSettings', { 
-            maintenance: document.getElementById('set-maint').value, 
-            broadcast: document.getElementById('set-broad').value 
+    async function submitUserEdit() {
+        const res = await callAPI('updateUser', {
+            id: document.getElementById('e-id').value,
+            password: document.getElementById('e-pass').value,
+            poin: document.getElementById('e-poin').value,
+            status: document.getElementById('e-status').value
         });
         if(res && res.success) {
-            showToast('Setting disimpan', 'success');
-            loadSettings();
+            showToast('User diperbarui', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('editUserModal')).hide();
+            loadAdmin();
         }
     }
 
-    // --- UTILS ---
+    async function processWd(id, status) {
+        const cat = prompt("Catatan (opsional):");
+        const res = await callAPI('updateTransaction', { id, status, catatan: cat || "" });
+        if(res && res.success) { showToast('Berhasil diproses', 'success'); loadAdmin(); }
+    }
+
+    async function saveAdminSettings() {
+        const res = await callAPI('updateSettings', {
+            maintenance: document.getElementById('sys-maint').value,
+            broadcast: document.getElementById('sys-broad').value
+        });
+        if(res && res.success) { showToast('Sistem diupdate', 'success'); loadSettings(); }
+    }
+
+    // --- GAME & IKLAN ---
+    function generateQuiz() {
+        const a = Math.floor(Math.random() * 25) + 5, b = Math.floor(Math.random() * 15) + 1, ans = a + b;
+        currentQuiz = { q: `${a} + ${b}`, a: ans };
+        document.getElementById('quiz-question').innerText = currentQuiz.q;
+        document.getElementById('prize-section').classList.add('d-none');
+        document.getElementById('quiz-options').classList.remove('d-none');
+        let choices = [ans, ans+5, ans-2, ans+10].sort(() => Math.random() - 0.5);
+        document.getElementById('quiz-options').innerHTML = choices.map(v => `<button onclick="checkAns(${v})" class="btn btn-outline-primary py-2 fw-bold border-2">${v}</button>`).join('');
+    }
+
+    function checkAns(v) {
+        if(v === currentQuiz.a) {
+            document.getElementById('quiz-options').classList.add('d-none');
+            document.getElementById('prize-section').classList.remove('d-none');
+        } else { showToast('Salah! Coba lagi', 'danger'); generateQuiz(); }
+    }
+
+    async function claimPrize() {
+        const btn = document.getElementById('btn-claim');
+        btn.disabled = true;
+        btn.innerText = "MENYIAPKAN IKLAN...";
+
+        if(!document.getElementById('ad-script')) {
+            const s = document.createElement('script');
+            s.id = 'ad-script';
+            s.src = '//libtl.com/sdk.js';
+            s.setAttribute('data-zone', AD_ZONE_ID);
+            s.setAttribute('data-sdk', AD_FUNCTION_NAME);
+            document.body.appendChild(s);
+        }
+
+        setTimeout(async () => {
+            if(typeof window[AD_FUNCTION_NAME] === 'function') {
+                try { await window[AD_FUNCTION_NAME](); } catch(e){}
+            }
+            const res = await callAPI('submitQuiz', { userId: currentUser.id });
+            if(res && res.success) {
+                currentUser.poin = res.newPoin;
+                localStorage.setItem('user', JSON.stringify(currentUser));
+                showToast('Poin berhasil masuk!', 'success');
+                generateQuiz();
+                showPage('page-home');
+            }
+            btn.disabled = false;
+            btn.innerText = "🎁 KLAIM +5 POIN (IKLAN)";
+        }, 1200);
+    }
+
+    // --- DATA SYNC ---
     async function syncPoin() {
         if(!currentUser) return;
         const res = await callAPI('getUserData', { userId: currentUser.id });
@@ -411,74 +407,68 @@
             currentUser.status = res.user.status;
             if(currentUser.status === 'blocked') logout();
             localStorage.setItem('user', JSON.stringify(currentUser));
-            updateUIPoints();
+            updateUIPointsDisplay();
         }
+    }
+
+    function updateUIPointsDisplay() {
+        document.querySelectorAll('.global-poin').forEach(el => el.innerText = currentUser.poin);
+        const btn = document.getElementById('admin-menu-btn');
+        if(currentUser.role === 'admin') btn.classList.remove('d-none');
     }
 
     async function loadSettings() {
         const res = await callAPI('getSettings');
         if(res && res.success) {
-            const b = res.settings.broadcast_message || "Selamat datang!";
+            const b = res.settings.broadcast_message || "";
             document.getElementById('broadcast-text').innerText = `${b} • ${b} • ${b}`;
-            document.getElementById('global-broadcast').classList.remove('d-none');
-            if(document.getElementById('set-maint')) document.getElementById('set-maint').value = res.settings.maintenance_mode;
-            if(document.getElementById('set-broad')) document.getElementById('set-broad').value = b;
+            document.getElementById('global-broadcast').classList.toggle('d-none', !b);
+            if(document.getElementById('sys-maint')) document.getElementById('sys-maint').value = res.settings.maintenance_mode;
+            if(document.getElementById('sys-broad')) document.getElementById('sys-broad').value = b;
         }
-    }
-
-    function generateQuiz() {
-        const a = Math.floor(Math.random() * 20) + 1, b = Math.floor(Math.random() * 10) + 1, ans = a + b;
-        currentQuiz = { q: `${a} + ${b}`, a: ans };
-        document.getElementById('quiz-question').innerText = currentQuiz.q;
-        document.getElementById('prize-section').classList.add('d-none');
-        document.getElementById('quiz-options').classList.remove('d-none');
-        let choices = [ans, ans+1, ans-1, ans+2].sort(() => Math.random() - 0.5);
-        document.getElementById('quiz-options').innerHTML = choices.map(v => `<button onclick="checkAns(${v})" class="btn btn-outline-primary py-2 fw-bold">${v}</button>`).join('');
-    }
-
-    function checkAns(v) {
-        if(v === currentQuiz.a) {
-            document.getElementById('quiz-options').classList.add('d-none');
-            document.getElementById('prize-section').classList.remove('d-none');
-        } else { showToast('Jawaban Salah!', 'danger'); generateQuiz(); }
     }
 
     async function loadHistory() {
         showPage('page-history');
         const res = await callAPI('getHistory', { userId: currentUser.id });
         if(res && res.success) {
-            document.getElementById('history-list').innerHTML = res.history.reverse().map(h => `
-                <div class="card card-custom p-3 mb-2 small shadow-sm">
-                    <div class="d-flex justify-content-between">
-                        <span class="fw-bold text-primary">${h.poin} Poin</span> 
-                        <span class="status-badge bg-${h.status==='pending'?'warning':h.status==='tolak'?'danger':'success'} text-white">${h.status.toUpperCase()}</span>
+            document.getElementById('history-container').innerHTML = res.history.reverse().map(h => `
+                <div class="card card-custom p-3 mb-2 shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div><div class="fw-bold">${h.nama}</div><div class="small text-muted">${h.no}</div></div>
+                        <div class="text-end">
+                            <div class="fw-bold text-primary">${h.poin} Poin</div>
+                            <span class="status-badge bg-${h.status==='pending'?'warning':h.status==='tolak'?'danger':'success'} text-white">${h.status.toUpperCase()}</span>
+                        </div>
                     </div>
-                    <div class="text-muted mt-1">${h.nama} (${h.no})</div>
                 </div>
-            `).join('') || '<p class="text-center mt-4">Belum ada riwayat penarikan.</p>';
+            `).join('') || '<p class="text-center p-5 text-muted small">Belum ada transaksi</p>';
         }
     }
 
     async function submitRedeem() {
         const p = parseInt(document.getElementById('wd-poin').value);
-        if(isNaN(p) || p < 50) return showToast('Min. 50 poin', 'warning');
-        const res = await callAPI('redeemPoin', { userId: currentUser.id, nama_dana: document.getElementById('wd-nama').value, no_hp: document.getElementById('wd-no').value, poin: p });
-        if(res && res.success) { 
-            currentUser.poin = res.newPoin; 
-            localStorage.setItem('user', JSON.stringify(currentUser)); 
-            showToast('Berhasil diajukan!', 'success');
-            loadHistory(); 
+        if(!p || p < 50) return showToast('Min. penarikan 50 poin', 'warning');
+        const res = await callAPI('redeemPoin', { 
+            userId: currentUser.id, 
+            nama_dana: document.getElementById('wd-nama').value, 
+            no_hp: document.getElementById('wd-no').value, 
+            poin: p 
+        });
+        if(res && res.success) {
+            currentUser.poin = res.newPoin;
+            localStorage.setItem('user', JSON.stringify(currentUser));
+            showToast('Permintaan dikirim', 'success');
+            loadHistory();
         } else showToast(res.message, 'danger');
     }
 
     function loadProfile() {
-        showPage('page-profile');
-        document.getElementById('prof-name').innerText = currentUser.username;
-        document.getElementById('prof-id').innerText = currentUser.id;
-        document.getElementById('prof-device').innerText = tg.initDataUnsafe?.user?.id || 'Browser';
+        showPage('page-home'); // Profile dialihkan ke info home sederhana atau buat page sendiri
+        showToast(`User ID: ${currentUser.id}`, 'info');
     }
 
-    function logout() { localStorage.removeItem('user'); location.reload(); }
+    function logout() { localStorage.clear(); location.reload(); }
 </script>
 </body>
 </html>
