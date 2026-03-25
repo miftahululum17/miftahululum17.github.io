@@ -20,6 +20,7 @@
         #loadingOverlay { position: fixed; inset: 0; background: rgba(255,255,255,0.8); z-index: 9999; display: none; justify-content: center; align-items: center; }
         .point-badge { background: #ffc107; color: #000; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; }
         .status-badge { font-size: 0.75rem; padding: 4px 8px; border-radius: 10px; }
+        .api-warning { background: #fee2e2; color: #dc2626; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #fca5a5; font-size: 0.85rem; }
     </style>
 </head>
 <body>
@@ -27,13 +28,21 @@
 <div id="loadingOverlay"><div class="spinner-border text-primary"></div></div>
 
 <div class="app-container">
+    <!-- Peringatan Jika API URL Kosong -->
+    <div id="api-config-alert" class="page active" style="display: none;">
+        <div class="api-warning mx-3 mt-4">
+            <h6 class="fw-bold">Konfigurasi Diperlukan!</h6>
+            <p class="mb-0">Aplikasi belum terhubung ke database. Harap masukkan <b>URL Web App</b> dari Google Apps Script ke variabel <code>API_URL</code> di dalam kode (baris 218).</p>
+        </div>
+    </div>
+
     <!-- Marquee Global -->
     <div id="global-broadcast" class="marquee-box d-none">
         <div class="marquee-content" id="broadcast-text">...</div>
     </div>
 
     <!-- Halaman Login -->
-    <div id="page-login" class="page active">
+    <div id="page-login" class="page">
         <div class="text-center my-4"><h2 class="fw-bold text-primary">CuanQuiz</h2></div>
         <div class="card card-custom p-4">
             <input type="text" id="login-username" class="form-control mb-2" placeholder="Username">
@@ -43,7 +52,7 @@
         </div>
     </div>
 
-    <!-- Halaman Register -->
+    <!-- Sisanya tetap sama seperti struktur sebelumnya namun dengan pengecekan API terpusat -->
     <div id="page-register" class="page">
         <div class="card card-custom p-4 mt-4">
             <h4>Daftar Baru</h4>
@@ -54,7 +63,6 @@
         </div>
     </div>
 
-    <!-- Menu Utama -->
     <div id="page-home" class="page">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div><h5>Halo, <span id="display-name">...</span></h5></div>
@@ -71,7 +79,6 @@
         <button onclick="logout()" class="btn btn-outline-danger w-100 mt-5">Logout</button>
     </div>
 
-    <!-- Halaman Quiz -->
     <div id="page-dashboard" class="page">
         <div class="d-flex justify-content-between mb-3 align-items-center">
             <button onclick="showPage('page-home')" class="btn btn-light btn-sm">← Menu</button>
@@ -88,17 +95,17 @@
         </div>
     </div>
 
-    <!-- Halaman Riwayat -->
     <div id="page-history" class="page">
-        <div class="d-flex justify-content-between mb-3 align-items-center">
-            <button onclick="showPage('page-home')" class="btn btn-light btn-sm">← Menu</button>
-            <div class="point-badge">Poin: <span class="global-poin">0</span></div>
+        <div id="history-header">
+            <div class="d-flex justify-content-between mb-3 align-items-center">
+                <button onclick="showPage('page-home')" class="btn btn-light btn-sm">← Menu</button>
+                <div class="point-badge">Poin: <span class="global-poin">0</span></div>
+            </div>
+            <button onclick="showPage('page-redeem')" class="btn btn-primary w-100 mb-3 fw-bold">TARIK POIN (Min. 50)</button>
         </div>
-        <button onclick="showPage('page-redeem')" class="btn btn-primary w-100 mb-3 fw-bold">TARIK POIN (Min. 50)</button>
         <div id="history-list"></div>
     </div>
 
-    <!-- Halaman Redeem -->
     <div id="page-redeem" class="page">
         <div class="d-flex justify-content-between mb-3">
             <button onclick="showPage('page-history')" class="btn btn-light btn-sm">← Batal</button>
@@ -113,7 +120,6 @@
         </div>
     </div>
 
-    <!-- Halaman Profil -->
     <div id="page-profile" class="page">
         <div class="d-flex justify-content-between mb-4 align-items-center">
             <button onclick="showPage('page-home')" class="btn btn-light btn-sm">← Menu</button>
@@ -130,7 +136,6 @@
         </div>
     </div>
 
-    <!-- Halaman Admin -->
     <div id="page-admin" class="page">
         <div class="d-flex justify-content-between mb-3">
             <button onclick="showPage('page-home')" class="btn btn-light btn-sm">← Menu</button>
@@ -180,7 +185,7 @@
     </div>
 </div>
 
-<!-- Toast Notifikasi -->
+<!-- Toast -->
 <div class="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3">
     <div id="appToast" class="toast align-items-center text-white border-0" role="alert">
         <div class="d-flex"><div class="toast-body" id="toastMsg"></div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>
@@ -189,18 +194,37 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    /**
+     * INSTRUKSI PENTING:
+     * Ganti "URL_WEB_APP_GAS_ANDA" dengan URL yang Anda dapatkan setelah 
+     * melakukan Deploy > New Deployment > Web App di Google Apps Script.
+     */
     const API_URL = "https://script.google.com/macros/s/AKfycbxHZl7ZiCe7OyepIzK__6NXTDPM5sdnpLCKsWSY-9KVmyTKQSoKrVJ4PN_DHaHSUabFBg/exec"; 
+    
     const tg = window.Telegram.WebApp;
     let currentUser = JSON.parse(localStorage.getItem('user')) || null;
     let currentQuiz = null;
 
     window.onload = () => {
-        if (currentUser) {
-            showPage('page-home');
-            syncPoin(); // Sync poin saat pertama buka
+        // Cek validasi API_URL
+        if (API_URL === "URL_WEB_APP_GAS_ANDA" || API_URL.trim() === "") {
+            document.getElementById('api-config-alert').style.display = 'block';
+            console.error("Kesalahan: API_URL belum dikonfigurasi.");
+            return;
         }
+
+        // Jika API OK, sembunyikan peringatan dan proses login
+        document.getElementById('api-config-alert').style.display = 'none';
+        
+        if (currentUser) {
+            updateUIPoints();
+            showPage('page-home');
+            syncPoin(); 
+        } else {
+            showPage('page-login');
+        }
+        
         loadSettings();
-        // Cek sinkronisasi poin setiap 30 detik secara otomatis
         setInterval(syncPoin, 30000);
     };
 
@@ -212,23 +236,28 @@
     }
 
     async function callAPI(action, payload = {}) {
+        if (API_URL === "URL_WEB_APP_GAS_ANDA") {
+            showToast("Konfigurasi API_URL belum dilakukan!", "danger");
+            return { success: false };
+        }
+
         if(action !== 'getUserData') document.getElementById('loadingOverlay').style.display = 'flex';
         try {
             const r = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action, payload }) });
             return await r.json();
         } catch (e) {
-            console.error(e);
-            return { success: false };
+            console.error("API Error:", e);
+            return { success: false, message: "Server tidak merespon" };
         } finally { document.getElementById('loadingOverlay').style.display = 'none'; }
     }
 
-    // Fungsi sinkronisasi poin tanpa mengganggu tampilan
     async function syncPoin() {
-        if(!currentUser) return;
+        if(!currentUser || API_URL === "URL_WEB_APP_GAS_ANDA") return;
         const res = await callAPI('getUserData', { userId: currentUser.id });
-        if(res.success) {
+        if(res && res.success) {
             currentUser.poin = res.user.poin;
             currentUser.status = res.user.status;
+            currentUser.role = res.user.role;
             if(currentUser.status === 'blocked') logout();
             localStorage.setItem('user', JSON.stringify(currentUser));
             updateUIPoints();
@@ -236,14 +265,23 @@
     }
 
     function showPage(id) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        if(!['page-login', 'page-register'].includes(id)) {
-            document.getElementById('global-broadcast').classList.remove('d-none');
-            syncPoin(); // Setiap ganti halaman, refresh poin
-        } else {
-            document.getElementById('global-broadcast').classList.add('d-none');
+        if(id === 'page-admin' && (!currentUser || currentUser.role !== 'admin')) {
+            showToast('Akses ditolak!', 'danger');
+            showPage('page-home');
+            return;
         }
+
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        const p = document.getElementById(id);
+        if(p) p.classList.add('active');
+        
+        const marquee = document.getElementById('global-broadcast');
+        if(!['page-login', 'page-register', 'api-config-alert'].includes(id)) {
+            marquee.classList.remove('d-none');
+        } else {
+            marquee.classList.add('d-none');
+        }
+
         if(id === 'page-dashboard') generateQuiz();
         updateUIPoints();
     }
@@ -252,115 +290,101 @@
         if(!currentUser) return;
         document.querySelectorAll('.global-poin').forEach(el => el.innerText = currentUser.poin);
         document.getElementById('display-name').innerText = currentUser.username;
-        if(currentUser.role === 'admin') document.getElementById('admin-menu-btn').classList.remove('d-none');
+        
+        const btn = document.getElementById('admin-menu-btn');
+        if(btn) currentUser.role === 'admin' ? btn.classList.remove('d-none') : btn.classList.add('d-none');
     }
 
     async function handleLogin() {
         const u = document.getElementById('login-username').value;
         const p = document.getElementById('login-password').value;
+        if(!u || !p) return showToast('Harap isi semua kolom', 'warning');
+
         const res = await callAPI('login', { username: u, password: p });
-        if(res.success) {
+        if(res && res.success) {
             currentUser = res.user;
             localStorage.setItem('user', JSON.stringify(currentUser));
+            updateUIPoints();
             showPage('page-home');
-        } else showToast(res.message, 'danger');
+        } else showToast(res ? res.message : "Cek koneksi & API URL", 'danger');
     }
 
     async function handleRegister() {
         const u = document.getElementById('reg-username').value;
         const p = document.getElementById('reg-password').value;
+        if(!u || !p) return showToast('Harap isi semua kolom', 'warning');
+
         const res = await callAPI('register', { username: u, password: p, device_id: tg.initDataUnsafe?.user?.id || 'Browser', country: 'ID' });
-        if(res.success) { showToast(res.message, 'success'); showPage('page-login'); }
-        else showToast(res.message, 'danger');
+        if(res && res.success) { showToast(res.message, 'success'); showPage('page-login'); }
+        else showToast(res ? res.message : "Gagal mendaftar", 'danger');
     }
 
     function logout() { localStorage.removeItem('user'); currentUser = null; location.reload(); }
 
     async function loadSettings() {
+        if(API_URL === "URL_WEB_APP_GAS_ANDA") return;
         const res = await callAPI('getSettings');
-        if(res.success) {
-            const bText = res.settings.broadcast_message;
+        if(res && res.success) {
+            const b = res.settings.broadcast_message || "Selamat datang!";
             const el = document.getElementById('broadcast-text');
-            // Duplicate text for seamless loop
-            el.innerText = bText + " • " + bText + " • " + bText;
-            document.getElementById('set-maint').value = res.settings.maintenance_mode;
-            document.getElementById('set-broad').value = bText;
+            if(el) el.innerText = `${b} • ${b} • ${b}`;
+            if(document.getElementById('set-maint')) document.getElementById('set-maint').value = res.settings.maintenance_mode || "OFF";
+            if(document.getElementById('set-broad')) document.getElementById('set-broad').value = b;
         }
     }
 
     function generateQuiz() {
-        const a = Math.floor(Math.random() * 50) + 1;
-        const b = Math.floor(Math.random() * 15) + 1;
-        const ans = a + b;
+        const a = Math.floor(Math.random() * 30) + 1, b = Math.floor(Math.random() * 20) + 1, ans = a + b;
         currentQuiz = { q: `${a} + ${b}`, a: ans };
         document.getElementById('quiz-question').innerText = currentQuiz.q;
         document.getElementById('prize-section').classList.add('d-none');
         document.getElementById('quiz-options').classList.remove('d-none');
-        let choices = [ans, ans+5, ans-2, ans+10].sort(() => Math.random() - 0.5);
-        document.getElementById('quiz-options').innerHTML = choices.map(c => `
-            <button onclick="checkAns(${c})" class="btn btn-outline-primary py-2 fw-bold">${c}</button>
-        `).join('');
+        let c = [ans, ans+2, ans-1, ans+5].sort(() => Math.random() - 0.5);
+        document.getElementById('quiz-options').innerHTML = c.map(v => `<button onclick="checkAns(${v})" class="btn btn-outline-primary py-2 fw-bold">${v}</button>`).join('');
     }
 
     function checkAns(v) {
         if(v === currentQuiz.a) {
             document.getElementById('quiz-options').classList.add('d-none');
             document.getElementById('prize-section').classList.remove('d-none');
-        } else { showToast('Salah! Coba lagi.', 'danger'); generateQuiz(); }
+        } else { showToast('Salah!', 'danger'); generateQuiz(); }
     }
 
-    function claimPrize() {
-        // Simulasi integrasi SDK Iklan
-        const s = document.createElement('script');
-        s.src = '//libtl.com/sdk.js'; s.setAttribute('data-zone', '9865183'); s.setAttribute('data-sdk', 'show_9865183');
-        document.body.appendChild(s);
-        
-        setTimeout(async () => {
-            const res = await callAPI('submitQuiz', { userId: currentUser.id });
-            if(res.success) { 
-                currentUser.poin = res.newPoin; 
-                localStorage.setItem('user', JSON.stringify(currentUser)); 
-                showToast('Selamat! +5 Poin ditambahkan', 'success');
-                generateQuiz(); 
-                updateUIPoints(); 
-            }
-        }, 2500);
+    async function claimPrize() {
+        const res = await callAPI('submitQuiz', { userId: currentUser.id });
+        if(res && res.success) { 
+            currentUser.poin = res.newPoin; 
+            localStorage.setItem('user', JSON.stringify(currentUser)); 
+            showToast('Poin bertambah!', 'success');
+            generateQuiz(); 
+            updateUIPoints(); 
+        }
     }
 
     async function loadHistory() {
         showPage('page-history');
         const res = await callAPI('getHistory', { userId: currentUser.id });
-        if(res.success) {
+        if(res && res.success) {
             document.getElementById('history-list').innerHTML = res.history.reverse().map(h => `
-                <div class="card card-custom p-3 mb-2 small">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
+                <div class="card card-custom p-3 mb-2 small shadow-sm">
+                    <div class="d-flex justify-content-between">
                         <span class="fw-bold text-primary">${h.poin} Poin</span> 
-                        <span class="status-badge bg-${h.status==='pending'?'warning':h.status==='tolak'?'danger':'success'} text-white">
-                            ${h.status.toUpperCase()}
-                        </span>
+                        <span class="status-badge bg-${h.status==='pending'?'warning':h.status==='tolak'?'danger':'success'} text-white">${h.status.toUpperCase()}</span>
                     </div>
-                    <div class="text-muted">${h.nama} | ${h.no}</div>
-                    ${h.catatan ? `<div class="mt-2 p-1 bg-light border-start border-3 border-danger">Ket: ${h.catatan}</div>` : ''}
+                    <div class="text-muted mt-1">${h.nama} (${h.no})</div>
                 </div>
-            `).join('') || '<p class="text-center mt-4">Belum ada riwayat tukar poin.</p>';
+            `).join('') || '<p class="text-center mt-4">Tidak ada data.</p>';
         }
     }
 
     async function submitRedeem() {
         const p = parseInt(document.getElementById('wd-poin').value);
-        if(isNaN(p) || p < 50 || p % 50 !== 0) return showToast('Minimal 50 poin & kelipatan 50', 'warning');
-        if(p > currentUser.poin) return showToast('Poin Anda tidak cukup', 'danger');
-        
-        const res = await callAPI('redeemPoin', { 
-            userId: currentUser.id, 
-            nama_dana: document.getElementById('wd-nama').value, 
-            no_hp: document.getElementById('wd-no').value, 
-            poin: p 
-        });
-        if(res.success) { 
+        if(isNaN(p) || p < 50) return showToast('Min. 50 poin', 'warning');
+        const res = await callAPI('redeemPoin', { userId: currentUser.id, nama_dana: document.getElementById('wd-nama').value, no_hp: document.getElementById('wd-no').value, poin: p });
+        if(res && res.success) { 
             currentUser.poin = res.newPoin; 
             localStorage.setItem('user', JSON.stringify(currentUser)); 
-            showToast('Pengajuan dikirim!', 'success');
+            showToast('Berhasil diajukan!', 'success');
             loadHistory(); 
         }
     }
@@ -369,29 +393,28 @@
         showPage('page-profile');
         document.getElementById('prof-name').innerText = currentUser.username;
         document.getElementById('prof-id').innerText = currentUser.id;
-        document.getElementById('prof-device').innerText = tg.initDataUnsafe?.user?.id || 'Browser/Unknown';
+        document.getElementById('prof-device').innerText = tg.initDataUnsafe?.user?.id || 'Browser';
     }
 
-    // FUNGSI ADMIN
     async function loadAdmin() {
+        showPage('page-admin');
         const res = await callAPI('adminGetData');
-        if(res.success) {
+        if(res && res.success) {
             document.getElementById('admin-user-list').innerHTML = res.users.map(u => `
                 <div class="card p-2 mb-2 small d-flex flex-row justify-content-between align-items-center shadow-sm">
-                    <div><b>${u[1]}</b> (${u[3]})<br><span class="text-primary">Poin: ${u[4]}</span> | <span class="text-${u[7]==='active'?'success':'danger'}">${u[7]}</span></div>
-                    <button class="btn btn-sm btn-primary" onclick="openEditUser('${u[0]}', '${u[2]}', ${u[4]}, '${u[7]}')">Edit</button>
+                    <div><b>${u[1]}</b><br>Poin: ${u[4]} | ${u[7]}</div>
+                    <button class="btn btn-sm btn-primary" onclick="openEditUser('${u[0]}','${u[2]}',${u[4]},'${u[7]}')">Edit</button>
                 </div>
             `).join('');
-            
             document.getElementById('admin-trans-list').innerHTML = res.transactions.filter(t=>t.status==='pending').map(t => `
-                <div class="card p-3 mb-2 small shadow-sm">
-                    <b>${t.nama}</b> (${t.no})<br>Poin: <span class="text-danger">${t.poin}</span>
-                    <div class="d-flex gap-2 mt-3">
-                        <button class="btn btn-success btn-sm w-100" onclick="processTrans('${t.id}', 'berhasil')">Terima</button>
-                        <button class="btn btn-danger btn-sm w-100" onclick="processTrans('${t.id}', 'tolak')">Tolak</button>
+                <div class="card p-2 mb-2 small shadow-sm">
+                    <b>${t.nama}</b> - ${t.poin} Poin
+                    <div class="d-flex gap-2 mt-2">
+                        <button class="btn btn-success btn-sm w-100" onclick="processTrans('${t.id}','berhasil')">✓</button>
+                        <button class="btn btn-danger btn-sm w-100" onclick="processTrans('${t.id}','tolak')">✗</button>
                     </div>
                 </div>
-            `).join('') || '<p class="text-center p-3">Semua penarikan sudah diproses.</p>';
+            `).join('') || '<p class="text-center p-3">Kosong</p>';
         }
     }
 
@@ -404,41 +427,25 @@
     }
 
     async function saveUserEdit() {
-        const p = {
-            id: document.getElementById('edit-id').value,
-            password: document.getElementById('edit-pass').value,
-            poin: document.getElementById('edit-poin').value,
-            status: document.getElementById('edit-status').value
-        };
-        const res = await callAPI('updateUser', p);
-        if(res.success) { 
-            showToast('User berhasil diperbarui'); 
-            bootstrap.Modal.getInstance(document.getElementById('editUserModal')).hide();
-            loadAdmin(); 
-        }
+        const res = await callAPI('updateUser', { id:document.getElementById('edit-id').value, password:document.getElementById('edit-pass').value, poin:document.getElementById('edit-poin').value, status:document.getElementById('edit-status').value });
+        if(res && res.success) { showToast('Berhasil!', 'success'); bootstrap.Modal.getInstance(document.getElementById('editUserModal')).hide(); loadAdmin(); }
     }
 
     async function deleteUser() {
-        if(!confirm('HAPUS AKUN INI? Tindakan ini tidak bisa dibatalkan.')) return;
-        const res = await callAPI('deleteUser', { id: document.getElementById('edit-id').value });
-        if(res.success) { 
-            bootstrap.Modal.getInstance(document.getElementById('editUserModal')).hide();
-            loadAdmin(); 
-        }
+        if(!confirm('Hapus?')) return;
+        const res = await callAPI('deleteUser', { id:document.getElementById('edit-id').value });
+        if(res && res.success) { showToast('Dihapus', 'success'); bootstrap.Modal.getInstance(document.getElementById('editUserModal')).hide(); loadAdmin(); }
     }
 
     async function processTrans(id, status) {
-        const note = prompt('Berikan catatan untuk user (opsional):');
+        const note = prompt('Catatan:');
         const res = await callAPI('updateTransaction', { id, status, catatan: note || "" });
-        if(res.success) { showToast('Status transaksi diperbarui'); loadAdmin(); }
+        if(res && res.success) { showToast('Berhasil', 'success'); loadAdmin(); }
     }
 
     async function saveSettings() {
-        const res = await callAPI('updateSettings', { 
-            maintenance: document.getElementById('set-maint').value, 
-            broadcast: document.getElementById('set-broad').value 
-        });
-        if(res.success) { showToast('Pengaturan Sistem disimpan'); loadSettings(); }
+        const res = await callAPI('updateSettings', { maintenance: document.getElementById('set-maint').value, broadcast: document.getElementById('set-broad').value });
+        if(res && res.success) showToast('Tersimpan', 'success');
     }
 </script>
 </body>
