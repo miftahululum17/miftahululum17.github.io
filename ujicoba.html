@@ -133,7 +133,7 @@
             <!-- Manajemen User -->
             <div class="tab-pane fade show active" id="tab-users">
                 <div class="input-group mb-3">
-                    <input type="text" id="search-user" class="form-control form-control-sm" placeholder="Cari username...">
+                    <input type="text" id="search-user" class="form-control form-control-sm" placeholder="Cari username..." oninput="handleSearchUser(this.value)">
                 </div>
                 <div id="admin-user-list"></div>
             </div>
@@ -303,8 +303,17 @@
         }
     }
 
+    function handleSearchUser(val) {
+        const filtered = allUsers.filter(u => u.username.toLowerCase().includes(val.toLowerCase()));
+        renderUserList(filtered);
+    }
+
     function renderUserList(users) {
         const container = document.getElementById('admin-user-list');
+        if(!users || users.length === 0) {
+            container.innerHTML = '<p class="text-center text-muted small mt-3">Tidak ada user ditemukan.</p>';
+            return;
+        }
         container.innerHTML = users.map(u => `
             <div class="card card-custom admin-card p-3">
                 <div class="d-flex justify-content-between align-items-center">
@@ -322,7 +331,11 @@
 
     function renderWdList(txs) {
         const container = document.getElementById('admin-wd-list');
-        container.innerHTML = txs.reverse().map(t => `
+        if(!txs || txs.length === 0) {
+            container.innerHTML = '<p class="text-center text-muted small mt-3">Tidak ada riwayat penukaran.</p>';
+            return;
+        }
+        container.innerHTML = txs.slice().reverse().map(t => `
             <div class="card card-custom p-3 mb-2 small shadow-sm">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
@@ -333,9 +346,9 @@
                     <div class="text-end">
                         <span class="badge bg-${t.status==='pending'?'warning':t.status==='berhasil'?'success':'danger'} mb-2 d-block">${t.status.toUpperCase()}</span>
                         <div class="btn-group btn-group-sm">
-                            <button onclick="updateWdStatus('${t.id}', 'berhasil')" class="btn btn-success">✓</button>
-                            <button onclick="updateWdStatus('${t.id}', 'tolak')" class="btn btn-warning">✕</button>
-                            <button onclick="deleteWdHistory('${t.id}')" class="btn btn-danger">🗑️</button>
+                            <button onclick="updateWdStatus('${t.id}', 'berhasil')" class="btn btn-success" title="Berhasil">✓</button>
+                            <button onclick="updateWdStatus('${t.id}', 'tolak')" class="btn btn-warning" title="Tolak">✕</button>
+                            <button onclick="deleteWdHistory('${t.id}')" class="btn btn-danger" title="Hapus">🗑️</button>
                         </div>
                     </div>
                 </div>
@@ -427,7 +440,7 @@
         showPage('page-history');
         const res = await callAPI('getHistory', { userId: currentUser.id });
         if(res && res.success) {
-            document.getElementById('history-container').innerHTML = res.history.reverse().map(h => `
+            document.getElementById('history-container').innerHTML = res.history.slice().reverse().map(h => `
                 <div class="card card-custom p-3 mb-2 small shadow-sm">
                     <div class="d-flex justify-content-between align-items-center">
                         <div><b>${h.nama}</b><br>${h.no}</div>
