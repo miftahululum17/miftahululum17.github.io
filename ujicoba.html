@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
+    <base target="_top">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Quiz Mini App - Telegram Mini App</title>
@@ -19,13 +20,12 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
         }
         
         .app-container {
             max-width: 500px;
             margin: 0 auto;
-            padding: 20px;
-            padding-bottom: 80px;
         }
         
         .card-custom {
@@ -180,9 +180,9 @@
         }
         
         @media (max-width: 768px) {
-            .app-container {
+            body {
                 padding: 15px;
-                padding-bottom: 75px;
+                padding-bottom: 80px;
             }
             
             .points-badge {
@@ -208,10 +208,14 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
+        
+        .quiz-container {
+            min-height: 300px;
+        }
     </style>
 </head>
 <body>
-    <div id="app">
+    <div class="app-container" id="appContainer">
         <!-- Loading Indicator -->
         <div id="loading" class="loading" style="display: none;">
             <div class="spinner-border text-light" role="status">
@@ -224,197 +228,194 @@
             <i class="fas fa-star"></i> <span id="totalPoints">0</span> Poin
         </div>
         
-        <!-- Main Content -->
-        <div class="app-container" id="appContainer">
-            <!-- Login Page -->
-            <div id="loginPage" class="page">
-                <div class="card card-custom p-4">
-                    <div class="text-center mb-4">
-                        <i class="fas fa-brain fa-4x text-gradient"></i>
-                        <h3 class="mt-3 fw-bold">Quiz Mini App</h3>
-                        <p class="text-muted">Login untuk bermain dan dapatkan poin</p>
-                    </div>
-                    <form id="loginForm">
-                        <div class="mb-3">
-                            <input type="text" class="form-control" id="loginUsername" placeholder="Username" required autocomplete="off">
-                        </div>
-                        <div class="mb-3">
-                            <input type="password" class="form-control" id="loginPassword" placeholder="Password" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-custom w-100">
-                            <i class="fas fa-sign-in-alt"></i> Login
-                        </button>
-                    </form>
-                    <hr class="my-4">
-                    <p class="text-center mb-0">
-                        Belum punya akun? <a href="#" id="showRegister" class="text-decoration-none">Daftar Sekarang</a>
-                    </p>
+        <!-- Login Page -->
+        <div id="loginPage" class="page">
+            <div class="card card-custom p-4">
+                <div class="text-center mb-4">
+                    <i class="fas fa-brain fa-4x text-gradient"></i>
+                    <h3 class="mt-3 fw-bold">Quiz Mini App</h3>
+                    <p class="text-muted">Login untuk bermain dan dapatkan poin</p>
                 </div>
+                <form id="loginForm">
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="loginUsername" placeholder="Username" required autocomplete="off">
+                    </div>
+                    <div class="mb-3">
+                        <input type="password" class="form-control" id="loginPassword" placeholder="Password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-custom w-100">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                </form>
+                <hr class="my-4">
+                <p class="text-center mb-0">
+                    Belum punya akun? <a href="#" id="showRegister" class="text-decoration-none">Daftar Sekarang</a>
+                </p>
+            </div>
+        </div>
+        
+        <!-- Register Page -->
+        <div id="registerPage" class="page" style="display: none;">
+            <div class="card card-custom p-4">
+                <div class="text-center mb-4">
+                    <i class="fas fa-user-plus fa-4x text-gradient"></i>
+                    <h3 class="mt-3 fw-bold">Daftar Akun</h3>
+                    <p class="text-muted">Isi data untuk bergabung</p>
+                </div>
+                <form id="registerForm">
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="regUsername" placeholder="Username" required autocomplete="off">
+                        <small class="text-muted">Minimal 3 karakter</small>
+                    </div>
+                    <div class="mb-3">
+                        <input type="password" class="form-control" id="regPassword" placeholder="Password" required>
+                        <small class="text-muted">Minimal 4 karakter</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-custom w-100">
+                        <i class="fas fa-user-check"></i> Daftar
+                    </button>
+                </form>
+                <hr class="my-4">
+                <p class="text-center mb-0">
+                    Sudah punya akun? <a href="#" id="showLogin" class="text-decoration-none">Login</a>
+                </p>
+            </div>
+        </div>
+        
+        <!-- Dashboard Page -->
+        <div id="dashboardPage" class="page" style="display: none;">
+            <div id="broadcastMessage" class="marquee" style="display: none;">
+                <span id="broadcastText"></span>
             </div>
             
-            <!-- Register Page -->
-            <div id="registerPage" class="page" style="display: none;">
-                <div class="card card-custom p-4">
-                    <div class="text-center mb-4">
-                        <i class="fas fa-user-plus fa-4x text-gradient"></i>
-                        <h3 class="mt-3 fw-bold">Daftar Akun</h3>
-                        <p class="text-muted">Isi data untuk bergabung</p>
-                    </div>
-                    <form id="registerForm">
-                        <div class="mb-3">
-                            <input type="text" class="form-control" id="regUsername" placeholder="Username" required autocomplete="off">
-                            <small class="text-muted">Minimal 3 karakter</small>
-                        </div>
-                        <div class="mb-3">
-                            <input type="password" class="form-control" id="regPassword" placeholder="Password" required>
-                            <small class="text-muted">Minimal 4 karakter</small>
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-custom w-100">
-                            <i class="fas fa-user-check"></i> Daftar
-                        </button>
-                    </form>
-                    <hr class="my-4">
-                    <p class="text-center mb-0">
-                        Sudah punya akun? <a href="#" id="showLogin" class="text-decoration-none">Login</a>
-                    </p>
-                </div>
-            </div>
-            
-            <!-- Dashboard Page -->
-            <div id="dashboardPage" class="page" style="display: none;">
-                <div id="broadcastMessage" class="marquee" style="display: none;">
-                    <span id="broadcastText"></span>
-                </div>
-                
-                <div class="card card-custom p-4 mb-3">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4 class="mb-0">
-                            <i class="fas fa-greeting"></i> Halo, <span id="userName" class="fw-bold"></span>!
-                        </h4>
-                        <button class="btn btn-sm btn-outline-danger" id="refreshQuizBtn">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                    </div>
-                    <div id="quizContainer" class="quiz-container">
-                        <div class="text-center py-5">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Loading quiz...</span>
-                            </div>
-                            <p class="mt-3 text-muted">Memuat soal...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- History Page -->
-            <div id="historyPage" class="page" style="display: none;">
-                <div class="card card-custom p-4 mb-3 text-center">
-                    <h5 class="text-muted">Total Poin Anda</h5>
-                    <h2 class="display-4 fw-bold text-gradient" id="historyTotalPoints">0</h2>
-                    <button class="btn btn-success btn-custom mt-3" data-bs-toggle="modal" data-bs-target="#redeemModal">
-                        <i class="fas fa-exchange-alt"></i> Tukar Poin
+            <div class="card card-custom p-4 mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="mb-0">
+                        <i class="fas fa-greeting"></i> Halo, <span id="userName" class="fw-bold"></span>!
+                    </h4>
+                    <button class="btn btn-sm btn-outline-danger" id="refreshQuizBtn">
+                        <i class="fas fa-sync-alt"></i>
                     </button>
                 </div>
-                
-                <div class="card card-custom p-4">
-                    <h5 class="mb-3">
-                        <i class="fas fa-list"></i> Riwayat Penukaran
-                    </h5>
-                    <div id="transactionsList" class="mt-2">
-                        <p class="text-muted text-center py-3">Belum ada riwayat penukaran</p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Profile Page -->
-            <div id="profilePage" class="page" style="display: none;">
-                <div class="card card-custom p-4">
-                    <div class="text-center mb-4">
-                        <i class="fas fa-user-circle fa-5x text-gradient"></i>
-                        <h4 class="mt-3 fw-bold" id="profileUsername"></h4>
-                        <span class="badge bg-secondary" id="profileRole"></span>
-                    </div>
-                    
-                    <div class="list-group">
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <span><i class="fas fa-id-card me-2"></i> ID Device</span>
-                            <span class="text-muted small" id="profileDeviceId">-</span>
+                <div id="quizContainer" class="quiz-container">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading quiz...</span>
                         </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <span><i class="fas fa-globe me-2"></i> Negara</span>
-                            <span class="text-muted" id="profileCountry">-</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <span><i class="fas fa-star me-2 text-warning"></i> Total Poin</span>
-                            <span class="fw-bold text-primary" id="profilePoints">0</span>
-                        </div>
+                        <p class="mt-3 text-muted">Memuat soal...</p>
                     </div>
-                    
-                    <button class="btn btn-danger btn-custom w-100 mt-4" id="logoutBtn">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Settings Page (Admin Only) -->
-            <div id="settingsPage" class="page" style="display: none;">
-                <div class="card card-custom p-4 mb-3">
-                    <h5 class="mb-3">
-                        <i class="fas fa-users"></i> Manajemen User
-                    </h5>
-                    <div id="usersList" class="mt-2" style="max-height: 300px; overflow-y: auto;"></div>
-                </div>
-                
-                <div class="card card-custom p-4 mb-3">
-                    <h5 class="mb-3">
-                        <i class="fas fa-exchange-alt"></i> Manajemen Penukaran
-                    </h5>
-                    <div id="adminTransactionsList" class="mt-2" style="max-height: 300px; overflow-y: auto;"></div>
-                </div>
-                
-                <div class="card card-custom p-4 mb-3">
-                    <h5 class="mb-3">
-                        <i class="fas fa-tools"></i> Mode Maintenance
-                    </h5>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="maintenanceMode" style="cursor: pointer;">
-                        <label class="form-check-label" for="maintenanceMode">
-                            Aktifkan Mode Maintenance (hanya admin bisa login)
-                        </label>
-                    </div>
-                </div>
-                
-                <div class="card card-custom p-4">
-                    <h5 class="mb-3">
-                        <i class="fas fa-bullhorn"></i> Broadcast Pesan
-                    </h5>
-                    <textarea id="broadcastInput" class="form-control mb-2" rows="3" placeholder="Masukkan pesan broadcast..."></textarea>
-                    <button class="btn btn-primary btn-custom w-100" id="sendBroadcastBtn">
-                        <i class="fas fa-paper-plane"></i> Kirim Broadcast
-                    </button>
                 </div>
             </div>
         </div>
         
-        <!-- Navigation Menu -->
-        <div class="nav-menu" id="navMenu" style="display: none;">
-            <div class="row g-0">
-                <div class="col-3 nav-item" data-page="dashboard">
-                    <i class="fas fa-home"></i>
-                    <span>Home</span>
+        <!-- History Page -->
+        <div id="historyPage" class="page" style="display: none;">
+            <div class="card card-custom p-4 mb-3 text-center">
+                <h5 class="text-muted">Total Poin Anda</h5>
+                <h2 class="display-4 fw-bold text-gradient" id="historyTotalPoints">0</h2>
+                <button class="btn btn-success btn-custom mt-3" data-bs-toggle="modal" data-bs-target="#redeemModal">
+                    <i class="fas fa-exchange-alt"></i> Tukar Poin
+                </button>
+            </div>
+            
+            <div class="card card-custom p-4">
+                <h5 class="mb-3">
+                    <i class="fas fa-list"></i> Riwayat Penukaran
+                </h5>
+                <div id="transactionsList" class="mt-2">
+                    <p class="text-muted text-center py-3">Belum ada riwayat penukaran</p>
                 </div>
-                <div class="col-3 nav-item" data-page="history">
-                    <i class="fas fa-history"></i>
-                    <span>Riwayat</span>
+            </div>
+        </div>
+        
+        <!-- Profile Page -->
+        <div id="profilePage" class="page" style="display: none;">
+            <div class="card card-custom p-4">
+                <div class="text-center mb-4">
+                    <i class="fas fa-user-circle fa-5x text-gradient"></i>
+                    <h4 class="mt-3 fw-bold" id="profileUsername"></h4>
+                    <span class="badge bg-secondary" id="profileRole"></span>
                 </div>
-                <div class="col-3 nav-item" data-page="profile">
-                    <i class="fas fa-user"></i>
-                    <span>Profil</span>
+                
+                <div class="list-group">
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-id-card me-2"></i> ID Device</span>
+                        <span class="text-muted small" id="profileDeviceId">-</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-globe me-2"></i> Negara</span>
+                        <span class="text-muted" id="profileCountry">-</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-star me-2 text-warning"></i> Total Poin</span>
+                        <span class="fw-bold text-primary" id="profilePoints">0</span>
+                    </div>
                 </div>
-                <div class="col-3 nav-item" id="settingsNav" data-page="settings" style="display: none;">
-                    <i class="fas fa-cog"></i>
-                    <span>Setting</span>
+                
+                <button class="btn btn-danger btn-custom w-100 mt-4" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+        
+        <!-- Settings Page (Admin Only) -->
+        <div id="settingsPage" class="page" style="display: none;">
+            <div class="card card-custom p-4 mb-3">
+                <h5 class="mb-3">
+                    <i class="fas fa-users"></i> Manajemen User
+                </h5>
+                <div id="usersList" class="mt-2" style="max-height: 300px; overflow-y: auto;"></div>
+            </div>
+            
+            <div class="card card-custom p-4 mb-3">
+                <h5 class="mb-3">
+                    <i class="fas fa-exchange-alt"></i> Manajemen Penukaran
+                </h5>
+                <div id="adminTransactionsList" class="mt-2" style="max-height: 300px; overflow-y: auto;"></div>
+            </div>
+            
+            <div class="card card-custom p-4 mb-3">
+                <h5 class="mb-3">
+                    <i class="fas fa-tools"></i> Mode Maintenance
+                </h5>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="maintenanceMode" style="cursor: pointer;">
+                    <label class="form-check-label" for="maintenanceMode">
+                        Aktifkan Mode Maintenance (hanya admin bisa login)
+                    </label>
                 </div>
+            </div>
+            
+            <div class="card card-custom p-4">
+                <h5 class="mb-3">
+                    <i class="fas fa-bullhorn"></i> Broadcast Pesan
+                </h5>
+                <textarea id="broadcastInput" class="form-control mb-2" rows="3" placeholder="Masukkan pesan broadcast..."></textarea>
+                <button class="btn btn-primary btn-custom w-100" id="sendBroadcastBtn">
+                    <i class="fas fa-paper-plane"></i> Kirim Broadcast
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Navigation Menu -->
+    <div class="nav-menu" id="navMenu" style="display: none;">
+        <div class="row g-0">
+            <div class="col-3 nav-item" data-page="dashboard">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </div>
+            <div class="col-3 nav-item" data-page="history">
+                <i class="fas fa-history"></i>
+                <span>Riwayat</span>
+            </div>
+            <div class="col-3 nav-item" data-page="profile">
+                <i class="fas fa-user"></i>
+                <span>Profil</span>
+            </div>
+            <div class="col-3 nav-item" id="settingsNav" data-page="settings" style="display: none;">
+                <i class="fas fa-cog"></i>
+                <span>Setting</span>
             </div>
         </div>
     </div>
@@ -459,12 +460,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        // ==================== CEK APAKAH BERJALAN DI GAS ====================
-        // Fungsi untuk mengecek apakah google.script tersedia
-        function isGoogleScriptAvailable() {
-            return typeof google !== 'undefined' && google.script && google.script.run;
-        }
-        
         // ==================== GLOBAL VARIABLES ====================
         let currentUser = null;
         let currentQuiz = null;
@@ -526,11 +521,17 @@
             }
         }
         
-        // ==================== API CALLS dengan Pengecekan ====================
+        // ==================== API CALLS ====================
         function callServer(func, ...args) {
             return new Promise((resolve, reject) => {
-                if (!isGoogleScriptAvailable()) {
+                // Cek apakah google.script tersedia
+                if (typeof google === 'undefined') {
                     reject(new Error('Google Script tidak tersedia. Pastikan aplikasi berjalan di Google Apps Script Web App.'));
+                    return;
+                }
+                
+                if (!google.script || !google.script.run) {
+                    reject(new Error('google.script.run tidak tersedia'));
                     return;
                 }
                 
@@ -1082,7 +1083,7 @@
         
         // ==================== AUTO LOGIN ====================
         const savedUserId = localStorage.getItem('userId');
-        if (savedUserId && isGoogleScriptAvailable()) {
+        if (savedUserId) {
             callServer('getUser', savedUserId).then(user => {
                 if (user && user.status === 'active') {
                     currentUser = user;
@@ -1116,12 +1117,6 @@
                 localStorage.removeItem('userId');
             });
         }
-        
-        // Tampilkan pesan jika google.script tidak tersedia (untuk debugging)
-if (!isGoogleScriptAvailable()) {
-    console.warn('Google Script API tidak tersedia. Pastikan aplikasi berjalan di Google Apps Script Web App.');
-    // showToast('Aplikasi sedang dalam mode development', 'warning'); // COMMENT atau HAPUS baris ini
-}
     </script>
 </body>
 </html>
