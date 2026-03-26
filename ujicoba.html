@@ -1118,10 +1118,10 @@
         }
         
         // Tampilkan pesan jika google.script tidak tersedia (untuk debugging)
-        if (!isGoogleScriptAvailable()) {
-            console.warn('Google Script API tidak tersedia. Pastikan aplikasi berjalan di Google Apps Script Web App.');
-            showToast('Aplikasi sedang dalam mode development', 'warning');
-        }
+if (!isGoogleScriptAvailable()) {
+    console.warn('Google Script API tidak tersedia. Pastikan aplikasi berjalan di Google Apps Script Web App.');
+    // showToast('Aplikasi sedang dalam mode development', 'warning'); // COMMENT atau HAPUS baris ini
+}
     </script>
 </body>
 </html>
