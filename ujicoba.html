@@ -3,12 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Quiz Mini App</title>
+    <title>Quiz Mini App - Telegram Mini App</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
@@ -19,14 +25,15 @@
             max-width: 500px;
             margin: 0 auto;
             padding: 20px;
+            padding-bottom: 80px;
         }
         
         .card-custom {
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            backdrop-filter: blur(10px);
-            background: rgba(255,255,255,0.95);
+            background: rgba(255,255,255,0.98);
             border: none;
+            backdrop-filter: blur(5px);
         }
         
         .btn-custom {
@@ -48,6 +55,8 @@
             border: 2px solid #e9ecef;
             transition: all 0.3s ease;
             cursor: pointer;
+            text-align: center;
+            font-weight: 500;
         }
         
         .quiz-option:hover {
@@ -55,23 +64,22 @@
             transform: translateX(5px);
         }
         
-        .quiz-option.selected {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
+        .quiz-option:active {
+            transform: scale(0.98);
         }
         
         .points-badge {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            top: 15px;
+            right: 15px;
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
-            padding: 10px 20px;
+            padding: 8px 16px;
             border-radius: 50px;
             font-weight: bold;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             z-index: 1000;
+            font-size: 14px;
         }
         
         .nav-menu {
@@ -81,9 +89,11 @@
             right: 0;
             background: white;
             box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
-            padding: 10px 20px;
+            padding: 8px 20px;
             border-radius: 30px 30px 0 0;
             z-index: 999;
+            max-width: 500px;
+            margin: 0 auto;
         }
         
         .nav-item {
@@ -92,6 +102,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             border-radius: 15px;
+            color: #6c757d;
         }
         
         .nav-item.active {
@@ -100,23 +111,24 @@
         }
         
         .nav-item i {
-            font-size: 24px;
+            font-size: 22px;
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
         
         .nav-item span {
-            font-size: 12px;
+            font-size: 11px;
         }
         
         .marquee {
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
-            padding: 10px;
-            border-radius: 10px;
+            padding: 10px 15px;
+            border-radius: 15px;
             margin-bottom: 15px;
             overflow: hidden;
             white-space: nowrap;
+            font-size: 14px;
         }
         
         .marquee span {
@@ -142,18 +154,86 @@
             z-index: 9999;
         }
         
+        .loading .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 12px;
+            padding: 12px 15px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+        }
+        
+        .btn-primary:hover, .btn-primary:focus {
+            background: linear-gradient(135deg, #5a67d8, #6b46a0);
+        }
+        
+        .list-group-item {
+            border-radius: 12px !important;
+            margin-bottom: 8px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .toast-container {
+            z-index: 9999;
+        }
+        
         @media (max-width: 768px) {
             .app-container {
                 padding: 15px;
-                padding-bottom: 80px;
+                padding-bottom: 75px;
             }
             
             .points-badge {
                 top: 10px;
                 right: 10px;
-                font-size: 14px;
+                font-size: 12px;
                 padding: 6px 12px;
             }
+            
+            .nav-item i {
+                font-size: 20px;
+            }
+            
+            .nav-item span {
+                font-size: 10px;
+            }
+        }
+        
+        .page {
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+        }
+        
+        .quiz-container {
+            min-height: 300px;
+        }
+        
+        .text-gradient {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
     </style>
 </head>
@@ -168,7 +248,7 @@
         
         <!-- Points Badge -->
         <div id="pointsBadge" class="points-badge" style="display: none;">
-            <i class="fas fa-star"></i> <span id="totalPoints">0</span>
+            <i class="fas fa-star"></i> <span id="totalPoints">0</span> Poin
         </div>
         
         <!-- Main Content -->
@@ -177,21 +257,25 @@
             <div id="loginPage" class="page">
                 <div class="card card-custom p-4">
                     <div class="text-center mb-4">
-                        <i class="fas fa-brain fa-3x" style="color: #667eea;"></i>
-                        <h3 class="mt-3">Quiz Mini App</h3>
-                        <p class="text-muted">Login untuk bermain</p>
+                        <i class="fas fa-brain fa-4x text-gradient"></i>
+                        <h3 class="mt-3 fw-bold">Quiz Mini App</h3>
+                        <p class="text-muted">Login untuk bermain dan dapatkan poin</p>
                     </div>
                     <form id="loginForm">
                         <div class="mb-3">
-                            <input type="text" class="form-control" id="loginUsername" placeholder="Username" required>
+                            <input type="text" class="form-control" id="loginUsername" placeholder="Username" required autocomplete="off">
                         </div>
                         <div class="mb-3">
                             <input type="password" class="form-control" id="loginPassword" placeholder="Password" required>
                         </div>
-                        <button type="submit" class="btn btn-primary btn-custom w-100">Login</button>
+                        <button type="submit" class="btn btn-primary btn-custom w-100">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </button>
                     </form>
-                    <hr>
-                    <p class="text-center mb-0">Belum punya akun? <a href="#" id="showRegister">Daftar</a></p>
+                    <hr class="my-4">
+                    <p class="text-center mb-0">
+                        Belum punya akun? <a href="#" id="showRegister" class="text-decoration-none">Daftar Sekarang</a>
+                    </p>
                 </div>
             </div>
             
@@ -199,20 +283,27 @@
             <div id="registerPage" class="page" style="display: none;">
                 <div class="card card-custom p-4">
                     <div class="text-center mb-4">
-                        <i class="fas fa-user-plus fa-3x" style="color: #667eea;"></i>
-                        <h3 class="mt-3">Daftar Akun</h3>
+                        <i class="fas fa-user-plus fa-4x text-gradient"></i>
+                        <h3 class="mt-3 fw-bold">Daftar Akun</h3>
+                        <p class="text-muted">Isi data untuk bergabung</p>
                     </div>
                     <form id="registerForm">
                         <div class="mb-3">
-                            <input type="text" class="form-control" id="regUsername" placeholder="Username" required>
+                            <input type="text" class="form-control" id="regUsername" placeholder="Username" required autocomplete="off">
+                            <small class="text-muted">Minimal 3 karakter</small>
                         </div>
                         <div class="mb-3">
                             <input type="password" class="form-control" id="regPassword" placeholder="Password" required>
+                            <small class="text-muted">Minimal 4 karakter</small>
                         </div>
-                        <button type="submit" class="btn btn-primary btn-custom w-100">Daftar</button>
+                        <button type="submit" class="btn btn-primary btn-custom w-100">
+                            <i class="fas fa-user-check"></i> Daftar
+                        </button>
                     </form>
-                    <hr>
-                    <p class="text-center mb-0">Sudah punya akun? <a href="#" id="showLogin">Login</a></p>
+                    <hr class="my-4">
+                    <p class="text-center mb-0">
+                        Sudah punya akun? <a href="#" id="showLogin" class="text-decoration-none">Login</a>
+                    </p>
                 </div>
             </div>
             
@@ -223,12 +314,20 @@
                 </div>
                 
                 <div class="card card-custom p-4 mb-3">
-                    <h4 class="mb-3"><i class="fas fa-greeting"></i> Halo, <span id="userName"></span>!</h4>
-                    <div id="quizContainer">
-                        <div class="text-center">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="mb-0">
+                            <i class="fas fa-greeting"></i> Halo, <span id="userName" class="fw-bold"></span>!
+                        </h4>
+                        <button class="btn btn-sm btn-outline-danger" id="refreshQuizBtn">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                    <div id="quizContainer" class="quiz-container">
+                        <div class="text-center py-5">
                             <div class="spinner-border text-primary" role="status">
                                 <span class="visually-hidden">Loading quiz...</span>
                             </div>
+                            <p class="mt-3 text-muted">Memuat soal...</p>
                         </div>
                     </div>
                 </div>
@@ -236,18 +335,20 @@
             
             <!-- History Page -->
             <div id="historyPage" class="page" style="display: none;">
-                <div class="card card-custom p-4 mb-3">
-                    <h4><i class="fas fa-history"></i> Total Poin</h4>
-                    <h2 class="text-center text-primary" id="historyTotalPoints">0</h2>
-                    <button class="btn btn-success btn-custom w-100 mt-3" data-bs-toggle="modal" data-bs-target="#redeemModal">
+                <div class="card card-custom p-4 mb-3 text-center">
+                    <h5 class="text-muted">Total Poin Anda</h5>
+                    <h2 class="display-4 fw-bold text-gradient" id="historyTotalPoints">0</h2>
+                    <button class="btn btn-success btn-custom mt-3" data-bs-toggle="modal" data-bs-target="#redeemModal">
                         <i class="fas fa-exchange-alt"></i> Tukar Poin
                     </button>
                 </div>
                 
                 <div class="card card-custom p-4">
-                    <h5><i class="fas fa-list"></i> Riwayat Penukaran</h5>
-                    <div id="transactionsList" class="mt-3">
-                        <p class="text-muted text-center">Belum ada riwayat</p>
+                    <h5 class="mb-3">
+                        <i class="fas fa-list"></i> Riwayat Penukaran
+                    </h5>
+                    <div id="transactionsList" class="mt-2">
+                        <p class="text-muted text-center py-3">Belum ada riwayat penukaran</p>
                     </div>
                 </div>
             </div>
@@ -256,28 +357,27 @@
             <div id="profilePage" class="page" style="display: none;">
                 <div class="card card-custom p-4">
                     <div class="text-center mb-4">
-                        <i class="fas fa-user-circle fa-4x" style="color: #667eea;"></i>
-                        <h4 class="mt-2" id="profileUsername"></h4>
+                        <i class="fas fa-user-circle fa-5x text-gradient"></i>
+                        <h4 class="mt-3 fw-bold" id="profileUsername"></h4>
+                        <span class="badge bg-secondary" id="profileRole"></span>
                     </div>
+                    
                     <div class="list-group">
-                        <div class="list-group-item">
-                            <strong><i class="fas fa-id-card"></i> ID Device:</strong>
-                            <span id="profileDeviceId"></span>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-id-card me-2"></i> ID Device</span>
+                            <span class="text-muted small" id="profileDeviceId">-</span>
                         </div>
-                        <div class="list-group-item">
-                            <strong><i class="fas fa-globe"></i> Negara:</strong>
-                            <span id="profileCountry"></span>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-globe me-2"></i> Negara</span>
+                            <span class="text-muted" id="profileCountry">-</span>
                         </div>
-                        <div class="list-group-item">
-                            <strong><i class="fas fa-star"></i> Poin:</strong>
-                            <span id="profilePoints"></span>
-                        </div>
-                        <div class="list-group-item">
-                            <strong><i class="fas fa-user-tag"></i> Role:</strong>
-                            <span id="profileRole"></span>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-star me-2 text-warning"></i> Total Poin</span>
+                            <span class="fw-bold text-primary" id="profilePoints">0</span>
                         </div>
                     </div>
-                    <button class="btn btn-danger btn-custom w-100 mt-3" id="logoutBtn">
+                    
+                    <button class="btn btn-danger btn-custom w-100 mt-4" id="logoutBtn">
                         <i class="fas fa-sign-out-alt"></i> Logout
                     </button>
                 </div>
@@ -286,34 +386,46 @@
             <!-- Settings Page (Admin Only) -->
             <div id="settingsPage" class="page" style="display: none;">
                 <div class="card card-custom p-4 mb-3">
-                    <h5><i class="fas fa-users"></i> Manajemen User</h5>
-                    <div id="usersList" class="mt-2"></div>
+                    <h5 class="mb-3">
+                        <i class="fas fa-users"></i> Manajemen User
+                    </h5>
+                    <div id="usersList" class="mt-2" style="max-height: 300px; overflow-y: auto;"></div>
                 </div>
                 
                 <div class="card card-custom p-4 mb-3">
-                    <h5><i class="fas fa-exchange-alt"></i> Manajemen Penukaran</h5>
-                    <div id="adminTransactionsList" class="mt-2"></div>
+                    <h5 class="mb-3">
+                        <i class="fas fa-exchange-alt"></i> Manajemen Penukaran
+                    </h5>
+                    <div id="adminTransactionsList" class="mt-2" style="max-height: 300px; overflow-y: auto;"></div>
                 </div>
                 
                 <div class="card card-custom p-4 mb-3">
-                    <h5><i class="fas fa-tools"></i> Mode Maintenance</h5>
+                    <h5 class="mb-3">
+                        <i class="fas fa-tools"></i> Mode Maintenance
+                    </h5>
                     <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="maintenanceMode">
-                        <label class="form-check-label" for="maintenanceMode">Aktifkan Mode Maintenance</label>
+                        <input class="form-check-input" type="checkbox" id="maintenanceMode" style="cursor: pointer;">
+                        <label class="form-check-label" for="maintenanceMode">
+                            Aktifkan Mode Maintenance (hanya admin bisa login)
+                        </label>
                     </div>
                 </div>
                 
                 <div class="card card-custom p-4">
-                    <h5><i class="fas fa-bullhorn"></i> Broadcast Pesan</h5>
+                    <h5 class="mb-3">
+                        <i class="fas fa-bullhorn"></i> Broadcast Pesan
+                    </h5>
                     <textarea id="broadcastInput" class="form-control mb-2" rows="3" placeholder="Masukkan pesan broadcast..."></textarea>
-                    <button class="btn btn-primary btn-custom w-100" id="sendBroadcastBtn">Kirim Broadcast</button>
+                    <button class="btn btn-primary btn-custom w-100" id="sendBroadcastBtn">
+                        <i class="fas fa-paper-plane"></i> Kirim Broadcast
+                    </button>
                 </div>
             </div>
         </div>
         
         <!-- Navigation Menu -->
         <div class="nav-menu" id="navMenu" style="display: none;">
-            <div class="row">
+            <div class="row g-0">
                 <div class="col-3 nav-item" data-page="dashboard">
                     <i class="fas fa-home"></i>
                     <span>Home</span>
@@ -335,28 +447,33 @@
     </div>
     
     <!-- Redeem Modal -->
-    <div class="modal fade" id="redeemModal" tabindex="-1">
+    <div class="modal fade" id="redeemModal" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Tukar Poin</h5>
+                    <h5 class="modal-title">
+                        <i class="fas fa-gift text-success"></i> Tukar Poin
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <form id="redeemForm">
                         <div class="mb-3">
-                            <label>Nama Akun DANA</label>
-                            <input type="text" class="form-control" id="danaName" required>
+                            <label class="form-label">Nama Akun DANA</label>
+                            <input type="text" class="form-control" id="danaName" required placeholder="Masukkan nama sesuai DANA">
                         </div>
                         <div class="mb-3">
-                            <label>No HP DANA</label>
-                            <input type="tel" class="form-control" id="danaPhone" required>
+                            <label class="form-label">No HP DANA</label>
+                            <input type="tel" class="form-control" id="danaPhone" required placeholder="08xxxxxxxxxx">
                         </div>
                         <div class="mb-3">
-                            <label>Jumlah Poin (Min 50, Kelipatan 50)</label>
-                            <input type="number" class="form-control" id="redeemPoints" required min="50" step="50">
+                            <label class="form-label">Jumlah Poin</label>
+                            <input type="number" class="form-control" id="redeemPoints" required min="50" step="50" placeholder="Minimal 50, kelipatan 50">
+                            <small class="text-muted">Minimal 50 poin dan kelipatan 50</small>
                         </div>
-                        <button type="submit" class="btn btn-success w-100">Tukar</button>
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="fas fa-exchange-alt"></i> Tukar Sekarang
+                        </button>
                     </form>
                 </div>
             </div>
@@ -368,624 +485,652 @@
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-    // Global variables
-    let currentUser = null;
-    let currentQuiz = null;
-    let isSubmitting = false;
-    
-    // Initialize Telegram WebApp
-    const tg = window.Telegram?.WebApp;
-    if (tg) {
-        tg.expand();
-        tg.ready();
-    }
-    
-    // Helper Functions
-    function showLoading(show) {
-        const loadingEl = document.getElementById('loading');
-        if (loadingEl) {
-            loadingEl.style.display = show ? 'flex' : 'none';
-        }
-    }
-    
-    function showToast(message, type = 'success') {
-        const toastContainer = document.querySelector('.toast-container');
-        if (!toastContainer) return;
+        // ==================== GLOBAL VARIABLES ====================
+        let currentUser = null;
+        let currentQuiz = null;
+        let isSubmitting = false;
         
-        const toastEl = document.createElement('div');
-        toastEl.className = `toast align-items-center text-white bg-${type} border-0`;
-        toastEl.setAttribute('role', 'alert');
-        toastEl.setAttribute('data-bs-autohide', 'true');
-        toastEl.setAttribute('data-bs-delay', '3000');
-        toastEl.innerHTML = `
-            <div class="d-flex">
-                <div class="toast-body">${message}</div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-            </div>
-        `;
-        toastContainer.appendChild(toastEl);
-        const toast = new bootstrap.Toast(toastEl);
-        toast.show();
-        toastEl.addEventListener('hidden.bs.toast', () => toastEl.remove());
-    }
-    
-    function getDeviceId() {
-        let deviceId = localStorage.getItem('device_id');
-        if (!deviceId) {
-            deviceId = 'web_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            localStorage.setItem('device_id', deviceId);
+        // ==================== HELPER FUNCTIONS ====================
+        function showLoading(show) {
+            const loadingEl = document.getElementById('loading');
+            if (loadingEl) {
+                loadingEl.style.display = show ? 'flex' : 'none';
+            }
         }
-        return deviceId;
-    }
-    
-    async function getCountry() {
-        try {
-            const response = await fetch('https://ipapi.co/json/');
-            const data = await response.json();
-            return data.country_name || 'Indonesia';
-        } catch (error) {
-            console.error('Get country error:', error);
-            return 'Indonesia';
-        }
-    }
-    
-    // API Calls with Promise
-    function callServer(func, ...args) {
-        return new Promise((resolve, reject) => {
-            google.script.run
-                .withSuccessHandler(resolve)
-                .withFailureHandler(reject)
-                [func](...args);
-        });
-    }
-    
-    // Quiz Functions
-    async function loadNewQuiz() {
-        try {
-            showLoading(true);
-            currentQuiz = await callServer('generateQuiz');
-            displayQuiz();
-        } catch (error) {
-            console.error('Load quiz error:', error);
-            showToast('Gagal memuat quiz', 'danger');
-            document.getElementById('quizContainer').innerHTML = `
-                <div class="text-center">
-                    <p class="text-danger">Gagal memuat quiz. Silakan refresh.</p>
-                    <button class="btn btn-primary btn-sm" onclick="loadNewQuiz()">Coba Lagi</button>
+        
+        function showToast(message, type = 'success') {
+            const toastContainer = document.querySelector('.toast-container');
+            if (!toastContainer) return;
+            
+            const toastEl = document.createElement('div');
+            toastEl.className = `toast align-items-center text-white bg-${type} border-0`;
+            toastEl.setAttribute('role', 'alert');
+            toastEl.setAttribute('data-bs-autohide', 'true');
+            toastEl.setAttribute('data-bs-delay', '3000');
+            toastEl.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">${escapeHtml(message)}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
                 </div>
             `;
-        } finally {
-            showLoading(false);
-        }
-    }
-    
-    function displayQuiz() {
-        const quizContainer = document.getElementById('quizContainer');
-        if (!currentQuiz) return;
-        
-        quizContainer.innerHTML = `
-            <div class="text-center mb-4">
-                <h4 class="mb-3">${escapeHtml(currentQuiz.question)}</h4>
-            </div>
-            ${currentQuiz.options.map((opt, idx) => `
-                <div class="quiz-option" data-answer="${opt}">
-                    ${opt}
-                </div>
-            `).join('')}
-        `;
-        
-        document.querySelectorAll('.quiz-option').forEach(opt => {
-            opt.addEventListener('click', () => checkAnswer(parseInt(opt.dataset.answer)));
-        });
-    }
-    
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-    
-    async function checkAnswer(answer) {
-        if (isSubmitting) return;
-        isSubmitting = true;
-        
-        const isCorrect = answer === currentQuiz.correct;
-        
-        if (isCorrect) {
-            showToast('Jawaban Benar! 🎉', 'success');
-            document.querySelectorAll('.quiz-option').forEach(opt => opt.style.pointerEvents = 'none');
-            
-            const rewardBtn = document.createElement('button');
-            rewardBtn.className = 'btn btn-success btn-custom w-100 mt-3';
-            rewardBtn.innerHTML = '<i class="fas fa-gift"></i> Ambil Hadiah';
-            rewardBtn.onclick = showAd;
-            
-            document.getElementById('quizContainer').appendChild(rewardBtn);
-        } else {
-            showToast(`Jawaban Salah! Jawaban yang benar: ${currentQuiz.correct}`, 'danger');
-            await loadNewQuiz();
+            toastContainer.appendChild(toastEl);
+            const toast = new bootstrap.Toast(toastEl);
+            toast.show();
+            toastEl.addEventListener('hidden.bs.toast', () => toastEl.remove());
         }
         
-        isSubmitting = false;
-    }
-    
-    async function showAd() {
-        showLoading(true);
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
         
-        // Load Monetag Ads
-        const script = document.createElement('script');
-        script.src = '//libtl.com/sdk.js';
-        script.setAttribute('data-zone', '9865183');
-        script.setAttribute('data-sdk', 'show_9865183');
-        document.body.appendChild(script);
+        function getDeviceId() {
+            let deviceId = localStorage.getItem('device_id');
+            if (!deviceId) {
+                deviceId = 'web_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('device_id', deviceId);
+            }
+            return deviceId;
+        }
         
-        // Wait for ad (simulated)
-        setTimeout(async () => {
+        async function getCountry() {
             try {
-                const result = await callServer('addPoints', currentUser.id, 5);
-                if (result.success) {
-                    currentUser.poin = result.newPoints;
-                    updatePointsDisplay();
-                    showToast('+5 Poin! ✨', 'success');
-                    await loadNewQuiz();
-                } else {
+                const response = await fetch('https://ipapi.co/json/');
+                const data = await response.json();
+                return data.country_name || 'Indonesia';
+            } catch (error) {
+                console.error('Get country error:', error);
+                return 'Indonesia';
+            }
+        }
+        
+        // ==================== API CALLS ====================
+        function callServer(func, ...args) {
+            return new Promise((resolve, reject) => {
+                google.script.run
+                    .withSuccessHandler(resolve)
+                    .withFailureHandler(reject)
+                    [func](...args);
+            });
+        }
+        
+        // ==================== QUIZ FUNCTIONS ====================
+        async function loadNewQuiz() {
+            try {
+                showLoading(true);
+                currentQuiz = await callServer('generateQuiz');
+                displayQuiz();
+            } catch (error) {
+                console.error('Load quiz error:', error);
+                document.getElementById('quizContainer').innerHTML = `
+                    <div class="text-center py-5">
+                        <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                        <p class="text-danger">Gagal memuat quiz</p>
+                        <button class="btn btn-primary btn-sm" onclick="loadNewQuiz()">
+                            <i class="fas fa-sync-alt"></i> Coba Lagi
+                        </button>
+                    </div>
+                `;
+                showToast('Gagal memuat quiz', 'danger');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        function displayQuiz() {
+            const quizContainer = document.getElementById('quizContainer');
+            if (!currentQuiz) return;
+            
+            quizContainer.innerHTML = `
+                <div class="text-center mb-4">
+                    <h3 class="mb-3">${escapeHtml(currentQuiz.question)}</h3>
+                </div>
+                ${currentQuiz.options.map((opt, idx) => `
+                    <div class="quiz-option" data-answer="${opt}">
+                        ${opt}
+                    </div>
+                `).join('')}
+            `;
+            
+            document.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.addEventListener('click', () => checkAnswer(parseInt(opt.dataset.answer)));
+            });
+        }
+        
+        async function checkAnswer(answer) {
+            if (isSubmitting) return;
+            isSubmitting = true;
+            
+            const isCorrect = answer === currentQuiz.correct;
+            
+            if (isCorrect) {
+                showToast('Jawaban Benar! 🎉', 'success');
+                document.querySelectorAll('.quiz-option').forEach(opt => opt.style.pointerEvents = 'none');
+                
+                const rewardBtn = document.createElement('button');
+                rewardBtn.className = 'btn btn-success btn-custom w-100 mt-3';
+                rewardBtn.innerHTML = '<i class="fas fa-gift"></i> Ambil Hadiah';
+                rewardBtn.onclick = showAd;
+                
+                document.getElementById('quizContainer').appendChild(rewardBtn);
+            } else {
+                showToast(`Jawaban Salah! Jawaban: ${currentQuiz.correct}`, 'danger');
+                await loadNewQuiz();
+            }
+            
+            isSubmitting = false;
+        }
+        
+        async function showAd() {
+            showLoading(true);
+            
+            // Load Monetag Ads
+            const script = document.createElement('script');
+            script.src = '//libtl.com/sdk.js';
+            script.setAttribute('data-zone', '9865183');
+            script.setAttribute('data-sdk', 'show_9865183');
+            document.body.appendChild(script);
+            
+            // Simulate ad close after 3 seconds
+            setTimeout(async () => {
+                try {
+                    const result = await callServer('addPoints', currentUser.id, 5);
+                    if (result.success) {
+                        currentUser.poin = result.newPoints;
+                        updatePointsDisplay();
+                        showToast('+5 Poin! ✨', 'success');
+                        await loadNewQuiz();
+                    } else {
+                        showToast('Gagal menambah poin', 'danger');
+                    }
+                } catch (error) {
+                    console.error('Add points error:', error);
                     showToast('Gagal menambah poin', 'danger');
+                } finally {
+                    showLoading(false);
                 }
-            } catch (error) {
-                console.error('Add points error:', error);
-                showToast('Gagal menambah poin', 'danger');
-            } finally {
-                showLoading(false);
-            }
-        }, 3000);
-    }
-    
-    function updatePointsDisplay() {
-        const totalPointsSpan = document.getElementById('totalPoints');
-        const profilePointsSpan = document.getElementById('profilePoints');
-        
-        if (totalPointsSpan) totalPointsSpan.textContent = currentUser.poin;
-        if (profilePointsSpan) profilePointsSpan.textContent = currentUser.poin;
-    }
-    
-    // Navigation
-    function showPage(pageName) {
-        document.querySelectorAll('.page').forEach(page => page.style.display = 'none');
-        const targetPage = document.getElementById(`${pageName}Page`);
-        if (targetPage) targetPage.style.display = 'block';
-        
-        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-        const activeNav = document.querySelector(`[data-page="${pageName}"]`);
-        if (activeNav) activeNav.classList.add('active');
-        
-        if (pageName === 'dashboard') loadNewQuiz();
-        if (pageName === 'history') loadHistory();
-        if (pageName === 'settings' && currentUser?.role === 'admin') loadAdminData();
-    }
-    
-    async function loadHistory() {
-        try {
-            showLoading(true);
-            document.getElementById('historyTotalPoints').textContent = currentUser.poin;
-            
-            const transactions = await callServer('getTransactions', currentUser.id);
-            const container = document.getElementById('transactionsList');
-            
-            if (!transactions || transactions.length === 0) {
-                container.innerHTML = '<p class="text-muted text-center">Belum ada riwayat</p>';
-                return;
-            }
-            
-            container.innerHTML = transactions.map(trans => `
-                <div class="card mb-2 p-3">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <strong>${escapeHtml(trans.nama_dana)}</strong><br>
-                            ${escapeHtml(trans.no_hp)}<br>
-                            <small class="text-muted">${trans.poin} poin</small>
-                        </div>
-                        <div>
-                            <span class="badge bg-${trans.status === 'pending' ? 'warning' : (trans.status === 'berhasil' ? 'success' : 'danger')}">
-                                ${trans.status}
-                            </span>
-                        </div>
-                    </div>
-                    ${trans.catatan_admin !== '-' ? `<small class="text-muted">Catatan: ${escapeHtml(trans.catatan_admin)}</small>` : ''}
-                </div>
-            `).join('');
-        } catch (error) {
-            console.error('Load history error:', error);
-            showToast('Gagal memuat riwayat', 'danger');
-        } finally {
-            showLoading(false);
+            }, 3000);
         }
-    }
-    
-    async function loadAdminData() {
-        try {
-            showLoading(true);
+        
+        function updatePointsDisplay() {
+            const totalPointsSpan = document.getElementById('totalPoints');
+            const profilePointsSpan = document.getElementById('profilePoints');
+            const historyPointsSpan = document.getElementById('historyTotalPoints');
             
-            const users = await callServer('getAllUsers');
-            const usersContainer = document.getElementById('usersList');
-            usersContainer.innerHTML = users.map(user => `
-                <div class="card mb-2 p-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <strong>${escapeHtml(user.username)}</strong><br>
-                            <small>Role: ${user.role} | Poin: ${user.poin} | Status: ${user.status}</small>
-                        </div>
-                        <div>
-                            <button class="btn btn-sm btn-warning" onclick="editUserPoints('${user.id}')">Edit Poin</button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteUserAccount('${user.id}')">Hapus</button>
-                            <button class="btn btn-sm btn-info" onclick="toggleBlockUser('${user.id}', '${user.status}')">
-                                ${user.status === 'active' ? 'Blokir' : 'Aktifkan'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-            
-            const transactions = await callServer('getTransactions');
-            const transContainer = document.getElementById('adminTransactionsList');
-            transContainer.innerHTML = transactions.map(trans => `
-                <div class="card mb-2 p-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <strong>${escapeHtml(trans.nama_dana)}</strong><br>
-                            <small>${escapeHtml(trans.no_hp)} | ${trans.poin} poin | Status: ${trans.status}</small>
-                        </div>
-                        <div>
-                            <select class="form-select form-select-sm" onchange="updateTransactionStatus('${trans.id}', this.value)">
-                                <option value="pending" ${trans.status === 'pending' ? 'selected' : ''}>Pending</option>
-                                <option value="berhasil" ${trans.status === 'berhasil' ? 'selected' : ''}>Berhasil</option>
-                                <option value="tolak" ${trans.status === 'tolak' ? 'selected' : ''}>Tolak</option>
-                            </select>
-                            <button class="btn btn-sm btn-danger mt-1" onclick="deleteTransaction('${trans.id}')">Hapus</button>
-                        </div>
-                    </div>
-                    ${trans.catatan_admin !== '-' ? `<small>Catatan: ${escapeHtml(trans.catatan_admin)}</small>` : ''}
-                </div>
-            `).join('');
-        } catch (error) {
-            console.error('Load admin data error:', error);
-            showToast('Gagal memuat data admin', 'danger');
-        } finally {
-            showLoading(false);
+            if (totalPointsSpan) totalPointsSpan.textContent = currentUser.poin;
+            if (profilePointsSpan) profilePointsSpan.textContent = currentUser.poin;
+            if (historyPointsSpan) historyPointsSpan.textContent = currentUser.poin;
         }
-    }
-    
-    // Admin functions (global)
-    window.editUserPoints = async function(userId) {
-        const newPoints = prompt('Masukkan jumlah poin baru:');
-        if (newPoints && !isNaN(newPoints)) {
+        
+        // ==================== NAVIGATION ====================
+        function showPage(pageName) {
+            document.querySelectorAll('.page').forEach(page => page.style.display = 'none');
+            const targetPage = document.getElementById(`${pageName}Page`);
+            if (targetPage) targetPage.style.display = 'block';
+            
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            const activeNav = document.querySelector(`[data-page="${pageName}"]`);
+            if (activeNav) activeNav.classList.add('active');
+            
+            if (pageName === 'dashboard') loadNewQuiz();
+            if (pageName === 'history') loadHistory();
+            if (pageName === 'settings' && currentUser?.role === 'admin') loadAdminData();
+        }
+        
+        // ==================== HISTORY FUNCTIONS ====================
+        async function loadHistory() {
             try {
                 showLoading(true);
-                await callServer('updateUser', userId, 'poin', parseInt(newPoints));
-                showToast('Poin berhasil diupdate', 'success');
-                loadAdminData();
+                updatePointsDisplay();
+                
+                const transactions = await callServer('getTransactions', currentUser.id);
+                const container = document.getElementById('transactionsList');
+                
+                if (!transactions || transactions.length === 0) {
+                    container.innerHTML = '<p class="text-muted text-center py-3">Belum ada riwayat penukaran</p>';
+                    return;
+                }
+                
+                container.innerHTML = transactions.map(trans => `
+                    <div class="card mb-2 p-3 border-0 shadow-sm">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <div class="fw-bold">${escapeHtml(trans.nama_dana)}</div>
+                                <div class="small text-muted">${escapeHtml(trans.no_hp)}</div>
+                                <div class="small mt-1">
+                                    <span class="badge bg-${trans.status === 'pending' ? 'warning' : (trans.status === 'berhasil' ? 'success' : 'danger')}">
+                                        ${trans.status === 'pending' ? 'Menunggu' : (trans.status === 'berhasil' ? 'Berhasil' : 'Ditolak')}
+                                    </span>
+                                    <span class="ms-2">${trans.poin} poin</span>
+                                </div>
+                                ${trans.catatan_admin && trans.catatan_admin !== '-' ? `<div class="small text-muted mt-2"><i class="fas fa-comment"></i> ${escapeHtml(trans.catatan_admin)}</div>` : ''}
+                            </div>
+                            <div class="text-end">
+                                <small class="text-muted">${new Date().toLocaleDateString()}</small>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
             } catch (error) {
-                showToast('Gagal update poin', 'danger');
+                console.error('Load history error:', error);
+                showToast('Gagal memuat riwayat', 'danger');
             } finally {
                 showLoading(false);
             }
         }
-    };
-    
-    window.deleteUserAccount = async function(userId) {
-        if (confirm('Yakin ingin menghapus akun ini?')) {
+        
+        // ==================== ADMIN FUNCTIONS ====================
+        async function loadAdminData() {
             try {
                 showLoading(true);
-                await callServer('deleteUser', userId);
-                showToast('Akun berhasil dihapus', 'success');
-                loadAdminData();
+                
+                const users = await callServer('getAllUsers');
+                const usersContainer = document.getElementById('usersList');
+                usersContainer.innerHTML = users.map(user => `
+                    <div class="card mb-2 p-2 border-0 shadow-sm">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="fw-bold">${escapeHtml(user.username)}</div>
+                                <div class="small">
+                                    <span class="badge bg-${user.role === 'admin' ? 'danger' : 'info'}">${user.role}</span>
+                                    <span class="ms-2">${user.poin} poin</span>
+                                    <span class="ms-2 badge bg-${user.status === 'active' ? 'success' : 'secondary'}">${user.status}</span>
+                                </div>
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-outline-warning me-1" onclick="window.editUserPoints('${user.id}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger me-1" onclick="window.deleteUserAccount('${user.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-${user.status === 'active' ? 'secondary' : 'success'}" onclick="window.toggleBlockUser('${user.id}', '${user.status}')">
+                                    <i class="fas fa-${user.status === 'active' ? 'ban' : 'check'}"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                
+                const transactions = await callServer('getTransactions');
+                const transContainer = document.getElementById('adminTransactionsList');
+                transContainer.innerHTML = transactions.map(trans => `
+                    <div class="card mb-2 p-2 border-0 shadow-sm">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <div class="fw-bold">${escapeHtml(trans.nama_dana)}</div>
+                                <div class="small text-muted">${escapeHtml(trans.no_hp)}</div>
+                                <div class="small">${trans.poin} poin</div>
+                            </div>
+                            <div class="text-end">
+                                <select class="form-select form-select-sm mb-1" onchange="window.updateTransactionStatus('${trans.id}', this.value)">
+                                    <option value="pending" ${trans.status === 'pending' ? 'selected' : ''}>Pending</option>
+                                    <option value="berhasil" ${trans.status === 'berhasil' ? 'selected' : ''}>Berhasil</option>
+                                    <option value="tolak" ${trans.status === 'tolak' ? 'selected' : ''}>Tolak</option>
+                                </select>
+                                <button class="btn btn-sm btn-outline-danger" onclick="window.deleteTransaction('${trans.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        ${trans.catatan_admin && trans.catatan_admin !== '-' ? `<div class="small text-muted mt-2">📝 ${escapeHtml(trans.catatan_admin)}</div>` : ''}
+                    </div>
+                `).join('');
+                
+                // Load maintenance mode status
+                const settings = await callServer('getSettings');
+                document.getElementById('maintenanceMode').checked = settings.maintenance_mode === 'true';
+                
             } catch (error) {
-                showToast('Gagal hapus akun', 'danger');
+                console.error('Load admin data error:', error);
+                showToast('Gagal memuat data admin', 'danger');
             } finally {
                 showLoading(false);
             }
         }
-    };
-    
-    window.toggleBlockUser = async function(userId, currentStatus) {
-        const newStatus = currentStatus === 'active' ? 'blocked' : 'active';
-        try {
-            showLoading(true);
-            await callServer('updateUser', userId, 'status', newStatus);
-            showToast(`Akun ${newStatus === 'blocked' ? 'diblokir' : 'diaktifkan'}`, 'success');
-            loadAdminData();
-        } catch (error) {
-            showToast('Gagal update status', 'danger');
-        } finally {
-            showLoading(false);
-        }
-    };
-    
-    window.updateTransactionStatus = async function(transId, status) {
-        try {
-            showLoading(true);
-            await callServer('updateTransactionStatus', transId, status, '');
-            showToast('Status penukaran diupdate', 'success');
-            loadAdminData();
-            if (document.getElementById('historyPage').style.display !== 'none') loadHistory();
-        } catch (error) {
-            showToast('Gagal update status', 'danger');
-        } finally {
-            showLoading(false);
-        }
-    };
-    
-    window.deleteTransaction = async function(transId) {
-        if (confirm('Yakin ingin menghapus transaksi ini?')) {
+        
+        // Admin global functions
+        window.editUserPoints = async function(userId) {
+            const newPoints = prompt('Masukkan jumlah poin baru:');
+            if (newPoints && !isNaN(newPoints) && newPoints >= 0) {
+                try {
+                    showLoading(true);
+                    await callServer('updateUser', userId, 'poin', parseInt(newPoints));
+                    showToast('Poin berhasil diupdate', 'success');
+                    loadAdminData();
+                } catch (error) {
+                    showToast('Gagal update poin', 'danger');
+                } finally {
+                    showLoading(false);
+                }
+            }
+        };
+        
+        window.deleteUserAccount = async function(userId) {
+            if (confirm('Yakin ingin menghapus akun ini? Tindakan ini tidak dapat dibatalkan.')) {
+                try {
+                    showLoading(true);
+                    await callServer('deleteUser', userId);
+                    showToast('Akun berhasil dihapus', 'success');
+                    loadAdminData();
+                } catch (error) {
+                    showToast('Gagal hapus akun', 'danger');
+                } finally {
+                    showLoading(false);
+                }
+            }
+        };
+        
+        window.toggleBlockUser = async function(userId, currentStatus) {
+            const newStatus = currentStatus === 'active' ? 'blocked' : 'active';
+            const action = newStatus === 'blocked' ? 'memblokir' : 'mengaktifkan';
+            if (confirm(`Yakin ingin ${action} akun ini?`)) {
+                try {
+                    showLoading(true);
+                    await callServer('updateUser', userId, 'status', newStatus);
+                    showToast(`Akun berhasil ${action}`, 'success');
+                    loadAdminData();
+                } catch (error) {
+                    showToast('Gagal update status', 'danger');
+                } finally {
+                    showLoading(false);
+                }
+            }
+        };
+        
+        window.updateTransactionStatus = async function(transId, status) {
             try {
                 showLoading(true);
-                await callServer('deleteTransaction', transId);
-                showToast('Transaksi dihapus', 'success');
+                await callServer('updateTransactionStatus', transId, status, '');
+                showToast('Status penukaran diupdate', 'success');
                 loadAdminData();
                 if (document.getElementById('historyPage').style.display !== 'none') loadHistory();
             } catch (error) {
-                showToast('Gagal hapus transaksi', 'danger');
+                showToast('Gagal update status', 'danger');
             } finally {
                 showLoading(false);
             }
-        }
-    };
-    
-    // Event Listeners
-    document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        showLoading(true);
+        };
         
-        const username = document.getElementById('loginUsername').value.trim();
-        const password = document.getElementById('loginPassword').value;
-        
-        if (!username || !password) {
-            showToast('Username dan password harus diisi!', 'danger');
-            showLoading(false);
-            return;
-        }
-        
-        try {
-            const result = await callServer('login', username, password);
-            
-            if (result.success) {
-                currentUser = result.user;
-                localStorage.setItem('userId', currentUser.id);
-                updatePointsDisplay();
-                
-                document.getElementById('userName').textContent = currentUser.username;
-                document.getElementById('profileUsername').textContent = currentUser.username;
-                document.getElementById('profileDeviceId').textContent = currentUser.device_id;
-                document.getElementById('profileCountry').textContent = currentUser.country;
-                document.getElementById('profilePoints').textContent = currentUser.poin;
-                document.getElementById('profileRole').textContent = currentUser.role === 'admin' ? 'Admin' : 'User';
-                
-                if (currentUser.role === 'admin') {
-                    document.getElementById('settingsNav').style.display = 'block';
+        window.deleteTransaction = async function(transId) {
+            if (confirm('Yakin ingin menghapus transaksi ini?')) {
+                try {
+                    showLoading(true);
+                    await callServer('deleteTransaction', transId);
+                    showToast('Transaksi dihapus', 'success');
+                    loadAdminData();
+                    if (document.getElementById('historyPage').style.display !== 'none') loadHistory();
+                } catch (error) {
+                    showToast('Gagal hapus transaksi', 'danger');
+                } finally {
+                    showLoading(false);
                 }
-                
-                const settings = await callServer('getSettings');
-                if (settings.broadcast_message) {
-                    document.getElementById('broadcastText').textContent = settings.broadcast_message;
-                    document.getElementById('broadcastMessage').style.display = 'block';
-                }
-                
-                document.getElementById('navMenu').style.display = 'block';
-                document.getElementById('pointsBadge').style.display = 'block';
-                showPage('dashboard');
-            } else {
-                showToast(result.message, 'danger');
             }
-        } catch (error) {
-            console.error('Login error:', error);
-            showToast('Terjadi kesalahan, coba lagi', 'danger');
-        } finally {
-            showLoading(false);
-        }
-    });
-    
-    document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        showLoading(true);
+        };
         
-        const username = document.getElementById('regUsername').value.trim();
-        const password = document.getElementById('regPassword').value;
+        // ==================== EVENT LISTENERS ====================
+        document.getElementById('refreshQuizBtn')?.addEventListener('click', () => loadNewQuiz());
         
-        if (!username || !password) {
-            showToast('Username dan password harus diisi!', 'danger');
-            showLoading(false);
-            return;
-        }
-        
-        if (username.length < 3) {
-            showToast('Username minimal 3 karakter', 'danger');
-            showLoading(false);
-            return;
-        }
-        
-        if (password.length < 4) {
-            showToast('Password minimal 4 karakter', 'danger');
-            showLoading(false);
-            return;
-        }
-        
-        try {
-            const deviceId = getDeviceId();
-            const country = await getCountry();
-            
-            const result = await callServer('register', username, password, deviceId, country);
-            
-            if (result.success) {
-                showToast(result.message, 'success');
-                // Reset form
-                document.getElementById('regUsername').value = '';
-                document.getElementById('regPassword').value = '';
-                // Show login page
-                document.getElementById('registerPage').style.display = 'none';
-                document.getElementById('loginPage').style.display = 'block';
-            } else {
-                showToast(result.message, 'danger');
-            }
-        } catch (error) {
-            console.error('Register error:', error);
-            showToast('Terjadi kesalahan: ' + error.message, 'danger');
-        } finally {
-            showLoading(false);
-        }
-    });
-    
-    document.getElementById('redeemForm')?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        showLoading(true);
-        
-        const nama_dana = document.getElementById('danaName').value.trim();
-        const no_hp = document.getElementById('danaPhone').value.trim();
-        const points = parseInt(document.getElementById('redeemPoints').value);
-        
-        if (!nama_dana || !no_hp) {
-            showToast('Data DANA harus diisi!', 'danger');
-            showLoading(false);
-            return;
-        }
-        
-        if (isNaN(points) || points < 50 || points % 50 !== 0) {
-            showToast('Minimal 50 poin dan kelipatan 50!', 'danger');
-            showLoading(false);
-            return;
-        }
-        
-        try {
-            const result = await callServer('redeemPoints', currentUser.id, nama_dana, no_hp, points);
-            
-            if (result.success) {
-                currentUser.poin = result.newPoints;
-                updatePointsDisplay();
-                showToast(result.message, 'success');
-                
-                // Close modal
-                const modal = bootstrap.Modal.getInstance(document.getElementById('redeemModal'));
-                if (modal) modal.hide();
-                
-                // Reset form
-                document.getElementById('danaName').value = '';
-                document.getElementById('danaPhone').value = '';
-                document.getElementById('redeemPoints').value = '';
-                
-                loadHistory();
-                
-                // Show ad after redeem
-                const script = document.createElement('script');
-                script.src = '//libtl.com/sdk.js';
-                script.setAttribute('data-zone', '9865183');
-                script.setAttribute('data-sdk', 'show_9865183');
-                document.body.appendChild(script);
-            } else {
-                showToast(result.message, 'danger');
-            }
-        } catch (error) {
-            console.error('Redeem error:', error);
-            showToast('Terjadi kesalahan', 'danger');
-        } finally {
-            showLoading(false);
-        }
-    });
-    
-    document.getElementById('logoutBtn')?.addEventListener('click', () => {
-        localStorage.removeItem('userId');
-        currentUser = null;
-        document.getElementById('navMenu').style.display = 'none';
-        document.getElementById('pointsBadge').style.display = 'none';
-        document.getElementById('loginPage').style.display = 'block';
-        document.getElementById('registerPage').style.display = 'none';
-        document.getElementById('loginUsername').value = '';
-        document.getElementById('loginPassword').value = '';
-    });
-    
-    document.getElementById('showRegister')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        document.getElementById('loginPage').style.display = 'none';
-        document.getElementById('registerPage').style.display = 'block';
-    });
-    
-    document.getElementById('showLogin')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        document.getElementById('registerPage').style.display = 'none';
-        document.getElementById('loginPage').style.display = 'block';
-    });
-    
-    document.querySelectorAll('.nav-item').forEach(item => {
-        item.addEventListener('click', () => {
-            const page = item.dataset.page;
-            if (page) showPage(page);
-        });
-    });
-    
-    document.getElementById('maintenanceMode')?.addEventListener('change', async (e) => {
-        const mode = e.target.checked ? 'true' : 'false';
-        try {
+        document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
             showLoading(true);
-            await callServer('setMaintenanceMode', mode);
-            showToast('Mode maintenance diupdate', 'success');
-        } catch (error) {
-            showToast('Gagal update mode', 'danger');
-        } finally {
-            showLoading(false);
-        }
-    });
-    
-    document.getElementById('sendBroadcastBtn')?.addEventListener('click', async () => {
-        const message = document.getElementById('broadcastInput').value.trim();
-        if (message) {
-            try {
-                showLoading(true);
-                await callServer('setBroadcastMessage', message);
-                showToast('Broadcast terkirim', 'success');
-                document.getElementById('broadcastInput').value = '';
-            } catch (error) {
-                showToast('Gagal kirim broadcast', 'danger');
-            } finally {
+            
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!username || !password) {
+                showToast('Username dan password harus diisi!', 'danger');
                 showLoading(false);
+                return;
             }
-        } else {
-            showToast('Pesan tidak boleh kosong', 'warning');
-        }
-    });
-    
-    // Check auto login
-    const savedUserId = localStorage.getItem('userId');
-    if (savedUserId) {
-        callServer('getUser', savedUserId).then(user => {
-            if (user && user.status === 'active') {
-                currentUser = user;
-                updatePointsDisplay();
-                document.getElementById('userName').textContent = currentUser.username;
-                document.getElementById('profileUsername').textContent = currentUser.username;
-                document.getElementById('profileDeviceId').textContent = currentUser.device_id;
-                document.getElementById('profileCountry').textContent = currentUser.country;
-                document.getElementById('profilePoints').textContent = currentUser.poin;
-                document.getElementById('profileRole').textContent = currentUser.role === 'admin' ? 'Admin' : 'User';
+            
+            try {
+                const result = await callServer('login', username, password);
                 
-                if (currentUser.role === 'admin') {
-                    document.getElementById('settingsNav').style.display = 'block';
-                }
-                
-                callServer('getSettings').then(settings => {
+                if (result.success) {
+                    currentUser = result.user;
+                    localStorage.setItem('userId', currentUser.id);
+                    updatePointsDisplay();
+                    
+                    document.getElementById('userName').textContent = currentUser.username;
+                    document.getElementById('profileUsername').textContent = currentUser.username;
+                    document.getElementById('profileDeviceId').textContent = currentUser.device_id || '-';
+                    document.getElementById('profileCountry').textContent = currentUser.country || 'Indonesia';
+                    document.getElementById('profilePoints').textContent = currentUser.poin;
+                    document.getElementById('profileRole').textContent = currentUser.role === 'admin' ? 'Admin' : 'User';
+                    
+                    if (currentUser.role === 'admin') {
+                        document.getElementById('settingsNav').style.display = 'block';
+                    }
+                    
+                    const settings = await callServer('getSettings');
                     if (settings.broadcast_message) {
                         document.getElementById('broadcastText').textContent = settings.broadcast_message;
                         document.getElementById('broadcastMessage').style.display = 'block';
                     }
-                });
-                
-                document.getElementById('navMenu').style.display = 'block';
-                document.getElementById('pointsBadge').style.display = 'block';
-                showPage('dashboard');
-            } else {
-                localStorage.removeItem('userId');
+                    
+                    document.getElementById('navMenu').style.display = 'block';
+                    document.getElementById('pointsBadge').style.display = 'block';
+                    showPage('dashboard');
+                } else {
+                    showToast(result.message, 'danger');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showToast('Terjadi kesalahan, coba lagi', 'danger');
+            } finally {
+                showLoading(false);
             }
-        }).catch(error => {
-            console.error('Auto login error:', error);
-            localStorage.removeItem('userId');
         });
-    }
-</script>
+        
+        document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading(true);
+            
+            const username = document.getElementById('regUsername').value.trim();
+            const password = document.getElementById('regPassword').value;
+            
+            if (!username || !password) {
+                showToast('Username dan password harus diisi!', 'danger');
+                showLoading(false);
+                return;
+            }
+            
+            if (username.length < 3) {
+                showToast('Username minimal 3 karakter', 'danger');
+                showLoading(false);
+                return;
+            }
+            
+            if (password.length < 4) {
+                showToast('Password minimal 4 karakter', 'danger');
+                showLoading(false);
+                return;
+            }
+            
+            try {
+                const deviceId = getDeviceId();
+                const country = await getCountry();
+                
+                const result = await callServer('register', username, password, deviceId, country);
+                
+                if (result.success) {
+                    showToast(result.message, 'success');
+                    document.getElementById('regUsername').value = '';
+                    document.getElementById('regPassword').value = '';
+                    document.getElementById('registerPage').style.display = 'none';
+                    document.getElementById('loginPage').style.display = 'block';
+                } else {
+                    showToast(result.message, 'danger');
+                }
+            } catch (error) {
+                console.error('Register error:', error);
+                showToast('Terjadi kesalahan: ' + (error.message || 'Coba lagi'), 'danger');
+            } finally {
+                showLoading(false);
+            }
+        });
+        
+        document.getElementById('redeemForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading(true);
+            
+            const nama_dana = document.getElementById('danaName').value.trim();
+            const no_hp = document.getElementById('danaPhone').value.trim();
+            const points = parseInt(document.getElementById('redeemPoints').value);
+            
+            if (!nama_dana || !no_hp) {
+                showToast('Data DANA harus diisi!', 'danger');
+                showLoading(false);
+                return;
+            }
+            
+            if (isNaN(points) || points < 50 || points % 50 !== 0) {
+                showToast('Minimal 50 poin dan kelipatan 50!', 'danger');
+                showLoading(false);
+                return;
+            }
+            
+            if (points > currentUser.poin) {
+                showToast('Poin tidak mencukupi!', 'danger');
+                showLoading(false);
+                return;
+            }
+            
+            try {
+                const result = await callServer('redeemPoints', currentUser.id, nama_dana, no_hp, points);
+                
+                if (result.success) {
+                    currentUser.poin = result.newPoints;
+                    updatePointsDisplay();
+                    showToast(result.message, 'success');
+                    
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('redeemModal'));
+                    if (modal) modal.hide();
+                    
+                    document.getElementById('danaName').value = '';
+                    document.getElementById('danaPhone').value = '';
+                    document.getElementById('redeemPoints').value = '';
+                    
+                    loadHistory();
+                    
+                    // Show ad after redeem
+                    const script = document.createElement('script');
+                    script.src = '//libtl.com/sdk.js';
+                    script.setAttribute('data-zone', '9865183');
+                    script.setAttribute('data-sdk', 'show_9865183');
+                    document.body.appendChild(script);
+                } else {
+                    showToast(result.message, 'danger');
+                }
+            } catch (error) {
+                console.error('Redeem error:', error);
+                showToast('Terjadi kesalahan', 'danger');
+            } finally {
+                showLoading(false);
+            }
+        });
+        
+        document.getElementById('logoutBtn')?.addEventListener('click', () => {
+            localStorage.removeItem('userId');
+            currentUser = null;
+            document.getElementById('navMenu').style.display = 'none';
+            document.getElementById('pointsBadge').style.display = 'none';
+            document.getElementById('loginPage').style.display = 'block';
+            document.getElementById('registerPage').style.display = 'none';
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
+        });
+        
+        document.getElementById('showRegister')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('registerPage').style.display = 'block';
+        });
+        
+        document.getElementById('showLogin')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('registerPage').style.display = 'none';
+            document.getElementById('loginPage').style.display = 'block';
+        });
+        
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const page = item.dataset.page;
+                if (page) showPage(page);
+            });
+        });
+        
+        document.getElementById('maintenanceMode')?.addEventListener('change', async (e) => {
+            const mode = e.target.checked ? 'true' : 'false';
+            try {
+                showLoading(true);
+                await callServer('setMaintenanceMode', mode);
+                showToast('Mode maintenance diupdate', 'success');
+            } catch (error) {
+                showToast('Gagal update mode', 'danger');
+                e.target.checked = !e.target.checked;
+            } finally {
+                showLoading(false);
+            }
+        });
+        
+        document.getElementById('sendBroadcastBtn')?.addEventListener('click', async () => {
+            const message = document.getElementById('broadcastInput').value.trim();
+            if (message) {
+                try {
+                    showLoading(true);
+                    await callServer('setBroadcastMessage', message);
+                    showToast('Broadcast terkirim', 'success');
+                    document.getElementById('broadcastInput').value = '';
+                } catch (error) {
+                    showToast('Gagal kirim broadcast', 'danger');
+                } finally {
+                    showLoading(false);
+                }
+            } else {
+                showToast('Pesan tidak boleh kosong', 'warning');
+            }
+        });
+        
+        // ==================== AUTO LOGIN ====================
+        const savedUserId = localStorage.getItem('userId');
+        if (savedUserId) {
+            callServer('getUser', savedUserId).then(user => {
+                if (user && user.status === 'active') {
+                    currentUser = user;
+                    updatePointsDisplay();
+                    document.getElementById('userName').textContent = currentUser.username;
+                    document.getElementById('profileUsername').textContent = currentUser.username;
+                    document.getElementById('profileDeviceId').textContent = currentUser.device_id || '-';
+                    document.getElementById('profileCountry').textContent = currentUser.country || 'Indonesia';
+                    document.getElementById('profilePoints').textContent = currentUser.poin;
+                    document.getElementById('profileRole').textContent = currentUser.role === 'admin' ? 'Admin' : 'User';
+                    
+                    if (currentUser.role === 'admin') {
+                        document.getElementById('settingsNav').style.display = 'block';
+                    }
+                    
+                    callServer('getSettings').then(settings => {
+                        if (settings.broadcast_message) {
+                            document.getElementById('broadcastText').textContent = settings.broadcast_message;
+                            document.getElementById('broadcastMessage').style.display = 'block';
+                        }
+                    });
+                    
+                    document.getElementById('navMenu').style.display = 'block';
+                    document.getElementById('pointsBadge').style.display = 'block';
+                    showPage('dashboard');
+                } else {
+                    localStorage.removeItem('userId');
+                }
+            }).catch(error => {
+                console.error('Auto login error:', error);
+                localStorage.removeItem('userId');
+            });
+        }
+    </script>
 </body>
 </html>
