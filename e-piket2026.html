@@ -60,7 +60,7 @@
 <body class="min-h-screen flex flex-col overflow-x-hidden text-xs sm:text-sm">
 
   <!-- ASSET LOGO TERSEMBUNYI UNTUK GENERATOR PDF (Mendukung CORS) -->
-  <img id="pdfLogoJateng" src="jateng.jpg" crossOrigin="anonymous" class="hidden" alt="Logo Jateng" onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Central_Java_COA.svg/200px-Central_Java_COA.svg.png';">
+  <img id="pdfLogoJateng" src="jateng.jpg" crossOrigin="anonymous" class="hidden" alt="Logo Jateng" onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/b/b2/Central_Java_COA.svg/200px-Central_Java_COA.svg.png';">
   <img id="logoSmk" src="smk.png" crossOrigin="anonymous" class="hidden" alt="Logo SMK" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/Feri-Susanto/SMK-BISA/main/logo-smk.png';">
 
   <!-- LOADING OVERLAY -->
@@ -213,7 +213,7 @@
       <!-- ==================== TAB 1: DASHBOARD ==================== -->
       <div id="tab-dashboard" class="tab-content space-y-4">
         <!-- TOP CONFIG ROW: WEEK CONFIGURATION, KEPATUHAN BELAJAR, & PETUGAS PIKET (Diperbarui untuk Mobile Grid Berdampingan) -->
-        <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <!-- Sisi Kiri: Konfigurasi Minggu (1/2 lebar di mobile, 1/3 di desktop) -->
           <div class="glass p-4 rounded-xl border border-slate-200 flex flex-col justify-between relative overflow-hidden shadow-sm">
             <div class="absolute -right-8 -top-8 w-20 h-20 bg-blue-500/5 rounded-full filter blur-xl"></div>
@@ -577,7 +577,7 @@
               </div>
               <div>
                 <h3 class="font-bold text-sm text-slate-800">Catatan & Kejadian Harian</h3>
-                <p class="text-[10px] text-slate-500">Dokumentasikan kejadian sekolah atau kunjungan tamu eksternal</p>
+                <p class="text-[10px] text-slate-505">Dokumentasikan kejadian sekolah atau kunjungan tamu eksternal</p>
               </div>
             </div>
             <button onclick="openModalCatatan()" class="bg-emerald-600 hover:bg-emerald-555 px-3.5 py-1.5 rounded-lg font-semibold text-xs flex items-center justify-center transition active:scale-95 text-white shadow-sm">
@@ -693,7 +693,7 @@
               </div>
               <div>
                 <h3 class="font-bold text-sm text-slate-800">Monitoring Pembelajaran & Kelas Kosong</h3>
-                <p class="text-[10px] text-slate-500">Pencatatan kelas kosong, alasan, dan petugas monitoring pembelajaran harian</p>
+                <p class="text-[10px] text-slate-505">Pencatatan kelas kosong, alasan, dan petugas monitoring pembelajaran harian</p>
               </div>
             </div>
             <button onclick="openModalMonitoring()" class="bg-emerald-600 hover:bg-emerald-555 px-3.5 py-1.5 rounded-lg font-semibold text-xs flex items-center justify-center transition active:scale-95 text-white shadow-sm">
@@ -885,7 +885,7 @@
             </div>
           </div>
         </div>
-        <button type="submit" class="w-full py-2 bg-indigo-600 hover:bg-indigo-550 rounded-lg font-bold text-white text-xs mt-2 shadow-md transition">Kirim & Simpan Data Izin</button>
+        <button type="submit" class="w-full py-2 bg-indigo-600 hover:bg-indigo-555 rounded-lg font-bold text-white text-xs mt-2 shadow-md transition">Kirim & Simpan Data Izin</button>
       </form>
     </div>
   </div>
@@ -956,7 +956,7 @@
           </div>
         </div>
 
-        <button type="submit" class="w-full py-2 bg-rose-600 hover:bg-rose-550 rounded-lg font-bold text-white tracking-wide text-xs mt-2 shadow-md transition">Kirim & Simpan Slip Izin</button>
+        <button type="submit" class="w-full py-2 bg-rose-600 hover:bg-rose-555 rounded-lg font-bold text-white tracking-wide text-xs mt-2 shadow-md transition">Kirim & Simpan Slip Izin</button>
       </form>
     </div>
   </div>
@@ -1224,6 +1224,9 @@
             document.getElementById("loginPage").classList.add("hidden");
             document.getElementById("mainApp").classList.remove("hidden");
             
+            // Set active state on tab bar
+            switchTab('dashboard');
+
             // Fetch All Data
             fetchAllData();
           } else {
@@ -1272,6 +1275,9 @@
           document.getElementById("loginPage").classList.add("hidden");
           document.getElementById("mainApp").classList.remove("hidden");
           
+          // Set active state on tab bar
+          switchTab('dashboard');
+
           // Ambil seluruh data dari Google Sheet
           fetchAllData();
         }
@@ -1293,7 +1299,7 @@
           dataState.catatan = data.catatan || [];
           dataState.guruList = data.guruList || []; // Mengambil data seluruh guru untuk monitoring pembelajaran
           dataState.monitoring = data.monitoring || []; // Mengambil log data monitoring pembelajaran kelas kosong harian
-          dataState.downloadedReports = data.downloadedReports || []; // Ambil riwayat laporan murni dari database
+          dataState.downloadedReports = data.downloadedReports || []; // Ambil riwayat laporan permanen dari database
           dataState.weekConfig = data.weekConfig || { week: 'Ganjil' };
 
           // Render all elements
@@ -1391,7 +1397,6 @@
           renderCatatanTable();
           renderMonitoringTable();
           populateClassFilter();
-          renderDownloadedReportsTable();
 
           // Otomatis populasi data Waka & Kepsek pada form laporan secara senyap (dengan fallback tangguh)
           const config = dataState.weekConfig;
@@ -1783,7 +1788,7 @@
 
       // Update lokal
       if (id) {
-        const idx = dataState.guruIzin.findIndex(x => x.id === id);
+        const idx = dataState.guruIzin.findIndex(x => String(x.id).trim() === String(id).trim());
         if (idx !== -1) dataState.guruIzin[idx] = payload;
       } else {
         dataState.guruIzin.push(payload);
@@ -1896,10 +1901,10 @@
             </td>
             <td class="p-3 text-center">
               <div class="flex items-center justify-center gap-1.5">
-                <button onclick="updateSiswaStatus('${item.id}', 'Kembali')" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-[10px] font-bold shadow-sm transition active:scale-90 flex items-center gap-1">
+                <button onclick="updateSiswaStatus('${item.id}', 'Kembali')" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-555 text-white rounded text-[10px] font-bold shadow-sm transition active:scale-90 flex items-center gap-1">
                   <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Kembali
                 </button>
-                <button onclick="updateSiswaStatus('${item.id}', 'Bolos')" class="px-3 py-1 bg-rose-600 hover:bg-rose-500 text-white rounded text-[10px] font-bold shadow-sm transition active:scale-90 flex items-center gap-1">
+                <button onclick="updateSiswaStatus('${item.id}', 'Bolos')" class="px-3 py-1 bg-rose-600 hover:bg-rose-555 text-white rounded text-[10px] font-bold shadow-sm transition active:scale-90 flex items-center gap-1">
                   <i data-lucide="alert-octagon" class="w-3.5 h-3.5"></i> Bolos
                 </button>
               </div>
@@ -2307,7 +2312,7 @@
     function renderCatatanTable() {
       const tbody = document.getElementById("catatanTableBody");
       if (dataState.catatan.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-450 font-medium text-xs">Belum ada catatan piket harian.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-455 font-medium text-xs">Belum ada catatan piket harian.</td></tr>`;
         return;
       }
 
@@ -2634,14 +2639,14 @@
       const imgJateng = document.getElementById("pdfLogoJateng");
       const imgSmk = document.getElementById("logoSmk");
 
-      if (imgJateng && imgJateng.complete) {
+      if (imgJateng && imgJateng.complete && imgJateng.naturalWidth !== 0) {
         try {
           doc.addImage(imgJateng, 'JPEG', 15, 10, 15, 18);
         } catch (e) {
           console.warn("Jateng logo could not be loaded into PDF", e);
         }
       }
-      if (imgSmk && imgSmk.complete) {
+      if (imgSmk && imgSmk.complete && imgSmk.naturalWidth !== 0) {
         try {
           doc.addImage(imgSmk, 'PNG', 178, 10, 16, 18);
         } catch (e) {
