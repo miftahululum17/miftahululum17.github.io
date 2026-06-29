@@ -120,7 +120,7 @@
 
   <!-- ==================== MAIN CONTAINER (DASHBOARD & MENUS) ==================== -->
   <div id="mainApp" class="flex-grow flex flex-col md:flex-row hidden">
-    <!-- SIDEBAR NAVIGATION (DIPERHALUS & DIPERSEMPURNAKAN) -->
+    <!-- SIDEBAR NAVIGATION -->
     <aside id="sidebar" class="w-full md:w-56 bg-white/95 backdrop-blur-md border-b md:border-r border-slate-200/60 flex flex-col shrink-0 shadow-sm">
       <div class="p-4 border-b border-slate-100 flex items-center justify-between">
         <div class="flex items-center space-x-2.5">
@@ -141,7 +141,7 @@
         </button>
       </div>
 
-      <!-- User Profile Card (Didesain Ulang Menjadi Kartu Indah) -->
+      <!-- User Profile Card -->
       <div class="p-4 border-b border-slate-100">
         <div class="p-3 bg-slate-50/80 border border-slate-100 rounded-2xl flex items-center space-x-3 shadow-inner">
           <div class="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600 font-bold border border-blue-200 text-xs shadow-sm" id="userInitial">
@@ -149,12 +149,12 @@
           </div>
           <div class="overflow-hidden">
             <h3 class="text-[11px] font-bold text-slate-800 truncate" id="userName">Guru Piket</h3>
-            <p class="text-[9px] text-slate-500 font-semibold truncate" id="userNip">NIP: -</p>
+            <p class="text-[9px] text-slate-500 truncate" id="userNip">NIP: -</p>
           </div>
         </div>
       </div>
 
-      <!-- Navigation Links (Desain Lebih Lembut & Animasi Presisi) -->
+      <!-- Navigation Links -->
       <nav id="navLinks" class="flex-grow p-4 space-y-1.5 hidden md:block">
         <button onclick="switchTab('dashboard')" data-tab="dashboard" class="nav-btn w-full flex items-center px-4 py-2.5 text-xs font-semibold rounded-xl transition-all duration-300 text-blue-600 bg-blue-50/70 border border-blue-100/50 shadow-sm shadow-blue-500/5 translate-x-1">
           <i data-lucide="layout-dashboard" class="w-4 h-4 mr-2.5"></i> Dashboard
@@ -182,7 +182,7 @@
         </button>
 
         <div class="pt-4 border-t border-slate-100">
-          <button onclick="logout()" class="w-full flex items-center px-4 py-2.5 text-xs font-semibold rounded-xl text-rose-600 hover:bg-rose-50/70 transition-all duration-300 active:scale-95">
+          <button onclick="logout()" class="w-full flex items-center px-4 py-2.5 text-xs font-semibold rounded-xl text-rose-600 hover:bg-rose-555/70 transition-all duration-300 active:scale-95">
             <i data-lucide="log-out" class="w-4 h-4 mr-2.5"></i> Keluar
           </button>
         </div>
@@ -212,10 +212,10 @@
 
       <!-- ==================== TAB 1: DASHBOARD ==================== -->
       <div id="tab-dashboard" class="tab-content space-y-4">
-        <!-- TOP CONFIG ROW: WEEK CONFIGURATION, KEPATUHAN BELAJAR, & PETUGAS PIKET (Diperbarui untuk Mobile Grid Berdampingan dengan Tinggi Seragam) -->
+        <!-- TOP CONFIG ROW: WEEK CONFIGURATION, KEPATUHAN BELAJAR, & PETUGAS PIKET (Mobile Grid Berdampingan dengan Tinggi Seragam) -->
         <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 items-stretch">
           <!-- Sisi Kiri: Konfigurasi Minggu (Sama tinggi, menggunakan flex flex-col) -->
-          <div class="glass p-4 rounded-xl border border-slate-200 flex flex-col justify-between relative overflow-hidden shadow-sm h-full">
+          <div class="glass p-4 rounded-xl border border-slate-200 flex flex-col justify-between relative overflow-hidden shadow-sm h-full min-w-0 flex-1">
             <div class="absolute -right-8 -top-8 w-20 h-20 bg-blue-500/5 rounded-full filter blur-xl"></div>
             <div class="flex-grow">
               <div class="flex justify-between items-start">
@@ -224,18 +224,19 @@
               </div>
               <p class="text-[10px] text-slate-500 mt-2.5">Pilih status ganjil/genap agar ter-update di seluruh perangkat.</p>
             </div>
-            <div class="mt-4 flex gap-2">
-              <button onclick="setWeekConfig('Ganjil')" id="btnWeekGanjil" class="flex-1 py-1.5 rounded-lg border border-slate-200 hover:border-slate-400 text-slate-600 transition text-xs font-semibold bg-white active:scale-95">
+            <!-- Grid tombol yang responsif dan tidak melebihi ukuran boks -->
+            <div class="mt-4 grid grid-cols-2 gap-2">
+              <button onclick="setWeekConfig('Ganjil')" id="btnWeekGanjil" class="py-1.5 rounded-lg border border-slate-200 hover:border-slate-400 text-slate-600 transition text-xs font-semibold bg-white active:scale-95">
                 Ganjil
               </button>
-              <button onclick="setWeekConfig('Genap')" id="btnWeekGenap" class="flex-1 py-1.5 rounded-lg border border-slate-200 hover:border-slate-400 text-slate-600 transition text-xs font-semibold bg-white active:scale-95">
+              <button onclick="setWeekConfig('Genap')" id="btnWeekGenap" class="py-1.5 rounded-lg border border-slate-200 hover:border-slate-400 text-slate-600 transition text-xs font-semibold bg-white active:scale-95">
                 Genap
               </button>
             </div>
           </div>
 
           <!-- Kepatuhan Belajar Card (Ditempatkan berdampingan langsung di mobile, sama tinggi dengan flex) -->
-          <div class="glass p-4 rounded-xl border border-slate-200 flex flex-col justify-between transition-all duration-300 shadow-sm h-full" id="kepatuhanCard">
+          <div class="glass p-4 rounded-xl border border-slate-200 flex flex-col justify-between transition-all duration-300 shadow-sm h-full min-w-0 flex-1" id="kepatuhanCard">
             <div class="flex-grow">
               <h3 class="text-xs font-semibold text-slate-500">Kepatuhan Belajar</h3>
               <p class="text-xl font-bold text-emerald-600 mt-1 transition-colors duration-300" id="kepatuhanStatus">Kondusif</p>
@@ -301,7 +302,7 @@
             <span class="text-[11px] text-slate-500 font-semibold">Terlambat</span>
             <div class="flex items-baseline justify-between mt-0.5">
               <span class="text-xl font-bold text-yellow-600" id="statTerlambat">0</span>
-              <span class="p-1 bg-yellow-50 text-yellow-600 rounded"><i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i></span>
+              <span class="p-1 bg-yellow-55 text-yellow-600 rounded"><i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i></span>
             </div>
           </div>
           <!-- Pulang Awal -->
@@ -309,7 +310,7 @@
             <span class="text-[11px] text-slate-500 font-semibold">Pulang Awal</span>
             <div class="flex items-baseline justify-between mt-0.5">
               <span class="text-xl font-bold text-purple-600" id="statPulangAwal">0</span>
-              <span class="p-1 bg-purple-50 text-purple-600 rounded"><i data-lucide="home" class="w-3.5 h-3.5"></i></span>
+              <span class="p-1 bg-purple-55 text-purple-600 rounded"><i data-lucide="home" class="w-3.5 h-3.5"></i></span>
             </div>
           </div>
           <!-- Kelas Kosong -->
@@ -364,11 +365,11 @@
               </div>
               <div>
                 <h3 class="font-bold text-sm text-slate-800">Database Siswa</h3>
-                <p class="text-[10px] text-slate-500" id="totalSiswaText">Total: 0 Siswa Terdaftar</p>
+                <p class="text-[10px] text-slate-505" id="totalSiswaText">Total: 0 Siswa Terdaftar</p>
               </div>
             </div>
             <div>
-              <button onclick="openModalSiswa()" class="bg-blue-600 hover:bg-blue-550 px-3.5 py-1.5 rounded-lg font-semibold text-xs flex items-center justify-center transition active:scale-95 text-white shadow-sm">
+              <button onclick="openModalSiswa()" class="bg-blue-600 hover:bg-blue-555 px-3.5 py-1.5 rounded-lg font-semibold text-xs flex items-center justify-center transition active:scale-95 text-white shadow-sm">
                 <i data-lucide="user-plus" class="w-3.5 h-3.5 mr-1.5"></i> Tambah Siswa
               </button>
             </div>
@@ -619,64 +620,26 @@
             </div>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="jadwalPiketGridContainer">
             <!-- MINGGU GANJIL -->
-            <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
               <div class="flex items-center space-x-1.5 mb-3 border-b border-slate-100 pb-2 text-blue-600">
                 <i data-lucide="calendar-days" class="w-4 h-4"></i>
                 <h4 class="font-bold text-xs uppercase tracking-wider">Minggu Ganjil</h4>
               </div>
-              <div class="space-y-2">
-                <div class="flex justify-between items-center p-2 rounded bg-slate-50">
-                  <span class="font-semibold text-slate-700">Senin</span>
-                  <span class="text-slate-850 text-right text-[11px] font-medium">Ahmad Fauzi, S.Pd. & Indah Permata, M.Pd.</span>
-                </div>
-                <div class="flex justify-between items-center p-2 rounded bg-slate-50">
-                  <span class="font-semibold text-slate-700">Selasa</span>
-                  <span class="text-slate-850 text-right text-[11px] font-medium">Budi Santoso, S.Si. & Siti Aminah, S.Pd.</span>
-                </div>
-                <div class="flex justify-between items-center p-2 rounded bg-slate-50">
-                  <span class="font-semibold text-slate-700">Rabu</span>
-                  <span class="text-slate-850 text-right text-[11px] font-medium">Roni Wijaya, S.Pd. & Dewi Lestari, M.Si.</span>
-                </div>
-                <div class="flex justify-between items-center p-2 rounded bg-slate-50">
-                  <span class="font-semibold text-slate-700">Kamis</span>
-                  <span class="text-slate-850 text-right text-[11px] font-medium">Eko Prasetyo, M.Pd. & Rina Astuti, S.Pd.</span>
-                </div>
-                <div class="flex justify-between items-center p-2 rounded bg-slate-50">
-                  <span class="font-semibold text-slate-700">Jumat</span>
-                  <span class="text-slate-850 text-right text-[11px] font-medium">Hadi Siswanto, S.Pd. & Sri Wahyuni, S.Ag.</span>
-                </div>
+              <div class="space-y-2" id="jadwalGanjilContainer">
+                <!-- Dynamic Content -->
               </div>
             </div>
 
             <!-- MINGGU GENAP -->
-            <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
               <div class="flex items-center space-x-1.5 mb-3 border-b border-slate-100 pb-2 text-purple-600">
                 <i data-lucide="calendar-range" class="w-4 h-4"></i>
                 <h4 class="font-bold text-xs uppercase tracking-wider">Minggu Genap</h4>
               </div>
-              <div class="space-y-2">
-                <div class="flex justify-between items-center p-2 rounded bg-slate-50">
-                  <span class="font-semibold text-slate-700">Senin</span>
-                  <span class="text-slate-850 text-right text-[11px] font-medium">Yusuf Habibi, M.Pd. & Mega Utami, S.Pd.</span>
-                </div>
-                <div class="flex justify-between items-center p-2 rounded bg-slate-50">
-                  <span class="font-semibold text-slate-700">Selasa</span>
-                  <span class="text-slate-850 text-right text-[11px] font-medium">Hendrik Pratama, S.Si. & Linda Sari, S.Pd.</span>
-                </div>
-                <div class="flex justify-between items-center p-2 rounded bg-slate-50">
-                  <span class="font-semibold text-slate-700">Rabu</span>
-                  <span class="text-slate-850 text-right text-[11px] font-medium">Zulkifli, S.Pd. & Nurhayati, M.Si.</span>
-                </div>
-                <div class="flex justify-between items-center p-2 rounded bg-slate-50">
-                  <span class="font-semibold text-slate-700">Kamis</span>
-                  <span class="text-slate-850 text-right text-[11px] font-medium">Deny Hidayat, M.Pd. & Kartika, S.Pd.</span>
-                </div>
-                <div class="flex justify-between items-center p-2 rounded bg-slate-50">
-                  <span class="font-semibold text-slate-700">Jumat</span>
-                  <span class="text-slate-850 text-right text-[11px] font-medium">Aris Nugroho, S.Pd. & Fatimah, S.Ag.</span>
-                </div>
+              <div class="space-y-2" id="jadwalGenapContainer">
+                <!-- Dynamic Content -->
               </div>
             </div>
           </div>
@@ -740,11 +703,11 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
                 <label class="block text-xs font-medium text-slate-700 mb-1">Tanggal Mulai Laporan</label>
-                <input type="date" id="lapTanggalMulai" required class="w-full p-2 rounded-lg glass-input text-xs text-slate-700">
+                <input type="date" id="lapTanggalMulai" required class="w-full p-2 rounded-lg glass-input text-xs text-slate-700 font-semibold">
               </div>
               <div>
                 <label class="block text-xs font-medium text-slate-700 mb-1">Tanggal Selesai Laporan</label>
-                <input type="date" id="lapTanggalSelesai" required class="w-full p-2 rounded-lg glass-input text-xs text-slate-700">
+                <input type="date" id="lapTanggalSelesai" required class="w-full p-2 rounded-lg glass-input text-xs text-slate-700 font-semibold">
               </div>
             </div>
 
@@ -784,7 +747,7 @@
           <div class="overflow-x-auto rounded-lg border border-slate-200 shadow-sm">
             <table class="w-full text-left border-collapse">
               <thead>
-                <!-- BARU: Warna header tabel dipertegas dan kontras tinggi -->
+                <!-- Warna header tabel dipertegas dan kontras tinggi -->
                 <tr class="bg-teal-100 border-b-2 border-teal-300 text-teal-900 text-[11px] uppercase font-bold tracking-wider">
                   <th class="p-2.5">Waktu Cetak</th>
                   <th class="p-2.5">Nama Berkas Laporan</th>
@@ -1066,6 +1029,7 @@
       guruList: [], // Menyimpan data guru murni dari spreadsheet
       monitoring: [], // Menyimpan log monitoring kelas kosong harian
       downloadedReports: [], // Array untuk menyimpan riwayat unduhan PDF sesi ini
+      jadwalPiket: [], // Menyimpan jadwal piket utuh dari database
       weekConfig: { week: 'Ganjil', lastUpdated: '' }
     };
 
@@ -1192,54 +1156,6 @@
       }
     }
 
-    // LOGIN ACTION
-    document.getElementById("loginForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      const inputGasUrl = document.getElementById("gasUrlInput").value.trim() || "https://script.google.com/macros/s/AKfycbxp6WBo6EnPMQnZQpugdQS7bbw7P1EUbZnI6cTD6GlrVNz6pMDgAwroQMbwa6fbE06cGQ/exec";
-      const nip = document.getElementById("nipInput").value.trim();
-
-      localStorage.setItem("gas_piket_url", inputGasUrl);
-      gasUrl = inputGasUrl;
-
-      toggleLoading(true, "Mengonfirmasi login NIP Anda...");
-
-      fetch(`${gasUrl}?action=login&nip=${encodeURIComponent(nip)}`, { method: 'GET', redirect: 'follow' })
-        .then(res => res.json())
-        .then(response => {
-          toggleLoading(false);
-          if (response.success) {
-            currentUser = response.guru;
-            document.getElementById("userName").textContent = currentUser.nama;
-            document.getElementById("userNip").textContent = `NIP: ${currentUser.nip}`;
-            document.getElementById("userInitial").textContent = currentUser.nama.substring(0, 2).toUpperCase();
-            document.getElementById("piketGuruNama").value = currentUser.nama;
-            
-            showToast("Selamat datang, " + currentUser.nama + "!", "success");
-            
-            // Simpan Sesi Login di localStorage
-            localStorage.setItem("piket_current_user", JSON.stringify(currentUser));
-            localStorage.setItem("piket_login_timestamp", new Date().getTime().toString());
-            
-            // Hide login, show main app
-            document.getElementById("loginPage").classList.add("hidden");
-            document.getElementById("mainApp").classList.remove("hidden");
-            
-            // Set active state on tab bar
-            switchTab('dashboard');
-
-            // Fetch All Data
-            fetchAllData();
-          } else {
-            showToast("NIP tidak terdaftar dalam database Guru!", "error");
-          }
-        })
-        .catch(err => {
-          toggleLoading(false);
-          console.error(err);
-          showToast("Gagal terhubung ke GAS. Pastikan URL Web App benar.", "error");
-        });
-    });
-
     // LOGOUT (Sesi Dihapus Bersih)
     function logout() {
       currentUser = null;
@@ -1278,372 +1194,87 @@
           // Set active state on tab bar
           switchTab('dashboard');
 
-          // Ambil seluruh data dari Google Sheet
-          fetchAllData();
+          // OFFLINE-FIRST: Muat data dari cache lokal jika ada biar instan
+          const cachedData = localStorage.getItem("piket_data_cache");
+          if (cachedData) {
+            dataState = JSON.parse(cachedData);
+            renderAllUI();
+          }
+          
+          // Lakukan sinkronisasi latar belakang secara diam-diam
+          syncData(false);
         }
       }
     }
 
-    // SINKRONISASI DATA UTAMA DARI GOOGLE SHEET (GAS) - BLOCKING OVERLAY
-    function fetchAllData() {
+    // OPTIMASI: Fungsi tunggal untuk mengurus proses sinkronisasi real-time & hemat request GAS
+    function syncData(showSpinner = false) {
       if (!gasUrl) return;
-      toggleLoading(true, "Memuat database secara real-time...");
+      if (showSpinner) {
+        toggleLoading(true, "Sinkronisasi data real-time...");
+      }
 
       fetch(`${gasUrl}?action=getAllData`, { method: 'GET', redirect: 'follow' })
         .then(res => res.json())
         .then(data => {
-          toggleLoading(false);
+          if (showSpinner) toggleLoading(false);
+          
+          // Sinkronkan ke State Global
           dataState.siswa = data.siswa || [];
           dataState.guruIzin = data.guruIzin || [];
           dataState.siswaIzin = data.siswaIzin || [];
           dataState.catatan = data.catatan || [];
-          dataState.guruList = data.guruList || []; // Mengambil data seluruh guru untuk monitoring pembelajaran
-          dataState.monitoring = data.monitoring || []; // Mengambil log data monitoring pembelajaran kelas kosong harian
-          dataState.downloadedReports = data.downloadedReports || []; // Ambil riwayat laporan murni dari database
+          dataState.guruList = data.guruList || [];
+          dataState.monitoring = data.monitoring || [];
+          dataState.downloadedReports = data.downloadedReports || [];
+          dataState.jadwalPiket = data.jadwalPiket || []; // Ambil jadwal piket dinamis dari GAS database
           dataState.weekConfig = data.weekConfig || { week: 'Ganjil' };
 
-          // Render all elements
-          renderDashboardStats();
-          renderWeekConfigUI();
-          renderSiswaTable();
-          renderGuruIzinTable();
-          renderSiswaIzinTable();
-          renderCatatanTable();
-          renderMonitoringTable();
-          populateClassFilter();
-          renderDownloadedReportsTable();
+          // Simpan seluruh dataState ke cache localStorage agar pemuatan berikutnya instant
+          localStorage.setItem("piket_data_cache", JSON.stringify(dataState));
 
-          // Otomatis populasi data Waka & Kepsek pada form laporan (ditambahkan fallback tangguh agar tidak kosong)
-          const config = dataState.weekConfig;
-          document.getElementById("lapWakaNama").value = config.waka_nama || "Drs. Heru, M.Pd.";
-          document.getElementById("lapWakaNip").value = config.waka_nip || "197410052003121002";
-          document.getElementById("lapKepsekNama").value = config.kepsek_nama || "Hj. Elly S.Pd., M.M.";
-          document.getElementById("lapKepsekNip").value = config.kepsek_nip || "196803241991032004";
-          
-          showToast("Semua data berhasil disinkronisasi!", "success");
+          // Render semua elemen UI
+          renderAllUI();
+
+          if (showSpinner) {
+            showToast("Sinkronisasi data berhasil!", "success");
+          }
         })
         .catch(err => {
-          toggleLoading(false);
-          console.error(err);
-          showToast("Gagal menyinkronkan data dari GAS.", "error");
+          if (showSpinner) {
+            toggleLoading(false);
+            showToast("Gagal menyinkronkan data.", "error");
+          }
+          console.error("Sinkronisasi gagal:", err);
         });
     }
 
-    // SINKRONISASI LATAR BELAKANG - TANPA BLOCKING OVERLAY (Silent Sync)
-    function silentFetchAllData() {
-      if (!gasUrl) return;
-      fetch(`${gasUrl}?action=getAllData`, { method: 'GET', redirect: 'follow' })
-        .then(res => res.json())
-        .then(data => {
-          // Menyimpan data terbaru murni dari server
-          const serverSiswa = data.siswa || [];
-          const serverGuruIzin = data.guruIzin || [];
-          const serverSiswaIzin = data.siswaIzin || [];
-          const serverCatatan = data.catatan || [];
-          const serverGuruList = data.guruList || [];
-          const serverMonitoring = data.monitoring || [];
-          const serverWeekConfig = data.weekConfig || { week: 'Ganjil' };
-
-          // Filter out temporary local items that have been successfully integrated
-          const tempSiswaIzin = dataState.siswaIzin.filter(item => String(item.id).startsWith("IS-temp-"));
-          const filteredTempSiswaIzin = tempSiswaIzin.filter(localItem => {
-            return !serverSiswaIzin.some(serverItem => 
-              String(serverItem.nis) === String(localItem.nis) &&
-              String(serverItem.jenis_ijin) === String(localItem.jenis_ijin) &&
-              formatTimeOnly(serverItem.jam_keluar) === formatTimeOnly(localItem.jam_keluar)
-            );
-          });
-
-          const tempGuruIzin = dataState.guruIzin.filter(item => String(item.id).startsWith("IG-temp-"));
-          const filteredTempGuruIzin = tempGuruIzin.filter(localItem => {
-            return !serverGuruIzin.some(serverItem => 
-              String(serverItem.nama_guru) === String(localItem.nama_guru) &&
-              String(serverItem.alasan) === String(localItem.alasan)
-            );
-          });
-
-          const tempCatatan = dataState.catatan.filter(item => String(item.id).startsWith("C-temp-"));
-          const filteredTempCatatan = tempCatatan.filter(localItem => {
-            return !serverCatatan.some(serverItem => 
-              String(serverItem.deskripsi) === String(localItem.deskripsi)
-            );
-          });
-
-          const tempMonitoring = dataState.monitoring.filter(item => String(item.id).startsWith("M-temp-"));
-          const filteredTempMonitoring = tempMonitoring.filter(localItem => {
-            return !serverMonitoring.some(serverItem => 
-              String(serverItem.kelas) === String(localItem.kelas) &&
-              String(serverItem.nama_guru) === String(localItem.nama_guru) &&
-              String(serverItem.mapel) === String(localItem.mapel)
-            );
-          });
-
-          // Integrasikan data murni server + data lokal sementara yang belum selesai diproses di server
-          dataState.siswaIzin = [...serverSiswaIzin, ...filteredTempSiswaIzin];
-          dataState.guruIzin = [...serverGuruIzin, ...filteredTempGuruIzin];
-          dataState.catatan = [...serverCatatan, ...filteredTempCatatan];
-          dataState.monitoring = [...serverMonitoring, ...filteredTempMonitoring];
-          
-          dataState.siswa = serverSiswa;
-          dataState.guruList = serverGuruList;
-          dataState.downloadedReports = data.downloadedReports || [];
-          dataState.weekConfig = serverWeekConfig;
-
-          renderDashboardStats();
-          renderWeekConfigUI();
-          renderSiswaTable();
-          renderGuruIzinTable();
-          renderSiswaIzinTable();
-          renderCatatanTable();
-          renderMonitoringTable();
-          populateClassFilter();
-          renderDownloadedReportsTable();
-
-          // Otomatis populasi data Waka & Kepsek pada form laporan secara senyap (dengan fallback tangguh)
-          const config = dataState.weekConfig;
-          document.getElementById("lapWakaNama").value = config.waka_nama || "Drs. Heru, M.Pd.";
-          document.getElementById("lapWakaNip").value = config.waka_nip || "197410052003121002";
-          document.getElementById("lapKepsekNama").value = config.kepsek_nama || "Hj. Elly S.Pd., M.M.";
-          document.getElementById("lapKepsekNip").value = config.kepsek_nip || "196803241991032004";
-        })
-        .catch(err => console.warn("Latar belakang sync mengalami gangguan ringan.", err));
-    }
-
-    // Helper untuk memformat data Waktu agar hanya menampilkan JAM & MENIT (HH:mm) sesuai timezone lokal (WIB)
-    function formatTimeOnly(timeStr) {
-      if (!timeStr || timeStr === "-" || String(timeStr).trim() === "") return "-";
-      
-      const str = String(timeStr).trim();
-      
-      // Kasus 1: Format ISO lengkap '1899-12-30T01:11:48.000Z' (selisih zona waktu dari GAS)
-      if (str.includes("T")) {
-        try {
-          const dateObj = new Date(str);
-          if (!isNaN(dateObj.getTime())) {
-            const hours = String(dateObj.getHours()).padStart(2, '0');
-            const minutes = String(dateObj.getMinutes()).padStart(2, '0');
-            return `${hours}:${minutes}`;
-          }
-        } catch (e) {
-          // Lanjut ke fallback jika gagal
-        }
-      }
-      
-      // Kasus 2: Format waktu standar atau parsial dengan titik dua (HH:mm:ss atau HH:mm)
-      if (str.includes(":")) {
-        const parts = str.split(":");
-        if (parts.length >= 2) {
-          const hours = String(parts[0].trim()).padStart(2, '0');
-          const minutes = String(parts[1].trim()).padStart(2, '0');
-          return `${hours}:${minutes}`;
-        }
-      }
-      
-      return str;
-    }
-
-    // --- RENDER 1: DASHBOARD ---
-    function renderDashboardStats() {
-      // Ambil tanggal hari ini dalam format lokal sekolah timezone-safe (GMT+7)
-      const tzOffset = new Date().getTimezoneOffset() * 60000;
-      const todayStr = new Date(Date.now() - tzOffset).toISOString().split('T')[0];
-
-      // Dashboard HANYA menampilkan aktivitas hari ini (1 Hari view)
-      const todaySiswaIzin = dataState.siswaIzin.filter(item => {
-        const itemDate = item.timestamp ? String(item.timestamp).split('T')[0] : '';
-        return itemDate === todayStr;
-      });
-
-      const todayGuruIzin = dataState.guruIzin.filter(item => {
-        const itemDate = item.timestamp ? String(item.timestamp).split('T')[0] : '';
-        return itemDate === todayStr;
-      });
-
-      const todayMonitoring = (dataState.monitoring || []).filter(item => {
-        const itemDate = item.timestamp ? String(item.timestamp).split('T')[0] : '';
-        return itemDate === todayStr;
-      });
-
-      const stats = { Ijin: 0, Keluar: 0, Kembali: 0, Bolos: 0, Terlambat: 0, PulangAwal: 0 };
-      
-      todaySiswaIzin.forEach(item => {
-        if (item.jenis_ijin === "Keluar Sementara") {
-          if (item.status === "Keluar") stats.Keluar++;
-          else if (item.status === "Kembali") stats.Kembali++;
-          else if (item.status === "Bolos") stats.Bolos++;
-        } else if (item.jenis_ijin === "Datang Terlambat") {
-          stats.Terlambat++;
-        } else if (item.jenis_ijin === "Pulang Awal") {
-          stats.PulangAwal++;
-        }
-      });
-      
-      // Sesuai Instruksi: Izin Kelas menampilkan status total SISWA yang izin setiap hari hari ini
-      stats.Ijin = todaySiswaIzin.length;
-
-      document.getElementById("statIjin").textContent = stats.Ijin;
-      document.getElementById("statKeluar").textContent = stats.Keluar;
-      document.getElementById("statKembali").textContent = stats.Kembali;
-      document.getElementById("statBolos").textContent = stats.Bolos;
-      document.getElementById("statTerlambat").textContent = stats.Terlambat;
-      document.getElementById("statPulangAwal").textContent = stats.PulangAwal;
-
-      // LOGIKA BARU: Hitung kelas kosong hari ini yang bertanda merah (tugas_pengganti kosong/belum diisi)
-      const todayEmptyClasses = todayMonitoring.filter(item => {
-        return !item.tugas_pengganti || item.tugas_pengganti === "-" || String(item.tugas_pengganti).trim() === "";
-      });
-      const emptyClassesCount = todayEmptyClasses.length;
-      document.getElementById("statKelasKosong").textContent = emptyClassesCount;
-
-      // DYNAMIC UPDATE CARD KEPATUHAN BELAJAR (Dioptimalkan untuk Light Mode Premium Kontras Tinggi)
-      const kepatuhanCard = document.getElementById("kepatuhanCard");
-      const kepatuhanStatus = document.getElementById("kepatuhanStatus");
-      const kepatuhanDesc = document.getElementById("kepatuhanDesc");
-
-      if (emptyClassesCount >= 1) {
-        // Warning Merah Mencolok
-        kepatuhanCard.className = "glass p-4 rounded-xl border-2 border-rose-500 bg-rose-50/80 flex flex-col justify-between transition-all duration-300 animate-pulse shadow-md";
-        kepatuhanStatus.className = "text-xl font-bold text-rose-600 mt-1";
-        kepatuhanStatus.textContent = "Butuh Tindakan";
-        kepatuhanDesc.className = "text-[10px] text-rose-700 mt-0.5 font-bold";
-        kepatuhanDesc.textContent = `Peringatan: Ada ${emptyClassesCount} kelas kosong hari ini belum diberikan tugas/pengganti!`;
-      } else {
-        // Normal Hijau Kondusif
-        kepatuhanCard.className = "glass p-4 rounded-xl border border-slate-200 flex flex-col justify-between transition-all duration-300 shadow-sm";
-        kepatuhanStatus.className = "text-xl font-bold text-emerald-600 mt-1";
-        kepatuhanStatus.textContent = "Kondusif";
-        kepatuhanDesc.className = "text-[10px] text-slate-600 mt-0.5 font-medium";
-        kepatuhanDesc.textContent = "Sistem memantau ketidakhadiran & izin siswa secara akurat.";
-      }
-
-      // Render daftar guru berhalangan HARI INI saja
-      const guruContainer = document.getElementById("guruIzinContainer");
-      document.getElementById("totalGuruIzinCount").textContent = `${todayGuruIzin.length} Izin`;
-      if (todayGuruIzin.length === 0) {
-        guruContainer.innerHTML = `<p class="text-[11px] text-slate-500 text-center py-10 font-medium">Tidak ada laporan guru izin mengajar hari ini.</p>`;
-      } else {
-        guruContainer.innerHTML = todayGuruIzin.map(item => `
-          <div class="p-2.5 bg-white rounded-lg border border-slate-200 flex flex-col gap-0.5 text-[11px] shadow-sm">
-            <div class="flex justify-between items-start">
-              <span class="font-bold text-slate-800 text-xs">${item.nama_guru}</span>
-              <span class="text-[9px] text-slate-500 font-semibold">${item.timestamp ? String(item.timestamp).split('T')[0] : '-'}</span>
-            </div>
-            <p class="text-indigo-700 mt-0.5"><span class="font-bold text-slate-500">Alasan:</span> ${item.alasan}</p>
-            <p class="text-slate-800 font-medium"><span class="font-bold text-slate-500">Tugas:</span> ${item.tugas}</p>
-            ${item.guru_pengganti ? `
-              <div class="mt-1.5 pt-1.5 border-t border-slate-200 flex items-center justify-between text-[10px] text-slate-600">
-                <span>Pengganti: <b class="text-slate-800 font-bold">${item.guru_pengganti}</b></span>
-                <a href="https://wa.me/${item.wa_pengganti}" target="_blank" class="text-emerald-600 hover:underline flex items-center font-bold">
-                  <i data-lucide="phone-call" class="w-3 h-3 mr-1"></i> WA Pengganti
-                </a>
-              </div>
-            ` : ''}
-          </div>
-        `).join('');
-      }
-
-      // Render aktivitas terbaru siswa HARI INI saja
-      const siswaContainer = document.getElementById("aktivitasSiswaContainer");
-      document.getElementById("totalSiswaIzinCount").textContent = `${todaySiswaIzin.length} Siswa`;
-      if (todaySiswaIzin.length === 0) {
-        siswaContainer.innerHTML = `<p class="text-[11px] text-slate-500 text-center py-10 font-medium">Tidak ada siswa berizin hari ini.</p>`;
-      } else {
-        const recentSiswa = [...todaySiswaIzin].reverse().slice(0, 10);
-        siswaContainer.innerHTML = recentSiswa.map(item => {
-          let statusColor = "text-slate-600 bg-slate-100 border border-slate-200";
-          if (item.status === "Keluar") statusColor = "text-amber-700 bg-amber-50 border border-amber-200 font-semibold";
-          else if (item.status === "Kembali") statusColor = "text-emerald-700 bg-emerald-50 border border-emerald-200 font-semibold";
-          else if (item.status === "Bolos") statusColor = "text-rose-700 bg-rose-50 border border-rose-200 font-semibold";
-          else if (item.status === "Terlambat") statusColor = "text-yellow-700 bg-yellow-50 border border-yellow-200 font-semibold";
-          else if (item.status === "Pulang Awal") statusColor = "text-purple-700 bg-purple-50 border border-purple-200 font-semibold";
-
-          return `
-            <div class="p-2.5 bg-white rounded-lg border border-slate-200 flex justify-between items-center text-[11px] shadow-sm">
-              <div>
-                <h4 class="font-bold text-slate-800 text-xs">${item.nama_siswa} (${item.kelas})</h4>
-                <p class="text-slate-600 text-[10px] font-medium">${item.jenis_ijin} - <span class="italic">"${item.alasan}"</span></p>
-                <p class="text-slate-500 text-[9px] font-semibold">Keluar: ${formatTimeOnly(item.jam_keluar)} | Masuk: ${formatTimeOnly(item.jam_masuk)}</p>
-              </div>
-              <div class="text-right flex flex-col items-end gap-1">
-                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold ${statusColor}">${item.status}</span>
-                <span class="text-[8px] text-slate-500 font-semibold">${item.timestamp ? String(item.timestamp).split('T')[0] : '-'}</span>
-              </div>
-            </div>
-          `;
-        }).join('');
-      }
-      lucide.createIcons();
-    }
-
-    // --- RENDER WEEK CONFIG ---
-    function renderWeekConfigUI() {
-      const activeWeek = dataState.weekConfig.week;
-      const statusBadge = document.getElementById("weekStatusBadge");
-      const btnGanjil = document.getElementById("btnWeekGanjil");
-      const btnGenap = document.getElementById("btnWeekGenap");
-
-      statusBadge.textContent = `Minggu ${activeWeek} Aktif`;
-      if (activeWeek === 'Ganjil') {
-        statusBadge.className = "px-2 py-0.5 text-[9px] rounded-full font-bold border border-blue-200 text-blue-600 bg-blue-50";
-        btnGanjil.className = "flex-1 py-1.5 rounded-lg bg-blue-600 text-white font-bold text-xs shadow-md shadow-blue-500/10 transition active:scale-95";
-        btnGenap.className = "flex-1 py-1.5 rounded-lg border border-slate-200 hover:border-slate-400 text-slate-600 transition text-xs font-semibold bg-white active:scale-95";
-      } else {
-        statusBadge.className = "px-2 py-0.5 text-[9px] rounded-full font-bold border border-purple-200 text-purple-600 bg-purple-50";
-        btnGenap.className = "flex-1 py-1.5 rounded-lg bg-purple-600 text-white font-bold text-xs shadow-md shadow-purple-500/10 transition active:scale-95";
-        btnGanjil.className = "flex-1 py-1.5 rounded-lg border border-slate-200 hover:border-slate-400 text-slate-600 transition text-xs font-semibold bg-white active:scale-95";
-      }
-
-      const hariIniIndo = new Date().toLocaleDateString('id-ID', { weekday: 'long' });
-      const jadwalPiket = {
-        'Ganjil': {
-          'Senin': 'Ahmad Fauzi, S.Pd. & Indah Permata, M.Pd.',
-          'Selasa': 'Budi Santoso, S.Si. & Siti Aminah, S.Pd.',
-          'Rabu': 'Roni Wijaya, S.Pd. & Dewi Lestari, M.Si.',
-          'Kamis': 'Eko Prasetyo, M.Pd. & Rina Astuti, S.Pd.',
-          'Jumat': 'Hadi Siswanto, S.Pd. & Sri Wahyuni, S.Ag.'
-        },
-        'Genap': {
-          'Senin': 'Yusuf Habibi, M.Pd. & Mega Utami, S.Pd.',
-          'Selasa': 'Hendrik Pratama, S.Si. & Linda Sari, S.Pd.',
-          'Rabu': 'Zulkifli, S.Pd. & Nurhayati, M.Si.',
-          'Kamis': 'Deny Hidayat, M.Pd. & Kartika, S.Pd.',
-          'Jumat': 'Aris Nugroho, S.Pd. & Fatimah, S.Ag.'
-        }
-      };
-
-      const piketNama = jadwalPiket[activeWeek]?.[hariIniIndo] || "Tidak ada Jadwal Piket (Hari Libur)";
-      document.getElementById("piketHariIniName").textContent = piketNama;
-      document.getElementById("piketHariIniRole").textContent = `Petugas Piket - ${hariIniIndo} (Minggu ${activeWeek})`;
-    }
-
-    // Set Week Config ke GAS (Optimistic UI)
-    function setWeekConfig(weekVal) {
-      const oldWeek = dataState.weekConfig.week;
-      
-      // Optimistic UI Update: Langsung ubah di layar (Tanpa Loading Blocking)
-      dataState.weekConfig.week = weekVal;
+    // FUNGSI MANDIRI: Memanggil rendering semua UI secara serentak
+    function renderAllUI() {
+      renderDashboardStats();
       renderWeekConfigUI();
-      showToast(`Status minggu diubah ke ${weekVal}...`, "success");
+      renderSiswaTable();
+      renderGuruIzinTable();
+      renderSiswaIzinTable();
+      renderCatatanTable();
+      renderMonitoringTable();
+      renderJadwalPiketTable(); // Memanggil rendering tabel jadwal piket dinamis
+      populateClassFilter();
+      renderDownloadedReportsTable();
 
-      // Kirim asinkron di latar belakang
-      fetch(`${gasUrl}?action=updateWeekConfig&week=${encodeURIComponent(weekVal)}`, { method: 'GET', redirect: 'follow' })
-        .then(res => res.json())
-        .then(res => {
-          if (res.success) {
-            silentFetchAllData(); // Verifikasi penuh dari database di background
-          } else {
-            // Rollback jika server gagal mencatat
-            dataState.weekConfig.week = oldWeek;
-            renderWeekConfigUI();
-            showToast("Gagal menyimpan konfigurasi minggu ke server.", "error");
-          }
-        })
-        .catch(() => {
-          // Rollback jika kendala jaringan
-          dataState.weekConfig.week = oldWeek;
-          renderWeekConfigUI();
-          showToast("Koneksi bermasalah. Konfigurasi minggu dibatalkan.", "error");
-        });
+      // Otomatis populasi data Waka & Kepsek pada form laporan
+      const config = dataState.weekConfig;
+      if (config) {
+        document.getElementById("lapWakaNama").value = config.waka_nama || "Drs. Heru, M.Pd.";
+        document.getElementById("lapWakaNip").value = config.waka_nip || "197410052003121002";
+        document.getElementById("lapKepsekNama").value = config.kepsek_nama || "Hj. Elly S.Pd., M.M.";
+        document.getElementById("lapKepsekNip").value = config.kepsek_nip || "196803241991032004";
+      }
+    }
+
+    // SINKRONISASI DATA UTAMA DARI GOOGLE SHEET (GAS) - Disederhanakan untuk efisiensi
+    function fetchAllData() {
+      syncData(true);
     }
 
     // --- RENDER 2: DATA SISWA ---
@@ -1652,26 +1283,26 @@
       document.getElementById("totalSiswaText").textContent = `Total: ${dataState.siswa.length} Siswa Terdaftar`;
 
       if (dataState.siswa.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-500 text-xs">Belum ada data siswa dalam database.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-500 text-xs font-semibold bg-slate-50/50">Belum ada data siswa dalam database.</td></tr>`;
         return;
       }
 
       tbody.innerHTML = dataState.siswa.map(siswa => `
         <tr class="hover:bg-slate-50 transition">
           <td class="p-3 font-semibold text-blue-600 text-xs">${siswa.nis}</td>
-          <td class="p-3 text-slate-800 font-semibold text-xs">${siswa.nama}</td>
-          <td class="p-3 text-slate-700 text-xs font-medium">${siswa.kelas}</td>
-          <td class="p-3 text-slate-500 text-xs font-medium">${siswa.jk}</td>
+          <td class="p-3 text-slate-800 font-bold text-xs">${siswa.nama}</td>
+          <td class="p-3 text-slate-700 text-xs font-semibold">${siswa.kelas}</td>
+          <td class="p-3 text-slate-500 text-xs font-semibold">${siswa.jk}</td>
           <!-- Kolom WhatsApp Wali/Siswa -->
           <td class="p-3 text-xs">
             <a href="https://wa.me/${siswa.no_wa}" target="_blank" class="text-emerald-600 hover:underline inline-flex items-center font-bold">
-              <i data-lucide="phone" class="w-3 h-3 mr-1"></i> ${siswa.no_wa}
+              <i data-lucide="phone" class="w-3 h-3 mr-1 font-bold"></i> ${siswa.no_wa}
             </a>
           </td>
           <!-- Kolom WhatsApp Wali Kelas -->
           <td class="p-3 text-xs">
             <a href="https://wa.me/${siswa.no_wa_walas || ''}" target="_blank" class="text-indigo-600 hover:underline inline-flex items-center font-bold">
-              <i data-lucide="phone" class="w-3 h-3 mr-1"></i> ${siswa.no_wa_walas || '-'}
+              <i data-lucide="phone" class="w-3 h-3 mr-1 font-bold"></i> ${siswa.no_wa_walas || '-'}
             </a>
           </td>
           <td class="p-3 text-center">
@@ -1890,11 +1521,11 @@
             <td class="p-3 font-semibold text-slate-800 text-xs">${item.nis}</td>
             <td class="p-3">
               <div class="font-bold text-slate-800 text-xs">${item.nama_siswa}</div>
-              <div class="text-[10px] text-slate-505 font-medium">${item.kelas} (${item.jk})</div>
+              <div class="text-[10px] text-slate-500 font-medium">${item.kelas} (${item.jk})</div>
             </td>
             <td class="p-3">
               <div class="text-slate-800 text-xs font-semibold">${item.jenis_ijin}</div>
-              <div class="text-slate-500 text-[10px] italic">"${item.alasan}"</div>
+              <div class="text-slate-505 text-[10px] italic">"${item.alasan}"</div>
             </td>
             <td class="p-3 font-bold text-slate-700">${formatTimeOnly(item.jam_keluar)}</td>
             <td class="p-3 text-center">
@@ -2396,7 +2027,7 @@
     }
 
     function editCatatan(id) {
-      const item = dataState.catatan.find(x => x.id === id);
+      const item = dataState.catatan.find(x => String(x.id).trim() === String(id).trim());
       if (!item) return;
       document.getElementById("editCatatanId").value = item.id;
       document.getElementById("catatanKategori").value = item.kategori;
@@ -2619,6 +2250,46 @@
           showToast("Kendala jaringan saat menghapus.", "error");
           fetchAllData();
         });
+    }
+
+    // BARU: FUNGSI DINAMIS UNTUK MERENDER JADWAL PIKET GURU DARI DATABASE GAS SPREADSHEET
+    function renderJadwalPiketTable() {
+      const ganjilContainer = document.getElementById("jadwalGanjilContainer");
+      const genapContainer = document.getElementById("jadwalGenapContainer");
+      
+      if (!ganjilContainer || !genapContainer) return;
+
+      const listJadwal = dataState.jadwalPiket || [];
+      const hariOrder = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"];
+      const sortByHari = (a, b) => hariOrder.indexOf(a.hari) - hariOrder.indexOf(b.hari);
+
+      // Filter data sesuai Minggu Ganjil & Minggu Genap
+      const ganjilItems = listJadwal.filter(item => item.minggu && item.minggu.toLowerCase().trim() === "ganjil").sort(sortByHari);
+      const genapItems = listJadwal.filter(item => item.minggu && item.minggu.toLowerCase().trim() === "genap").sort(sortByHari);
+
+      // Render Ganjil
+      if (ganjilItems.length === 0) {
+        ganjilContainer.innerHTML = `<p class="text-xs text-slate-500 py-4 text-center font-medium">Belum ada jadwal piket minggu ganjil.</p>`;
+      } else {
+        ganjilContainer.innerHTML = ganjilItems.map(item => `
+          <div class="flex justify-between items-center p-2 rounded bg-slate-50 border border-slate-100/80 shadow-sm">
+            <span class="font-bold text-slate-700">${item.hari}</span>
+            <span class="text-slate-800 text-right text-[11px] font-semibold">${item.petugas}</span>
+          </div>
+        `).join('');
+      }
+
+      // Render Genap
+      if (genapItems.length === 0) {
+        genapContainer.innerHTML = `<p class="text-xs text-slate-500 py-4 text-center font-medium">Belum ada jadwal piket minggu genap.</p>`;
+      } else {
+        genapContainer.innerHTML = genapItems.map(item => `
+          <div class="flex justify-between items-center p-2 rounded bg-slate-50 border border-slate-100/80 shadow-sm">
+            <span class="font-bold text-slate-700">${item.hari}</span>
+            <span class="text-slate-800 text-right text-[11px] font-semibold">${item.petugas}</span>
+          </div>
+        `).join('');
+      }
     }
 
     // --- RENDERING INTEGRASI PDF MODULAR & AMAN DARI SINTAKS ERROR ---
